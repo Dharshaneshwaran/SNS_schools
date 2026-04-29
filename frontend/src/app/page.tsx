@@ -1,195 +1,319 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { 
-  Books, 
-  ChalkboardTeacher, 
-  Trophy, 
-  UserCircle, 
-  CalendarCheck, 
-  CreditCard, 
-  Notebook, 
-  ChartLineUp, 
-  BellRinging, 
-  Clock, 
+import {
+  Books,
+  ChalkboardTeacher,
+  Trophy,
+  UserCircle,
+  CalendarCheck,
+  CreditCard,
+  Notebook,
+  ChartLineUp,
+  BellRinging,
+  Clock,
   UsersThree,
   Check,
-  ArrowRight
+  ArrowRight,
+  Star,
 } from "@phosphor-icons/react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-const fadeIn = {
-  initial: { opacity: 0, y: 30 },
+const fadeUp = {
+  initial: { opacity: 0, y: 32 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
-  transition: { duration: 0.8 }
+  transition: { duration: 0.65 },
 };
+
+const stats = [
+  { value: "5000+", label: "Students Enrolled" },
+  { value: "200+",  label: "Expert Teachers"   },
+  { value: "98%",   label: "Parent Satisfaction"},
+  { value: "15+",   label: "Years of Excellence"},
+];
+
+const aboutItems = [
+  {
+    icon: <Books size={44} weight="duotone" />,
+    title: "Academics",
+    desc: "Design Thinking integrated CBSE curriculum for holistic student development and global readiness.",
+  },
+  {
+    icon: <ChalkboardTeacher size={44} weight="duotone" />,
+    title: "Experienced Faculty",
+    desc: "Stanford-trained educators providing a 10:1 student-teacher ratio with personalised mentorship.",
+  },
+  {
+    icon: <Trophy size={44} weight="duotone" />,
+    title: "Achievements",
+    desc: "Consistently securing top ranks in national and international competitions year after year.",
+  },
+];
+
+const features = [
+  { icon: <UserCircle size={30} weight="duotone" />, title: "Student Dashboard",     desc: "360-degree view of student progress and activities." },
+  { icon: <CalendarCheck size={30} weight="duotone" />, title: "Attendance Tracking", desc: "Real-time updates and monthly attendance reports." },
+  { icon: <CreditCard size={30} weight="duotone" />,    title: "Fee Management",     desc: "Secure online payments and automated receipts." },
+  { icon: <Notebook size={30} weight="duotone" />,      title: "Homework & Diary",   desc: "Daily assignments and teacher notes at your fingertips." },
+  { icon: <ChartLineUp size={30} weight="duotone" />,   title: "Academic Reports",   desc: "Detailed performance analytics and exam results." },
+  { icon: <BellRinging size={30} weight="duotone" />,   title: "Notifications",      desc: "Instant alerts for school events and emergencies." },
+  { icon: <Clock size={30} weight="duotone" />,         title: "Timetable",          desc: "Easy access to class schedules and substitutions." },
+  { icon: <UsersThree size={30} weight="duotone" />,    title: "Multi-Student",      desc: "Manage multiple children from a single parent login." },
+];
 
 export default function Home() {
   return (
-    <main className="font-sans">
+    <main style={{ overflowX: "hidden" }}>
       <Header />
 
-      {/* Hero Section */}
-      <section className="pt-40 pb-24 bg-bg-gradient relative overflow-hidden">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div 
-              className="hero-content"
-              initial={{ opacity: 0, x: -50 }}
+      {/* ════════════════════════════════
+          HERO
+      ════════════════════════════════ */}
+      <section className="hero-section">
+        {/* decorative blobs */}
+        <div style={{
+          position: "absolute", top: -100, right: -80,
+          width: 500, height: 500, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(255,127,80,0.18) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+        <div style={{
+          position: "absolute", bottom: -60, left: -60,
+          width: 360, height: 360, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(255,127,80,0.08) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+
+        <div className="page-container" style={{ width: "100%" }}>
+          <div className="hero-grid">
+
+            {/* ── Left: Text ── */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-[3.5rem] leading-[1.2] mb-6 text-accent font-poppins font-bold">
-                Smart School Management with <span className="text-gradient">SNS ERP</span>
+              <div className="hero-badge">
+                <Star size={14} weight="fill" />
+                CBSE Curriculum · Design Thinking
+              </div>
+
+              <h1 className="hero-title">
+                Smart School<br />Management with{" "}
+                <span className="text-gradient">SNS&nbsp;ERP</span>
               </h1>
-              <p className="text-lg text-text-muted mb-10 max-w-[500px]">
-                Simplifying communication between parents, teachers, and administration through innovation and design thinking.
+
+              <p className="hero-desc">
+                Simplifying communication between parents, teachers, and administration
+                through innovation and design thinking — all in one powerful platform.
               </p>
-              <div className="flex gap-6">
-                <Link href="/login" className="btn btn-primary">Login Now</Link>
-                <Link href="#features" className="btn btn-outline">Explore Features</Link>
+
+              <div className="hero-btns">
+                <Link href="/login" className="btn btn-primary">
+                  Access Dashboard <ArrowRight size={18} weight="bold" />
+                </Link>
+                <Link href="#features" className="btn btn-outline">
+                  Explore Features
+                </Link>
+              </div>
+
+              {/* Stats */}
+              <div className="hero-stats">
+                {stats.map((s, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
+                  >
+                    <div className="stat-val">{s.value}</div>
+                    <div className="stat-label">{s.label}</div>
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
-            
-            <motion.div 
-              className="hero-image relative"
-              initial={{ opacity: 0, x: 50 }}
+
+            {/* ── Right: Image ── */}
+            <motion.div
+              className="hero-image-wrap"
+              initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <div className="animate-float flex justify-center">
-                <img 
-                  src="/images/hero-dashboard.png" 
+              <div className="float-anim">
+                <img
+                  src="/images/hero-dashboard.png"
                   alt="SNS ERP Dashboard"
-                  className="w-full max-w-[550px] rounded-[24px] shadow-medium"
+                  className="hero-img"
                 />
               </div>
             </motion.div>
+
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-24">
-        <div className="container-custom">
-          <motion.div className="text-center mb-16" {...fadeIn}>
-            <h2 className="text-[2.5rem] mb-4 font-poppins font-bold">Excellence in Education</h2>
-            <p className="text-text-muted">Leading the digital transformation in Coimbatore&apos;s most progressive CBSE school.</p>
+      {/* ════════════════════════════════
+          ABOUT
+      ════════════════════════════════ */}
+      <section id="about" style={{ padding: "6rem 0" }}>
+        <div className="page-container">
+          <motion.div className="section-header" {...fadeUp}>
+            <p className="section-label">Who We Are</p>
+            <h2 className="section-title">Excellence in Education</h2>
+            <p className="section-desc">
+              Leading the digital transformation in Coimbatore&apos;s most progressive CBSE school.
+            </p>
           </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { icon: <Books size={48} />, title: "Academics", desc: "Design Thinking integrated CBSE curriculum for holistic development." },
-              { icon: <ChalkboardTeacher size={48} />, title: "Experienced Faculty", desc: "Stanford-trained educators providing 10:1 personalized care." },
-              { icon: <Trophy size={48} />, title: "Achievements", desc: "Consistently securing top ranks in national and international competitions." }
-            ].map((item, i) => (
-              <motion.div 
+
+          <div className="about-grid">
+            {aboutItems.map((item, i) => (
+              <motion.div
                 key={i}
-                className="about-card glass border border-transparent hover:border-primary"
-                {...fadeIn}
-                transition={{ delay: i * 0.1 }}
+                className="about-card"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.6 }}
               >
-                <div className="text-primary mb-6 flex justify-center">{item.icon}</div>
-                <h3 className="text-xl font-bold mb-2 font-poppins">{item.title}</h3>
-                <p className="text-text-muted">{item.desc}</p>
+                <div className="about-card-icon">{item.icon}</div>
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-[#FAFAFA]">
-        <div className="container-custom">
-          <motion.div className="text-center mb-16" {...fadeIn}>
-            <h2 className="text-[2.5rem] mb-4 font-poppins font-bold">ERP Power Features</h2>
-            <p className="text-text-muted">Everything you need to manage school life efficiently in one place.</p>
+      {/* ════════════════════════════════
+          FEATURES
+      ════════════════════════════════ */}
+      <section id="features" style={{ padding: "6rem 0", background: "#FAFAFA" }}>
+        <div className="page-container">
+          <motion.div className="section-header" {...fadeUp}>
+            <p className="section-label">ERP Capabilities</p>
+            <h2 className="section-title">Power Features</h2>
+            <p className="section-desc">
+              Everything you need to manage school life efficiently — in one place.
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: <UserCircle size={32} />, title: "Student Dashboard", desc: "360-degree view of student progress and activities." },
-              { icon: <CalendarCheck size={32} />, title: "Attendance Tracking", desc: "Real-time updates and monthly attendance reports." },
-              { icon: <CreditCard size={32} />, title: "Fee Management", desc: "Secure online payments and automated fee receipts." },
-              { icon: <Notebook size={32} />, title: "Homework & Diary", desc: "Daily assignments and teacher notes at your fingertips." },
-              { icon: <ChartLineUp size={32} />, title: "Academic Reports", desc: "Detailed performance analytics and exam results." },
-              { icon: <BellRinging size={32} />, title: "Notifications", desc: "Instant alerts for school events and emergencies." },
-              { icon: <Clock size={32} />, title: "Timetable", desc: "Easy access to class schedules and substitutions." },
-              { icon: <UsersThree size={32} />, title: "Multi-Student Support", desc: "Manage multiple children from a single parent login." }
-            ].map((feature, i) => (
-              <motion.div 
+          <div className="features-grid">
+            {features.map((f, i) => (
+              <motion.div
                 key={i}
-                className="feature-card group"
-                {...fadeIn}
-                transition={{ delay: i * 0.05 }}
+                className="feature-card"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06, duration: 0.55 }}
               >
-                <div className="text-primary mb-4 group-hover:text-white transition-colors">{feature.icon}</div>
-                <h3 className="text-lg font-bold mb-2 font-poppins">{feature.title}</h3>
-                <p className="text-text-muted group-hover:text-white/80 transition-colors text-sm">{feature.desc}</p>
+                <div className="feature-icon">{f.icon}</div>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Experience Section */}
-      <section id="experience" className="py-24">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div className="order-2 lg:order-1 flex justify-center" {...fadeIn}>
-              <img 
-                src="/images/experience-section.png" 
-                alt="Experience Illustration" 
-                className="w-full max-w-[500px] rounded-[24px]"
+      {/* ════════════════════════════════
+          EXPERIENCE / ROLES
+      ════════════════════════════════ */}
+      <section id="experience" style={{ padding: "6rem 0" }}>
+        <div className="page-container">
+          <div className="exp-grid">
+
+            {/* Image */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              style={{ display: "flex", justifyContent: "center" }}
+            >
+              <img
+                src="/images/experience-section.png"
+                alt="Tailored for Every Role"
+                style={{
+                  width: "100%",
+                  maxWidth: 480,
+                  borderRadius: 24,
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.09)",
+                  display: "block",
+                }}
               />
             </motion.div>
-            <motion.div className="order-1 lg:order-2" {...fadeIn}>
-              <h2 className="text-[2.5rem] mb-6 font-poppins font-bold">Tailored for Every Role</h2>
-              <p className="text-text-muted mb-8">Whether you&apos;re a parent tracking growth or a teacher managing a classroom, SNS ERP adapts to your needs.</p>
-              
-              <div className="flex flex-col sm:flex-row gap-12">
-                <div className="flex-1">
-                  <h4 className="text-primary font-bold mb-4 uppercase tracking-wider">Parents</h4>
-                  <ul className="exp-list">
-                    <li><Check size={20} className="text-primary bg-primary/10 p-1 rounded-full" weight="bold" /> Track Progress</li>
-                    <li><Check size={20} className="text-primary bg-primary/10 p-1 rounded-full" weight="bold" /> View Fees & Attendance</li>
-                    <li><Check size={20} className="text-primary bg-primary/10 p-1 rounded-full" weight="bold" /> Instant Notifications</li>
-                  </ul>
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-primary font-bold mb-4 uppercase tracking-wider">Teachers</h4>
-                  <ul className="exp-list">
-                    <li><Check size={20} className="text-primary bg-primary/10 p-1 rounded-full" weight="bold" /> Manage Classes</li>
-                    <li><Check size={20} className="text-primary bg-primary/10 p-1 rounded-full" weight="bold" /> Upload Homework</li>
-                    <li><Check size={20} className="text-primary bg-primary/10 p-1 rounded-full" weight="bold" /> Digital Attendance</li>
-                  </ul>
-                </div>
+
+            {/* Text */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+            >
+              <p className="section-label">Built for Everyone</p>
+              <h2 className="section-title">Tailored for Every Role</h2>
+              <p style={{ fontSize: "1rem", color: "#636E72", lineHeight: 1.75, marginBottom: "2.5rem" }}>
+                Whether you&apos;re a parent tracking your child&apos;s growth or a teacher managing a
+                classroom, SNS ERP adapts seamlessly to your needs.
+              </p>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+                {[
+                  { role: "Parents", items: ["Track Academic Progress", "View Fees & Attendance", "Instant Notifications"] },
+                  { role: "Teachers", items: ["Manage Classes Easily", "Upload Homework & Notes", "Digital Attendance"] },
+                ].map((col, ci) => (
+                  <div key={ci}>
+                    <p className="role-label">{col.role}</p>
+                    <ul className="exp-list">
+                      {col.items.map((item, ii) => (
+                        <li key={ii}>
+                          <span className="exp-check">
+                            <Check size={13} weight="bold" />
+                          </span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
             </motion.div>
+
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24">
-        <div className="container-custom">
-          <motion.div className="cta-card" {...fadeIn}>
-            <div className="relative z-10 max-w-[800px] mx-auto">
-              <h2 className="text-[2.8rem] md:text-[3.5rem] mb-6 font-poppins font-bold leading-tight">
-                Ready to transform your <br className="hidden md:block" /> school management?
+      {/* ════════════════════════════════
+          CTA
+      ════════════════════════════════ */}
+      <section style={{ padding: "5rem 0" }}>
+        <div className="page-container">
+          <motion.div
+            className="cta-block"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            <div className="cta-inner">
+              <p className="cta-label">Get Started Today</p>
+              <h2 className="cta-title">
+                Ready to transform your<br />school management?
               </h2>
-              <p className="mb-10 opacity-90 text-xl max-w-[600px] mx-auto">
-                Join hundreds of educators already using SNS ERP to simplify their daily operations and focus on what matters most.
+              <p className="cta-desc">
+                Join hundreds of educators already using SNS ERP to simplify their daily
+                operations and focus on what matters most — the students.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Link href="/login" className="btn btn-primary px-10 py-4 text-lg">
-                  Access Dashboard <ArrowRight size={22} weight="bold" />
+              <div className="cta-btns">
+                <Link href="/login" className="btn btn-primary">
+                  Access Dashboard <ArrowRight size={18} weight="bold" />
                 </Link>
-                <Link href="#contact" className="btn btn-outline border-white text-white hover:bg-white hover:text-accent px-10 py-4 text-lg">
+                <Link href="#contact" className="btn btn-ghost">
                   Contact Sales
                 </Link>
               </div>

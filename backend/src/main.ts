@@ -4,7 +4,8 @@ import { appConfig } from './config/app.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const allowedOrigins = appConfig.frontendOrigin.split(',')
+  const allowedOrigins = appConfig.frontendOrigin
+    .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
 
@@ -16,4 +17,4 @@ async function bootstrap() {
 
   await app.listen(appConfig.port);
 }
-bootstrap();
+void bootstrap();

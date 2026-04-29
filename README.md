@@ -34,4 +34,7 @@ All test configurations leverage the shared core password: `ChangeMe123!`
 | **Admin** | `admin@sns-erp.local` |
 | **Leader** | `leader@sns-erp.local` |
 | **Teacher** | `teacher@sns-erp.local` |
+| **Parent** | `1234567890` |
+
+---
 

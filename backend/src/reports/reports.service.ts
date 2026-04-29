@@ -7,17 +7,20 @@ export class ReportsService {
       availableReports: [
         {
           title: 'Monthly attendance',
-          description: 'Department-wise attendance rollups with leave and late analytics.',
+          description:
+            'Department-wise attendance rollups with leave and late analytics.',
           format: 'PDF / Excel ready',
         },
         {
           title: 'Substitution efficiency',
-          description: 'Tracks leader approvals, emergency coverage, and unresolved periods.',
+          description:
+            'Tracks leader approvals, emergency coverage, and unresolved periods.',
           format: 'Excel ready',
         },
         {
           title: 'Teacher workload',
-          description: 'Highlights overload and free-capacity distribution before publishing schedules.',
+          description:
+            'Highlights overload and free-capacity distribution before publishing schedules.',
           format: 'PDF / Excel ready',
         },
       ],

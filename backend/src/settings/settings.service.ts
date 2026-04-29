@@ -9,13 +9,7 @@ export class SettingsService {
         academicYear: '2026 - 2027',
         timezone: 'Asia/Kolkata',
       },
-      departments: [
-        'Mathematics',
-        'Science',
-        'Languages',
-        'Primary',
-        'Arts',
-      ],
+      departments: ['Mathematics', 'Science', 'Languages', 'Primary', 'Arts'],
       notifications: [
         {
           channel: 'Email digests',

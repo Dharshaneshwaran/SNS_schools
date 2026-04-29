@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -20,7 +21,7 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/health')
       .expect(200)
-      .expect(({ body }) => {
+      .expect(({ body }: { body: any }) => {
         expect(body.status).toBe('ok');
         expect(body.service).toBe('sns-erp-backend');
       });
@@ -37,7 +38,7 @@ describe('AppController (e2e)', () => {
         password: 'ChangeMe123!',
       })
       .expect(201)
-      .expect(({ body }) => {
+      .expect(({ body }: { body: any }) => {
         expect(body.accessToken).toEqual(expect.any(String));
         expect(body.refreshToken).toEqual(expect.any(String));
         expect(body.user.email).toBe('admin@sns-erp.local');
