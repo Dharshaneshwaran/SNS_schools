@@ -25,26 +25,14 @@ interface Props {
   setActiveStudent: (s: Student) => void;
   activeMenu: MenuKey;
   setActiveMenu: (m: MenuKey) => void;
+  onMenuClick?: () => void;
 }
 
-export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu }: Props) {
+export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, onMenuClick }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <aside style={{
-      width: 270,
-      minHeight: "100vh",
-      background: "#fff",
-      borderRight: "1px solid rgba(0,0,0,0.06)",
-      boxShadow: "4px 0 24px rgba(0,0,0,0.05)",
-      display: "flex",
-      flexDirection: "column",
-      position: "sticky",
-      top: 0,
-      height: "100vh",
-      flexShrink: 0,
-      zIndex: 50,
-    }}>
+    <aside className="w-[280px] bg-white border-r border-gray-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)] flex flex-col h-[100dvh] flex-shrink-0 z-50 relative">
       {/* Logo */}
       <div style={{ padding: "28px 24px 20px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -144,7 +132,7 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
           return (
             <button
               key={item.key}
-              onClick={() => setActiveMenu(item.key)}
+              onClick={() => { setActiveMenu(item.key); onMenuClick?.(); }}
               style={{
                 width: "100%",
                 display: "flex", alignItems: "center", gap: 12,
