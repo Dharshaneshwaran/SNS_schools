@@ -23,7 +23,14 @@ interface Props {
 export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, theme }: Props) {
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
 
-  const sections = [
+  const sections: {
+    title: string;
+    items: {
+      key: MenuKey;
+      label: string;
+      icon: any;
+    }[];
+  }[] = [
     {
       title: "MENU",
       items: [
