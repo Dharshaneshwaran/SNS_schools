@@ -55,17 +55,9 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-          <Gear size={26} weight="duotone" color="#FF7F50" />
-          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: theme.text }}>Settings</h1>
-        </div>
-        <p style={{ color: theme.textMuted, fontSize: 14 }}>Manage your account preferences</p>
-      </div>
-
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       {/* Edit Profile */}
-      <div style={cardStyle}>
+      <div className="premium-card" style={{ padding: "32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
           <PencilSimple size={18} color="#FF7F50" weight="duotone" />
           <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Edit Profile</p>
@@ -86,7 +78,7 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
       </div>
 
       {/* Preferences */}
-      <div style={cardStyle}>
+      <div className="premium-card" style={{ padding: "32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <Sun size={18} color="#FF7F50" weight="duotone" />
           <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Preferences</p>
@@ -119,7 +111,7 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
       </div>
 
       {/* Password Reset */}
-      <div style={cardStyle}>
+      <div className="premium-card" style={{ padding: "32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
           <Lock size={18} color="#FF7F50" weight="duotone" />
           <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Password Reset</p>
@@ -131,6 +123,9 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
               <input type="password" placeholder="••••••••" style={inputStyle2} />
             </div>
           ))}
+          <button style={{ background: "none", border: "none", color: "#FF7F50", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", padding: 0 }}>
+            Forgot Password?
+          </button>
         </div>
       </div>
 
@@ -153,6 +148,6 @@ const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
       transition: "background 0.3s", display: "flex", alignItems: "center",
       justifyContent: on ? "flex-end" : "flex-start",
     }}>
-    <motion.div animate={{ x: on ? 0 : 0 }} style={{ width: 20, height: 20, borderRadius: "50%", background: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }} />
+    <motion.div animate={{ x: on ? 20 : 0 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} style={{ width: 20, height: 20, borderRadius: "50%", background: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }} />
   </button>
 );

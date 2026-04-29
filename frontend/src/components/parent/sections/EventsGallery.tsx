@@ -25,55 +25,53 @@ import { DashboardTheme } from "../../../types/theme";
 
 export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
   return (
-    <div>
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-          <Images size={26} weight="duotone" color="#FF7F50" />
-          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: theme.text }}>Events Gallery</h1>
-        </div>
-        <p style={{ color: theme.textMuted, fontSize: 14 }}>Explore recent school events and highlights</p>
-      </div>
-
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       {/* Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
         {events.map((event, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08, duration: 0.5 }}
-            whileHover={{ y: -6, transition: { duration: 0.25 } }}
+            transition={{ delay: i * 0.05 }}
+            className="premium-card"
             style={{
-              borderRadius: 18,
               overflow: "hidden",
-              boxShadow: theme.isDark ? "none" : "0 4px 24px rgba(0,0,0,0.08)",
-              background: theme.cardBg,
-              cursor: "pointer",
-              border: `1px solid ${theme.border}`,
-              transition: "all 0.3s ease",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
-            {/* Image placeholder */}
+            {/* Image area */}
             <div style={{
               height: 160,
               background: cardColors[i % cardColors.length],
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 56, position: "relative",
+              overflow: "hidden"
             }}>
-              {event.emoji}
+              <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "40%", background: "linear-gradient(to bottom, rgba(255,255,255,0.1), transparent)", pointerEvents: "none" }} />
+              
+              <motion.span 
+                whileHover={{ scale: 1.2, rotate: 5 }}
+                style={{ filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.15))" }}
+              >
+                {event.emoji}
+              </motion.span>
+              
               <div style={{
                 position: "absolute", top: 12, right: 12,
-                padding: "4px 10px", borderRadius: 20,
-                background: "rgba(255,255,255,0.25)", backdropFilter: "blur(8px)",
-                color: "white", fontSize: 11, fontWeight: 600,
+                padding: "4px 10px", borderRadius: 10,
+                background: "rgba(255,255,255,0.2)", backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "white", fontSize: 10, fontWeight: 800,
+                letterSpacing: "0.05em", textTransform: "uppercase"
               }}>{event.category}</div>
             </div>
-            {/* Info */}
-            <div style={{ padding: "16px 18px" }}>
-              <h3 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 15, fontWeight: 700, color: theme.text, marginBottom: 8 }}>{event.title}</h3>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, color: theme.textMuted, fontSize: 13 }}>
-                <CalendarBlank size={14} />
+
+            {/* Info area */}
+            <div style={{ padding: "20px" }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: theme.text, marginBottom: 8, letterSpacing: "-0.01em" }}>{event.title}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, color: theme.textMuted, fontSize: 13, fontWeight: 600 }}>
+                <CalendarBlank size={16} weight="bold" color="#FF7F50" />
                 {event.date}
               </div>
             </div>

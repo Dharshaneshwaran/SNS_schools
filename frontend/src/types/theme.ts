@@ -7,4 +7,7 @@ export interface DashboardTheme {
   textMuted: string;
   border: string;
   accent: string;
+  primary: string;
+  success: string;
+  danger: string;
 }
