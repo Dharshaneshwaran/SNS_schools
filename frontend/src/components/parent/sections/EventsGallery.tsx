@@ -21,16 +21,18 @@ const cardColors = [
   "linear-gradient(135deg,#EC4899,#db2777)",
 ];
 
-export default function EventsGallery() {
+import { DashboardTheme } from "../../../types/theme";
+
+export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
   return (
     <div>
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <Images size={26} weight="duotone" color="#FF7F50" />
-          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: "#121212" }}>Events Gallery</h1>
+          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: theme.text }}>Events Gallery</h1>
         </div>
-        <p style={{ color: "#888", fontSize: 14 }}>Explore recent school events and highlights</p>
+        <p style={{ color: theme.textMuted, fontSize: 14 }}>Explore recent school events and highlights</p>
       </div>
 
       {/* Grid */}
@@ -45,10 +47,11 @@ export default function EventsGallery() {
             style={{
               borderRadius: 18,
               overflow: "hidden",
-              boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
-              background: "#fff",
+              boxShadow: theme.isDark ? "none" : "0 4px 24px rgba(0,0,0,0.08)",
+              background: theme.cardBg,
               cursor: "pointer",
-              border: "1px solid rgba(0,0,0,0.05)",
+              border: `1px solid ${theme.border}`,
+              transition: "all 0.3s ease",
             }}
           >
             {/* Image placeholder */}
@@ -68,8 +71,8 @@ export default function EventsGallery() {
             </div>
             {/* Info */}
             <div style={{ padding: "16px 18px" }}>
-              <h3 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 15, fontWeight: 700, color: "#121212", marginBottom: 8 }}>{event.title}</h3>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#999", fontSize: 13 }}>
+              <h3 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 15, fontWeight: 700, color: theme.text, marginBottom: 8 }}>{event.title}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, color: theme.textMuted, fontSize: 13 }}>
                 <CalendarBlank size={14} />
                 {event.date}
               </div>

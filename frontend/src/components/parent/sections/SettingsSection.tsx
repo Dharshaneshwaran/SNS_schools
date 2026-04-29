@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Gear, PencilSimple, Moon, Sun, Lock, Globe } from "@phosphor-icons/react";
+import { DashboardTheme } from "../../../types/theme";
 
-export default function SettingsSection() {
-  const [darkMode, setDarkMode] = useState(false);
+export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { theme: DashboardTheme; isDarkMode: boolean; setIsDarkMode: (v: boolean) => void }) {
   const [language, setLanguage] = useState("English");
   const [saved, setSaved] = useState(false);
 
@@ -15,12 +15,13 @@ export default function SettingsSection() {
   };
 
   const cardStyle: React.CSSProperties = {
-    background: "#fff",
+    background: theme.cardBg,
     borderRadius: 16,
     padding: "24px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.07)",
+    boxShadow: theme.isDark ? "none" : "0 4px 20px rgba(0,0,0,0.07)",
     marginBottom: 16,
-    border: "1px solid rgba(0,0,0,0.04)",
+    border: `1px solid ${theme.border}`,
+    transition: "all 0.3s",
   };
 
   const rowStyle: React.CSSProperties = {
@@ -28,13 +29,13 @@ export default function SettingsSection() {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "14px 0",
-    borderBottom: "1px solid rgba(0,0,0,0.05)",
+    borderBottom: `1px solid ${theme.border}`,
   };
 
   const labelStyle2: React.CSSProperties = {
     fontSize: 12,
     fontWeight: 600,
-    color: "#bbb",
+    color: theme.textMuted,
     marginBottom: 6,
     textTransform: "uppercase" as const,
     letterSpacing: "0.04em",
@@ -44,30 +45,30 @@ export default function SettingsSection() {
     width: "100%",
     padding: "12px 14px",
     borderRadius: 10,
-    border: "1px solid rgba(0,0,0,0.1)",
+    border: `1px solid ${theme.border}`,
     fontSize: 14,
     outline: "none",
     fontFamily: "var(--font-inter,'Inter',sans-serif)",
-    color: "#333",
-    background: "#fafafa",
+    color: theme.text,
+    background: theme.isDark ? "rgba(255,255,255,0.03)" : "#fafafa",
+    transition: "all 0.3s",
   };
-
 
   return (
     <div>
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <Gear size={26} weight="duotone" color="#FF7F50" />
-          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: "#121212" }}>Settings</h1>
+          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: theme.text }}>Settings</h1>
         </div>
-        <p style={{ color: "#888", fontSize: 14 }}>Manage your account preferences</p>
+        <p style={{ color: theme.textMuted, fontSize: 14 }}>Manage your account preferences</p>
       </div>
 
       {/* Edit Profile */}
       <div style={cardStyle}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
           <PencilSimple size={18} color="#FF7F50" weight="duotone" />
-          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: "#121212" }}>Edit Profile</p>
+          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Edit Profile</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
@@ -88,30 +89,30 @@ export default function SettingsSection() {
       <div style={cardStyle}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <Sun size={18} color="#FF7F50" weight="duotone" />
-          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: "#121212" }}>Preferences</p>
+          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Preferences</p>
         </div>
 
         <div style={rowStyle}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {darkMode ? <Moon size={18} color="#6C63FF" /> : <Sun size={18} color="#F59E0B" />}
+            {isDarkMode ? <Moon size={18} color="#6C63FF" /> : <Sun size={18} color="#F59E0B" />}
             <div>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>Dark Mode</p>
-              <p style={{ fontSize: 12, color: "#bbb" }}>Switch between light and dark theme</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: theme.text }}>Dark Mode</p>
+              <p style={{ fontSize: 12, color: theme.textMuted }}>Switch between light and dark theme</p>
             </div>
           </div>
-          <Toggle on={darkMode} onToggle={() => setDarkMode(!darkMode)} />
+          <Toggle on={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
         </div>
 
         <div style={{ ...rowStyle, borderBottom: "none" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Globe size={18} color="#10B981" />
             <div>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>Language</p>
-              <p style={{ fontSize: 12, color: "#bbb" }}>Choose your preferred language</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: theme.text }}>Language</p>
+              <p style={{ fontSize: 12, color: theme.textMuted }}>Choose your preferred language</p>
             </div>
           </div>
           <select value={language} onChange={(e) => setLanguage(e.target.value)}
-            style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.1)", fontSize: 13, color: "#333", outline: "none", cursor: "pointer", fontFamily: "var(--font-inter,'Inter',sans-serif)" }}>
+            style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${theme.border}`, fontSize: 13, color: theme.text, background: theme.cardBg, outline: "none", cursor: "pointer", fontFamily: "var(--font-inter,'Inter',sans-serif)" }}>
             {["English", "Tamil", "Hindi"].map(l => <option key={l} value={l}>{l}</option>)}
           </select>
         </div>
@@ -121,7 +122,7 @@ export default function SettingsSection() {
       <div style={cardStyle}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
           <Lock size={18} color="#FF7F50" weight="duotone" />
-          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: "#121212" }}>Password Reset</p>
+          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Password Reset</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 400 }}>
           {["Current Password", "New Password", "Confirm New Password"].map((pl, i) => (
