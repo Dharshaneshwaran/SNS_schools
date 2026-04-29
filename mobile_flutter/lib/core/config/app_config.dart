@@ -7,11 +7,11 @@ class AppConfig {
     if (_envUrl.isNotEmpty) return _envUrl;
     
     if (kIsWeb) {
-      return 'http://127.0.0.1:5000';
+      return 'http://localhost:5000';
     } else {
-      // 172.20.10.5 is the current LAN IP of the host computer.
-      // This allows physical devices and emulators on the same network to connect.
-      return 'http://172.20.10.5:5000';
+      // Use 10.0.2.2 for Android emulator (maps to host's localhost).
+      // For physical devices, replace with your computer's LAN IP.
+      return 'http://10.0.2.2:5000';
     }
   }
 

@@ -1,39 +1,25 @@
 @import "tailwindcss";
 
-:root {
-    --primary: #FF7F50;
-    --primary-light: #ff9d7a;
-    --primary-dark: #e66a3e;
-    --secondary: #FFFFFF;
-    --accent: #121212;
-    --accent-light: #1E1E1E;
-    --text-main: #2D3436;
-    --text-muted: #636E72;
-    --bg-gradient: linear-gradient(135deg, #FFF5F0 0%, #FFFFFF 100%);
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.3);
+@theme {
+    --color-primary: #FF7F50;
+    --color-primary-light: #ff9d7a;
+    --color-primary-dark: #e66a3e;
+    --color-secondary: #FFFFFF;
+    --color-accent: #121212;
+    --color-accent-light: #1E1E1E;
+    --color-text-main: #2D3436;
+    --color-text-muted: #636E72;
+
+    --font-inter: var(--font-inter), "Inter", sans-serif;
+    --font-poppins: var(--font-poppins), "Poppins", sans-serif;
+
     --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
     --shadow-medium: 0 15px 40px rgba(255, 127, 80, 0.15);
-    --radius-sm: 12px;
-    --radius-lg: 24px;
-    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
 
-@theme {
-    --color-primary: var(--primary);
-    --color-primary-light: var(--primary-light);
-    --color-primary-dark: var(--primary-dark);
-    --color-secondary: var(--secondary);
-    --color-accent: var(--accent);
-    --color-accent-light: var(--accent-light);
-    --color-text-main: var(--text-main);
-    --color-text-muted: var(--text-muted);
-    
-    --font-inter: var(--font-inter), sans-serif;
-    --font-poppins: var(--font-poppins), sans-serif;
-    
-    --shadow-soft: var(--shadow-soft);
-    --shadow-medium: var(--shadow-medium);
+    /* Dashboard variables kept for backward compat */
+    --color-background: #f4f7fb;
+    --color-foreground: #18233d;
+    --font-sans: "Inter", "Segoe UI", sans-serif;
 }
 
 * {
@@ -47,15 +33,15 @@ html {
 }
 
 body {
-    font-family: var(--font-inter), sans-serif;
-    background-color: var(--secondary);
-    color: var(--text-main);
+    font-family: var(--font-inter), "Inter", sans-serif;
+    background-color: #FFFFFF;
+    color: #2D3436;
     line-height: 1.6;
     overflow-x: hidden;
 }
 
 h1, h2, h3, h4, .font-poppins {
-    font-family: var(--font-poppins), sans-serif;
+    font-family: var(--font-poppins), "Poppins", sans-serif;
 }
 
 /* --- Utilities --- */
@@ -66,11 +52,11 @@ h1, h2, h3, h4, .font-poppins {
 }
 
 .glass {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .btn {
@@ -78,49 +64,52 @@ h1, h2, h3, h4, .font-poppins {
     border-radius: 50px;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
     border: none;
+    font-size: 0.95rem;
 }
 
 .btn-primary {
-    background: var(--primary);
+    background: #FF7F50;
     color: white;
     box-shadow: 0 4px 15px rgba(255, 127, 80, 0.3);
 }
 
 .btn-primary:hover {
-    background: var(--primary-dark);
+    background: #e66a3e;
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(255, 127, 80, 0.4);
 }
 
 .btn-outline {
     background: transparent;
-    border: 2px solid var(--primary);
-    color: var(--primary);
+    border: 2px solid #FF7F50;
+    color: #FF7F50;
 }
 
 .btn-outline:hover {
-    background: var(--primary);
+    background: #FF7F50;
     color: white;
 }
 
 .text-gradient {
-    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    background: linear-gradient(90deg, #FF7F50, #e66a3e);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* Header Scrolled state */
 .header-scrolled {
     padding: 1rem 0 !important;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-soft);
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 /* Hero Animation */
@@ -136,38 +125,43 @@ h1, h2, h3, h4, .font-poppins {
 /* Section Components */
 .about-card {
     padding: 3rem 2rem;
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
     text-align: center;
-    transition: var(--transition);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     cursor: default;
 }
 
 .about-card:hover {
     transform: translateY(-10px);
-    border-color: var(--primary);
-    box-shadow: var(--shadow-medium);
+    border-color: #FF7F50;
+    box-shadow: 0 15px 40px rgba(255, 127, 80, 0.15);
 }
 
 .feature-card {
     background: white;
     padding: 2rem;
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
     border: 1px solid #f0f0f0;
-    transition: var(--transition);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .feature-card:hover {
-    background: var(--primary);
-    border-color: var(--primary);
+    background: #FF7F50;
+    border-color: #FF7F50;
     color: white !important;
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(255, 127, 80, 0.25);
 }
 
-.feature-card:hover i, .feature-card:hover p, .feature-card:hover h3 {
+.feature-card:hover svg,
+.feature-card:hover p,
+.feature-card:hover h3 {
     color: white !important;
 }
 
 .exp-list {
     list-style: none;
+    padding: 0;
 }
 
 .exp-list li {
@@ -179,12 +173,12 @@ h1, h2, h3, h4, .font-poppins {
 }
 
 .cta-card {
-    border-radius: var(--radius-lg);
+    border-radius: 24px;
     padding: 5rem 2rem;
     text-align: center;
     position: relative;
     overflow: hidden;
-    background: var(--accent);
+    background: #121212;
     color: white;
 }
 
@@ -197,4 +191,21 @@ h1, h2, h3, h4, .font-poppins {
     height: 400px;
     background: radial-gradient(circle, rgba(255, 127, 80, 0.2) 0%, transparent 70%);
     z-index: 0;
+}
+
+/* Background gradient for hero */
+.bg-bg-gradient {
+    background: linear-gradient(135deg, #FFF5F0 0%, #FFFFFF 100%);
+}
+
+/* Dashboard backward compat */
+:root {
+    --panel: rgba(255, 255, 255, 0.92);
+    --panel-strong: #ffffff;
+    --muted: #64748b;
+    --border: rgba(148, 163, 184, 0.22);
+    --sidebar: #ffffff;
+    --sidebar-text: #31415f;
+    --sidebar-active: #ecebff;
+    --accent-soft: #eef0ff;
 }
