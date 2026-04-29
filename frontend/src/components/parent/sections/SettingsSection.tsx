@@ -9,9 +9,33 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
   const [language, setLanguage] = useState("English");
   const [saved, setSaved] = useState(false);
 
+  const [profileData, setProfileData] = useState({
+    fullName: "Parent Name",
+    email: "parent@email.com",
+    mobile: "+91 9876543210",
+    city: "Coimbatore"
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    current: "",
+    new: "",
+    confirm: ""
+  });
+
   const handleSave = () => {
+    if (passwordData.new && passwordData.new !== passwordData.confirm) {
+      alert("New passwords do not match!");
+      return;
+    }
+
+    console.log("Saving profile data:", profileData);
+    if (passwordData.new) console.log("Password updated");
+
     setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setTimeout(() => {
+      setSaved(false);
+      setPasswordData({ current: "", new: "", confirm: "" });
+    }, 2500);
   };
 
   const cardStyle: React.CSSProperties = {
@@ -72,14 +96,19 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
-            { label: "Full Name", placeholder: "Parent Name", type: "text" },
-            { label: "Email", placeholder: "parent@email.com", type: "email" },
-            { label: "Mobile", placeholder: "+91 XXXXXXXXXX", type: "tel" },
-            { label: "City", placeholder: "Coimbatore", type: "text" },
+            { label: "Full Name", key: "fullName", type: "text" },
+            { label: "Email", key: "email", type: "email" },
+            { label: "Mobile", key: "mobile", type: "tel" },
+            { label: "City", key: "city", type: "text" },
           ].map((f, i) => (
             <div key={i}>
               <label style={labelStyle2}>{f.label}</label>
-              <input type={f.type} placeholder={f.placeholder} style={inputStyle2} />
+              <input 
+                type={f.type} 
+                value={profileData[f.key as keyof typeof profileData]}
+                onChange={(e) => setProfileData({ ...profileData, [f.key]: e.target.value })}
+                style={inputStyle2} 
+              />
             </div>
           ))}
         </div>
@@ -125,10 +154,20 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
           <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Password Reset</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 400 }}>
-          {["Current Password", "New Password", "Confirm New Password"].map((pl, i) => (
+          {[
+            { label: "Current Password", key: "current" },
+            { label: "New Password", key: "new" },
+            { label: "Confirm New Password", key: "confirm" }
+          ].map((f, i) => (
             <div key={i}>
-              <label style={labelStyle2}>{pl}</label>
-              <input type="password" placeholder="••••••••" style={inputStyle2} />
+              <label style={labelStyle2}>{f.label}</label>
+              <input 
+                type="password" 
+                value={passwordData[f.key as keyof typeof passwordData]}
+                onChange={(e) => setPasswordData({ ...passwordData, [f.key]: e.target.value })}
+                placeholder="••••••••" 
+                style={inputStyle2} 
+              />
             </div>
           ))}
         </div>
