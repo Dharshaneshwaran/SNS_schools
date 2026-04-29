@@ -9,11 +9,15 @@ import '../../../auth/data/auth_storage_service.dart';
 class SettingsTab extends StatefulWidget {
   final AuthSession session;
   final Function(AuthSession) onSessionUpdated;
+  final bool isDarkMode;
+  final ValueChanged<bool>? onThemeChanged;
 
   const SettingsTab({
     super.key,
     required this.session,
     required this.onSessionUpdated,
+    this.isDarkMode = false,
+    this.onThemeChanged,
   });
 
   @override
@@ -38,27 +42,29 @@ class _SettingsTabState extends State<SettingsTab> {
   final _confirmPasswordCtrl = TextEditingController();
   bool _isPasswordLoading = false;
 
-  // Biometrics
+  // Preferences
   bool _biometricsEnabled = false;
+  String _selectedLanguage = 'English';
 
   @override
   void initState() {
     super.initState();
     _emailCtrl = TextEditingController(text: widget.session.user.email);
-    _phoneCtrl = TextEditingController(text: '+91 98765 43210'); // Mock phone for now
-    _loadBiometricPref();
+    _phoneCtrl = TextEditingController(text: '+91 98765 43210');
+    _loadPrefs();
   }
 
-  Future<void> _loadBiometricPref() async {
-    final enabled = await _authStorage.getBiometricsEnabled();
+  Future<void> _loadPrefs() async {
+    final bioEnabled = await _authStorage.getBiometricsEnabled();
+    final lang = await _authStorage.getLanguage();
     setState(() {
-      _biometricsEnabled = enabled;
+      _biometricsEnabled = bioEnabled;
+      _selectedLanguage = lang;
     });
   }
 
   Future<void> _toggleBiometrics(bool value) async {
     if (value) {
-      // Trying to enable
       try {
         final canCheckBiometrics = await _localAuth.canCheckBiometrics;
         final isDeviceSupported = await _localAuth.isDeviceSupported();
@@ -85,7 +91,6 @@ class _SettingsTabState extends State<SettingsTab> {
         _showSnackBar('Error: ${e.message}', true);
       }
     } else {
-      // Disable
       await _authStorage.setBiometricsEnabled(false);
       setState(() {
         _biometricsEnabled = false;
@@ -166,18 +171,96 @@ class _SettingsTabState extends State<SettingsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = widget.isDarkMode;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // Preferences Section
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.palette_outlined, color: Color(0xFFFF7F50)),
+                  SizedBox(width: 8),
+                  Text('Preferences', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Dark Mode', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Switch between light and dark theme'),
+                value: widget.isDarkMode,
+                onChanged: (val) {
+                  if (widget.onThemeChanged != null) {
+                    widget.onThemeChanged!(val);
+                  }
+                },
+                activeColor: const Color(0xFFFF7F50),
+              ),
+              const Divider(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Language', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                      SizedBox(height: 4),
+                      Text('Choose your preferred language', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                    ],
+                  ),
+                  DropdownButton<String>(
+                    value: _selectedLanguage,
+                    dropdownColor: theme.cardColor,
+                    items: const [
+                      DropdownMenuItem(value: 'English', child: Text('English')),
+                      DropdownMenuItem(value: 'Hindi', child: Text('Hindi')),
+                      DropdownMenuItem(value: 'Tamil', child: Text('Tamil')),
+                    ],
+                    onChanged: (val) async {
+                      if (val != null) {
+                        await _authStorage.setLanguage(val);
+                        setState(() {
+                          _selectedLanguage = val;
+                        });
+                        _showSnackBar('Language updated to $val', false);
+                      }
+                    },
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
         // Security & App Lock Section
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )
@@ -215,11 +298,11 @@ class _SettingsTabState extends State<SettingsTab> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )
@@ -289,11 +372,11 @@ class _SettingsTabState extends State<SettingsTab> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )

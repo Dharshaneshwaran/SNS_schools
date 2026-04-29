@@ -29,6 +29,8 @@ class _SnsErpAppState extends State<SnsErpApp> {
   String _message =
       'Use the teacher account to access the mobile dashboard foundation.';
 
+  bool _isDarkMode = false;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +39,10 @@ class _SnsErpAppState extends State<SnsErpApp> {
 
   Future<void> _bootstrapSession() async {
     final storedSession = await _authStorageService.readSession();
+    final isDark = await _authStorageService.getDarkModeEnabled();
+    setState(() {
+      _isDarkMode = isDark;
+    });
 
     if (storedSession == null) {
       setState(() {
@@ -172,17 +178,33 @@ class _SnsErpAppState extends State<SnsErpApp> {
     });
   }
 
+  void _updateTheme(bool value) async {
+    await _authStorageService.setDarkModeEnabled(value);
+    setState(() {
+      _isDarkMode = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SNS ERP',
       debugShowCheckedModeBanner: false,
+      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0F766E),
+          seedColor: const Color(0xFFFF7F50),
           brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF4EFE6),
+        scaffoldBackgroundColor: const Color(0xFFF9FAFB),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFFF7F50),
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF121212),
         useMaterial3: true,
       ),
       home: _isBootstrapping
@@ -199,6 +221,8 @@ class _SnsErpAppState extends State<SnsErpApp> {
                       ? ParentDashboardScreen(
                           session: _session!,
                           onLogout: _logout,
+                          isDarkMode: _isDarkMode,
+                          onThemeChanged: _updateTheme,
                         )
                       : DashboardScreen(
                           session: _session!,

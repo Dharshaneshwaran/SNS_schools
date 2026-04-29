@@ -12,11 +12,15 @@ class ParentDashboardScreen extends StatefulWidget {
   const ParentDashboardScreen({
     required this.session,
     required this.onLogout,
+    this.isDarkMode = false,
+    this.onThemeChanged,
     super.key,
   });
 
   final AuthSession session;
   final VoidCallback onLogout;
+  final bool isDarkMode;
+  final ValueChanged<bool>? onThemeChanged;
 
   @override
   State<ParentDashboardScreen> createState() => _ParentDashboardScreenState();
@@ -55,18 +59,19 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     final user = widget.session.user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           _pageTitles[_currentIndex],
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
+            color: theme.colorScheme.onSurface,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: theme.cardColor,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
       ),
       drawer: _buildDrawer(theme, user),
       body: [
@@ -77,6 +82,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
         const TransportTab(),
         SettingsTab(
           session: _currentSession,
+          isDarkMode: widget.isDarkMode,
+          onThemeChanged: widget.onThemeChanged,
           onSessionUpdated: (newSession) {
             setState(() {
               _currentSession = newSession;
@@ -89,7 +96,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
 
   Widget _buildDrawer(ThemeData theme, dynamic user) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.cardColor,
       child: SafeArea(
         child: Column(
           children: [
@@ -120,7 +127,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            color: Colors.black87,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 2),
