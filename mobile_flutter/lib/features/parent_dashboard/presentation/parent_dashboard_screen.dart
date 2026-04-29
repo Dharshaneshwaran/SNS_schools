@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../core/models/auth_session.dart';
 import 'tabs/events_gallery_tab.dart';
-import 'tabs/placeholder_tabs.dart';
+import 'tabs/profile_tab.dart';
+import 'tabs/diary_tab.dart';
+import 'tabs/academic_tab.dart';
+import 'tabs/transport_tab.dart';
+import 'tabs/settings_tab.dart';
 
 class ParentDashboardScreen extends StatefulWidget {
   const ParentDashboardScreen({
@@ -21,15 +25,13 @@ class ParentDashboardScreen extends StatefulWidget {
 class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   int _currentIndex = 0; // Default to Events Gallery
   bool _isStudentDropdownOpen = false;
+  late AuthSession _currentSession;
 
-  final List<Widget> _pages = const [
-    EventsGalleryTab(),
-    ProfileTab(),
-    DiaryTab(),
-    AcademicTab(),
-    TransportTab(),
-    SettingsTab(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _currentSession = widget.session;
+  }
 
   final List<String> _pageTitles = [
     'Events Gallery',
@@ -67,7 +69,21 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
       drawer: _buildDrawer(theme, user),
-      body: _pages[_currentIndex],
+      body: [
+        const EventsGalleryTab(),
+        const ProfileTab(),
+        const DiaryTab(),
+        const AcademicTab(),
+        const TransportTab(),
+        SettingsTab(
+          session: _currentSession,
+          onSessionUpdated: (newSession) {
+            setState(() {
+              _currentSession = newSession;
+            });
+          },
+        ),
+      ][_currentIndex],
     );
   }
 

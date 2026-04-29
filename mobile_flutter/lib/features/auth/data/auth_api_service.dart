@@ -69,6 +69,55 @@ class AuthApiService {
     return AuthUser.fromJson(decoded);
   }
 
+  Future<void> changePassword({
+    required String accessToken,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final response = await http.post(
+      Uri.parse('${AppConfig.apiBaseUrl}/auth/change-password'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      }),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      throw Exception(_extractMessage(decoded));
+    }
+  }
+
+  Future<AuthUser> updateProfile({
+    required String accessToken,
+    required String email,
+    required String phone,
+  }) async {
+    final response = await http.patch(
+      Uri.parse('${AppConfig.apiBaseUrl}/auth/profile'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        'email': email,
+        'phone': phone,
+      }),
+    );
+
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(_extractMessage(decoded));
+    }
+
+    return AuthUser.fromJson(decoded);
+  }
+
   String _extractMessage(Map<String, dynamic> decoded) {
     final message = decoded['message'];
     if (message is String && message.isNotEmpty) {
