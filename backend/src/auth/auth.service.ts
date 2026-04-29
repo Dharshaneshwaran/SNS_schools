@@ -71,7 +71,9 @@ export class AuthService {
     return this.verifyToken(token, appConfig.jwtSecret, 'access');
   }
 
-  private createSession(user: ReturnType<UsersService['findByEmail']>): AuthSession {
+  private createSession(
+    user: ReturnType<UsersService['findByEmail']>,
+  ): AuthSession {
     if (!user) {
       throw new UnauthorizedException('User not found.');
     }

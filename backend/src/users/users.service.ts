@@ -7,7 +7,9 @@ export class UsersService {
   private readonly users: AuthUser[] = this.buildSeedUsers();
 
   findByEmail(email: string) {
-    return this.users.find((user) => user.email === email.toLowerCase()) ?? null;
+    return (
+      this.users.find((user) => user.email === email.toLowerCase()) ?? null
+    );
   }
 
   findById(id: string) {
@@ -48,6 +50,14 @@ export class UsersService {
         'teacher@sns-erp.local',
         'teacher',
         'Mathematics',
+        sharedPassword,
+      ),
+      this.createSeedUser(
+        'parent-1',
+        'Sharma Parent',
+        '1234567890',
+        'parent',
+        'Parent Portal',
         sharedPassword,
       ),
     ];
