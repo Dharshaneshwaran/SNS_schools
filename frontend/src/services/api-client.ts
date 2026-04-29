@@ -1,11 +1,12 @@
 const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000";
+  (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000").replace(/\/$/, "");
 
 export async function apiRequest<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch(`${apiBaseUrl}${path}`, {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const response = await fetch(`${apiBaseUrl}${cleanPath}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
