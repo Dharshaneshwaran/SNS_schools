@@ -6,7 +6,8 @@ import {
   GraduationCap, User, BookOpen, ChartBar,
   Bus, Gear, Images, CaretDown, SignOut,
 } from "@phosphor-icons/react";
-import type { MenuKey } from "../../app/parent-dashboard/page";
+import { MenuKey } from "../../app/parent-dashboard/page";
+import { DashboardTheme } from "../../types/theme";
 
 const menuItems: { key: MenuKey; label: string; icon: React.ReactNode }[] = [
   { key: "events",    label: "Events Gallery", icon: <Images size={20} weight="duotone" /> },
@@ -25,35 +26,43 @@ interface Props {
   setActiveStudent: (s: Student) => void;
   activeMenu: MenuKey;
   setActiveMenu: (m: MenuKey) => void;
+  theme: DashboardTheme;
   onMenuClick?: () => void;
 }
 
-export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, onMenuClick }: Props) {
+export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, theme, onMenuClick }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <aside className="w-[280px] bg-white border-r border-gray-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)] flex flex-col h-[100dvh] flex-shrink-0 z-50 relative">
+    <aside 
+      className="w-[280px] flex flex-col h-[100dvh] flex-shrink-0 z-50 relative transition-colors duration-300"
+      style={{
+        background: theme.sidebarBg,
+        borderRight: `1px solid ${theme.border}`,
+        boxShadow: theme.isDark ? "none" : "4px 0 24px rgba(0,0,0,0.02)",
+      }}
+    >
       {/* Logo */}
-      <div style={{ padding: "28px 24px 20px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "28px 24px 20px", borderBottom: `1px solid ${theme.border}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: "#FF7F50", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 38, height: 38, borderRadius: 10, background: theme.accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <GraduationCap size={22} weight="fill" color="white" />
           </div>
           <div>
-            <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: "#121212", lineHeight: 1 }}>SNS Academy</p>
-            <p style={{ fontSize: 11, color: "#FF7F50", fontWeight: 600, letterSpacing: "0.05em", marginTop: 2 }}>PARENT PORTAL</p>
+            <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text, lineHeight: 1 }}>SNS Academy</p>
+            <p style={{ fontSize: 11, color: theme.accent, fontWeight: 600, letterSpacing: "0.05em", marginTop: 2 }}>PARENT PORTAL</p>
           </div>
         </div>
       </div>
 
       {/* Student Profile + Switcher */}
-      <div style={{ padding: "20px 16px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "20px 16px", borderBottom: `1px solid ${theme.border}` }}>
         <div
           onClick={() => setDropdownOpen(!dropdownOpen)}
           style={{
             borderRadius: 14,
-            background: "linear-gradient(135deg, #fff5f0, #fff)",
-            border: "1px solid rgba(255,127,80,0.2)",
+            background: theme.isDark ? "rgba(255,255,255,0.03)" : "linear-gradient(135deg, #fff5f0, #fff)",
+            border: theme.isDark ? `1px solid ${theme.border}` : "1px solid rgba(255,127,80,0.2)",
             padding: "14px 16px",
             cursor: "pointer",
             transition: "all 0.2s",
@@ -79,11 +88,11 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
                 {activeStudent.avatar}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontWeight: 700, fontSize: 14, color: "#121212", fontFamily: "var(--font-poppins,'Poppins',sans-serif)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{activeStudent.name}</p>
-                <p style={{ fontSize: 12, color: "#888", marginTop: 2 }}>Class {activeStudent.class} – Sec {activeStudent.section}</p>
+                <p style={{ fontWeight: 700, fontSize: 14, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{activeStudent.name}</p>
+                <p style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>Class {activeStudent.class} – Sec {activeStudent.section}</p>
               </div>
               <motion.div animate={{ rotate: dropdownOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                <CaretDown size={16} color="#FF7F50" weight="bold" />
+                <CaretDown size={16} color={theme.accent} weight="bold" />
               </motion.div>
             </motion.div>
           </AnimatePresence>
@@ -97,8 +106,8 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
                 transition={{ duration: 0.25 }}
                 style={{ overflow: "hidden" }}
               >
-                <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(255,127,80,0.15)" }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, color: "#bbb", letterSpacing: "0.08em", marginBottom: 8 }}>SWITCH STUDENT</p>
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${theme.border}` }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: "0.08em", marginBottom: 8 }}>SWITCH STUDENT</p>
                   {students.map((s) => (
                     <div
                       key={s.id}
@@ -110,10 +119,10 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
                         cursor: "pointer", transition: "background 0.2s",
                       }}
                     >
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#FF7F50", color: "white", fontWeight: 700, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{s.avatar}</div>
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: theme.accent, color: "white", fontWeight: 700, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{s.avatar}</div>
                       <div>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: "#222" }}>{s.name}</p>
-                        <p style={{ fontSize: 11, color: "#999" }}>Class {s.class}-{s.section}</p>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: theme.text }}>{s.name}</p>
+                        <p style={{ fontSize: 11, color: theme.textMuted }}>Class {s.class}-{s.section}</p>
                       </div>
                     </div>
                   ))}
@@ -126,7 +135,7 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
 
       {/* Nav Menu */}
       <nav style={{ flex: 1, padding: "16px 12px", overflowY: "auto" }}>
-        <p style={{ fontSize: 10, fontWeight: 700, color: "#bbb", letterSpacing: "0.08em", padding: "0 12px", marginBottom: 10 }}>NAVIGATION</p>
+        <p style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: "0.08em", padding: "0 12px", marginBottom: 10 }}>NAVIGATION</p>
         {menuItems.map((item) => {
           const isActive = activeMenu === item.key;
           return (
@@ -138,7 +147,7 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
                 display: "flex", alignItems: "center", gap: 12,
                 padding: "11px 14px", borderRadius: 12, marginBottom: 4,
                 background: isActive ? "linear-gradient(90deg,#FF7F50,#e66a3e)" : "transparent",
-                color: isActive ? "white" : "#555",
+                color: isActive ? "white" : theme.isDark ? theme.textMuted : "#555",
                 border: "none", cursor: "pointer",
                 fontWeight: isActive ? 600 : 500,
                 fontSize: 14, textAlign: "left",
@@ -146,13 +155,13 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
                 boxShadow: isActive ? "0 4px 16px rgba(255,127,80,0.3)" : "none",
                 fontFamily: "var(--font-inter,'Inter',sans-serif)",
               }}
-              onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "#fff5f0"; }}
+              onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = theme.isDark ? "rgba(255,255,255,0.05)" : "#fff5f0"; }}
               onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
             >
               <span style={{ opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
               {item.label}
               {item.key === "diary" && (
-                <span style={{ marginLeft: "auto", width: 18, height: 18, borderRadius: "50%", background: isActive ? "rgba(255,255,255,0.3)" : "#FF7F50", color: "white", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>3</span>
+                <span style={{ marginLeft: "auto", width: 18, height: 18, borderRadius: "50%", background: isActive ? "rgba(255,255,255,0.3)" : theme.accent, color: "white", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>3</span>
               )}
             </button>
           );
@@ -160,15 +169,15 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
       </nav>
 
       {/* Bottom */}
-      <div style={{ padding: "16px 12px", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "16px 12px", borderTop: `1px solid ${theme.border}` }}>
         <button style={{
           width: "100%", display: "flex", alignItems: "center", gap: 12,
           padding: "11px 14px", borderRadius: 12, background: "transparent",
-          color: "#999", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
+          color: theme.textMuted, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
           transition: "all 0.2s", fontFamily: "var(--font-inter,'Inter',sans-serif)",
         }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#fff0ed"; e.currentTarget.style.color = "#FF7F50"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#999"; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = theme.isDark ? "rgba(255,127,80,0.1)" : "#fff0ed"; e.currentTarget.style.color = theme.accent; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = theme.textMuted; }}
         >
           <SignOut size={20} weight="duotone" /> Sign Out
         </button>

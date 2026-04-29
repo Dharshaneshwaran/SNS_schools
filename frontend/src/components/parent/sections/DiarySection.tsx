@@ -48,7 +48,9 @@ const notifications = [
   { msg: "Science project submission reminder", time: "2 days ago", type: "reminder" },
 ];
 
-export default function DiarySection({ student }: { student: Student }) {
+import { DashboardTheme } from "../../../types/theme";
+
+export default function DiarySection({ student, theme }: { student: Student; theme: DashboardTheme }) {
   const [activeTab, setActiveTab] = useState<Tab>("homework");
 
   return (
@@ -56,9 +58,9 @@ export default function DiarySection({ student }: { student: Student }) {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <BookOpen size={26} weight="duotone" color="#FF7F50" />
-          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: "#121212" }}>Diary</h1>
+          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: theme.text }}>Diary</h1>
         </div>
-        <p style={{ color: "#888", fontSize: 14 }}>Homework, timetables & notifications for {student.name}</p>
+        <p style={{ color: theme.textMuted, fontSize: 14 }}>Homework, timetables & notifications for {student.name}</p>
       </div>
 
       {/* Tabs */}
@@ -69,12 +71,13 @@ export default function DiarySection({ student }: { student: Student }) {
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
               style={{
                 display: "flex", alignItems: "center", gap: 7,
-                padding: "9px 16px", borderRadius: 10, border: "none", cursor: "pointer",
+                padding: "9px 16px", borderRadius: 10, cursor: "pointer",
                 fontFamily: "var(--font-inter,'Inter',sans-serif)",
                 fontSize: 13, fontWeight: isActive ? 600 : 500,
-                background: isActive ? "#FF7F50" : "#fff",
-                color: isActive ? "white" : "#666",
-                boxShadow: isActive ? "0 4px 12px rgba(255,127,80,0.3)" : "0 1px 6px rgba(0,0,0,0.06)",
+                background: isActive ? "#FF7F50" : theme.cardBg,
+                color: isActive ? "white" : theme.textMuted,
+                boxShadow: isActive ? "0 4px 12px rgba(255,127,80,0.3)" : theme.isDark ? "none" : "0 1px 6px rgba(0,0,0,0.06)",
+                border: isActive ? "none" : `1px solid ${theme.border}`,
                 transition: "all 0.2s",
               }}>
               {tab.icon} {tab.label}
@@ -88,11 +91,11 @@ export default function DiarySection({ student }: { student: Student }) {
         {activeTab === "homework" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {hwData.map((hw, i) => (
-              <div key={i} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.04)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div key={i} style={{ background: theme.cardBg, borderRadius: 14, padding: "18px 20px", boxShadow: theme.isDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.3s ease" }}>
                 <div>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#FF7F50", textTransform: "uppercase", letterSpacing: "0.05em" }}>{hw.subject}</span>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#222", margin: "4px 0" }}>{hw.task}</p>
-                  <p style={{ fontSize: 12, color: "#aaa" }}>Due: {hw.due}</p>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: theme.text, margin: "4px 0" }}>{hw.task}</p>
+                  <p style={{ fontSize: 12, color: theme.textMuted }}>Due: {hw.due}</p>
                 </div>
                 <span style={{ padding: "5px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: hw.status === "Submitted" ? "rgba(16,185,129,0.1)" : "rgba(255,127,80,0.1)", color: hw.status === "Submitted" ? "#059669" : "#FF7F50" }}>{hw.status}</span>
               </div>
@@ -101,7 +104,7 @@ export default function DiarySection({ student }: { student: Student }) {
         )}
 
         {activeTab === "classtimetable" && (
-          <div style={{ background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.07)", border: "1px solid rgba(0,0,0,0.05)" }}>
+          <div style={{ background: theme.cardBg, borderRadius: 16, overflow: "hidden", boxShadow: theme.isDark ? "none" : "0 4px 20px rgba(0,0,0,0.07)", border: `1px solid ${theme.border}`, transition: "all 0.3s ease" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "linear-gradient(90deg,#FF7F50,#e66a3e)" }}>
@@ -111,9 +114,9 @@ export default function DiarySection({ student }: { student: Student }) {
               </thead>
               <tbody>
                 {classTT.map((row, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid rgba(0,0,0,0.04)", background: i % 2 === 0 ? "#fafafa" : "white" }}>
-                    <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600, color: "#333" }}>{row.day}</td>
-                    {row.periods.map((p, j) => <td key={j} style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#666" }}>{p}</td>)}
+                  <tr key={i} style={{ borderBottom: `1px solid ${theme.border}`, background: i % 2 === 0 ? theme.isDark ? "rgba(255,255,255,0.02)" : "#fafafa" : "transparent" }}>
+                    <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600, color: theme.text }}>{row.day}</td>
+                    {row.periods.map((p, j) => <td key={j} style={{ padding: "12px", textAlign: "center", fontSize: 12, color: theme.textMuted }}>{p}</td>)}
                   </tr>
                 ))}
               </tbody>
@@ -124,11 +127,11 @@ export default function DiarySection({ student }: { student: Student }) {
         {activeTab === "examtimetable" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {examTT.map((e, i) => (
-              <div key={i} style={{ background: "#fff", borderRadius: 14, padding: "18px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", display: "flex", alignItems: "center", gap: 16 }}>
+              <div key={i} style={{ background: theme.cardBg, borderRadius: 14, padding: "18px 20px", boxShadow: theme.isDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", gap: 16, transition: "all 0.3s ease" }}>
                 <div style={{ width: 48, height: 48, borderRadius: 12, background: "linear-gradient(135deg,#FF7F50,#e66a3e)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, textAlign: "center", flexShrink: 0, lineHeight: 1.2 }}>{e.subject.slice(0,3)}</div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 700, fontSize: 15, color: "#222", fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>{e.subject}</p>
-                  <p style={{ fontSize: 13, color: "#888", marginTop: 2 }}>{e.date} · {e.time} · {e.duration}</p>
+                  <p style={{ fontWeight: 700, fontSize: 15, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>{e.subject}</p>
+                  <p style={{ fontSize: 13, color: theme.textMuted, marginTop: 2 }}>{e.date} · {e.time} · {e.duration}</p>
                 </div>
               </div>
             ))}
@@ -138,12 +141,12 @@ export default function DiarySection({ student }: { student: Student }) {
         {activeTab === "events" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {upcomingEvents.map((ev, i) => (
-              <div key={i} style={{ background: "#fff", borderRadius: 14, padding: "16px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div key={i} style={{ background: theme.cardBg, borderRadius: 14, padding: "16px 20px", boxShadow: theme.isDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.3s ease" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <CalendarBlank size={20} color="#FF7F50" weight="duotone" />
                   <div>
-                    <p style={{ fontWeight: 600, fontSize: 14, color: "#222" }}>{ev.name}</p>
-                    <p style={{ fontSize: 12, color: "#aaa", marginTop: 2 }}>{ev.date}</p>
+                    <p style={{ fontWeight: 600, fontSize: 14, color: theme.text }}>{ev.name}</p>
+                    <p style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>{ev.date}</p>
                   </div>
                 </div>
                 <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "rgba(255,127,80,0.1)", color: "#FF7F50" }}>{ev.type}</span>
@@ -155,13 +158,13 @@ export default function DiarySection({ student }: { student: Student }) {
         {activeTab === "notifications" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {notifications.map((n, i) => (
-              <div key={i} style={{ background: "#fff", borderRadius: 14, padding: "16px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", display: "flex", alignItems: "flex-start", gap: 14 }}>
+              <div key={i} style={{ background: theme.cardBg, borderRadius: 14, padding: "16px 20px", boxShadow: theme.isDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${theme.border}`, display: "flex", alignItems: "flex-start", gap: 14, transition: "all 0.3s ease" }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,127,80,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Bell size={18} color="#FF7F50" weight="duotone" />
                 </div>
                 <div>
-                  <p style={{ fontSize: 14, fontWeight: 500, color: "#333" }}>{n.msg}</p>
-                  <p style={{ fontSize: 12, color: "#bbb", marginTop: 4 }}>{n.time}</p>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: theme.text }}>{n.msg}</p>
+                  <p style={{ fontSize: 12, color: theme.textMuted, marginTop: 4 }}>{n.time}</p>
                 </div>
               </div>
             ))}
