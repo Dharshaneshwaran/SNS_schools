@@ -1,268 +1,226 @@
 import 'package:flutter/material.dart';
 
-class DiaryTab extends StatelessWidget {
+class DiaryTab extends StatefulWidget {
   const DiaryTab({super.key});
 
   @override
+  State<DiaryTab> createState() => _DiaryTabState();
+}
+
+class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin {
+  late TabController _subTabController;
+
+  final List<String> _tabs = [
+    'Homework',
+    'Class Timetable',
+    'Exam Timetable',
+    'Events',
+    'Notifications',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _subTabController = TabController(length: _tabs.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _subTabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Column(
-        children: [
-          Container(
-            color: Colors.white,
-            child: const TabBar(
-              indicatorColor: Color(0xFFFF7F50),
-              labelColor: Color(0xFFFF7F50),
-              unselectedLabelColor: Colors.grey,
-              tabs: [
-                Tab(text: 'Homework'),
-                Tab(text: 'Remarks'),
-                Tab(text: 'Circulars'),
-              ],
-            ),
+    return Column(
+      children: [
+        Container(
+          color: Colors.white,
+          child: TabBar(
+            controller: _subTabController,
+            isScrollable: true,
+            indicatorColor: const Color(0xFFFF7F50),
+            labelColor: const Color(0xFFFF7F50),
+            unselectedLabelColor: Colors.grey[600],
+            tabs: _tabs.map((t) => Tab(text: t)).toList(),
           ),
-          Expanded(
-            child: TabBarView(
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _subTabController,
+            children: [
+              _buildHomeworkView(),
+              _buildClassTimetableView(),
+              _buildExamTimetableView(),
+              _buildEventsView(),
+              _buildNotificationsView(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 1. Homework
+  Widget _buildHomeworkView() {
+    final hwData = [
+      {'subject': 'Mathematics', 'task': 'Complete Exercise 5.3 – Trigonometry', 'due': 'Tomorrow', 'status': 'Pending'},
+      {'subject': 'Science', 'task': 'Draw diagram of the human digestive system', 'due': 'Apr 30', 'status': 'Pending'},
+      {'subject': 'English', 'task': 'Write a 200-word essay on "My School"', 'due': 'May 1', 'status': 'Submitted'},
+    ];
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: hwData.length,
+      itemBuilder: (context, i) {
+        final hw = hwData[i];
+        final isSubmitted = hw['status'] == 'Submitted';
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            title: Text(hw['subject']!, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF7F50))),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHomeworkList(),
-                _buildRemarksList(),
-                _buildCircularsList(),
+                const SizedBox(height: 4),
+                Text(hw['task']!, style: const TextStyle(fontSize: 14)),
+                const SizedBox(height: 4),
+                Text('Due: ${hw['due']}', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHomeworkList() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildHomeworkCard(
-          subject: 'Mathematics',
-          title: 'Algebra Worksheet',
-          desc: 'Complete problems 1 to 15 on page 42.',
-          dueDate: 'Tomorrow',
-          color: const Color(0xFF6C63FF),
-        ),
-        _buildHomeworkCard(
-          subject: 'Science',
-          title: 'Physics Lab Report',
-          desc: 'Submit the final draft of the pendulum experiment.',
-          dueDate: 'Friday',
-          color: const Color(0xFF10B981),
-        ),
-        _buildHomeworkCard(
-          subject: 'English',
-          title: 'Essay Draft',
-          desc: 'Write a 500-word essay on climate change.',
-          dueDate: 'Next Monday',
-          color: const Color(0xFFF59E0B),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHomeworkCard({
-    required String subject,
-    required String title,
-    required String desc,
-    required String dueDate,
-    required Color color,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  subject,
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSubmitted ? Colors.green.withOpacity(0.1) : const Color(0xFFFF7F50).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
               ),
-              Row(
-                children: [
-                  const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Due: $dueDate',
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            desc,
-            style: TextStyle(color: Colors.grey[700], height: 1.4),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRemarksList() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildRemarkCard(
-          teacher: 'Mr. Rajesh',
-          subject: 'Mathematics',
-          type: 'Positive',
-          remark: 'Excellent performance in the algebra surprise test. Keep it up!',
-          date: 'Oct 24',
-        ),
-        _buildRemarkCard(
-          teacher: 'Mrs. Priya',
-          subject: 'Science',
-          type: 'Needs Improvement',
-          remark: 'Please ensure lab records are submitted on time.',
-          date: 'Oct 20',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRemarkCard({
-    required String teacher,
-    required String subject,
-    required String type,
-    required String remark,
-    required String date,
-  }) {
-    final isPositive = type == 'Positive';
-    final color = isPositive ? const Color(0xFF4CAF50) : const Color(0xFFFF9800);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border(left: BorderSide(color: color, width: 4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '$teacher • $subject',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              Text(
-                date,
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            remark,
-            style: TextStyle(color: Colors.grey[800], height: 1.4),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCircularsList() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildCircularCard('Diwali Holidays Announcement', 'Oct 22', true),
-        _buildCircularCard('Term 1 Examination Schedule', 'Oct 15', false),
-        _buildCircularCard('Fee Payment Reminder', 'Oct 10', false),
-      ],
-    );
-  }
-
-  Widget _buildCircularCard(String title, String date, bool isNew) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF5F0),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: const Icon(Icons.picture_as_pdf, color: Color(0xFFFF7F50)),
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-              ),
+              child: Text(hw['status']!, style: TextStyle(color: isSubmitted ? Colors.green : const Color(0xFFFF7F50), fontWeight: FontWeight.bold, fontSize: 12)),
             ),
-            if (isNew)
-              Container(
-                margin: const EdgeInsets.only(left: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text('NEW', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-              )
-          ],
+          ),
+        );
+      },
+    );
+  }
+
+  // 2. Class Timetable
+  Widget _buildClassTimetableView() {
+    final classTT = [
+      {'day': 'Monday', 'periods': ['Math', 'Science', 'English', 'Hindi', 'Social', 'PT']},
+      {'day': 'Tuesday', 'periods': ['English', 'Math', 'Science', 'Art', 'Hindi', 'Library']},
+      {'day': 'Wednesday', 'periods': ['Science', 'Social', 'Math', 'English', 'PT', 'Hindi']},
+      {'day': 'Thursday', 'periods': ['Hindi', 'Math', 'Art', 'Science', 'English', 'Social']},
+      {'day': 'Friday', 'periods': ['Math', 'English', 'Science', 'Social', 'Hindi', 'Music']},
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columns: const [
+              DataColumn(label: Text('Day')),
+              DataColumn(label: Text('P1')),
+              DataColumn(label: Text('P2')),
+              DataColumn(label: Text('P3')),
+              DataColumn(label: Text('P4')),
+              DataColumn(label: Text('P5')),
+              DataColumn(label: Text('P6')),
+            ],
+            rows: classTT.map((row) {
+              final periods = row['periods'] as List<String>;
+              return DataRow(cells: [
+                DataCell(Text(row['day'] as String, style: const TextStyle(fontWeight: FontWeight.bold))),
+                ...periods.map((p) => DataCell(Text(p))).toList(),
+              ]);
+            }).toList(),
+          ),
         ),
-        subtitle: Text(date, style: const TextStyle(fontSize: 12)),
-        trailing: const Icon(Icons.download, color: Colors.grey),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      ),
+      ],
+    );
+  }
+
+  // 3. Exam Timetable
+  Widget _buildExamTimetableView() {
+    final examTT = [
+      {'subject': 'Mathematics', 'date': 'May 10, 2026', 'time': '9:00 AM', 'duration': '2.5 hrs'},
+      {'subject': 'Science', 'date': 'May 12, 2026', 'time': '9:00 AM', 'duration': '2 hrs'},
+      {'subject': 'English', 'date': 'May 14, 2026', 'time': '9:00 AM', 'duration': '2 hrs'},
+      {'subject': 'Social', 'date': 'May 16, 2026', 'time': '9:00 AM', 'duration': '2 hrs'},
+    ];
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: examTT.length,
+      itemBuilder: (context, i) {
+        final e = examTT[i];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: const Color(0xFFFF7F50),
+              foregroundColor: Colors.white,
+              child: Text(e['subject']!.substring(0, 3)),
+            ),
+            title: Text(e['subject']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text('${e['date']} · ${e['time']}\nDuration: ${e['duration']}'),
+          ),
+        );
+      },
+    );
+  }
+
+  // 4. Events
+  Widget _buildEventsView() {
+    final upcomingEvents = [
+      {'name': 'Unit Test – Math', 'date': 'Apr 30', 'type': 'Exam'},
+      {'name': 'Sports Day Practice', 'date': 'May 2', 'type': 'Activity'},
+      {'name': 'Holiday – Labour Day', 'date': 'May 1', 'type': 'Holiday'},
+    ];
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: upcomingEvents.length,
+      itemBuilder: (context, i) {
+        final ev = upcomingEvents[i];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: const Icon(Icons.event, color: Color(0xFFFF7F50)),
+            title: Text(ev['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(ev['date']!),
+            trailing: Chip(
+              label: Text(ev['type']!, style: const TextStyle(fontSize: 12)),
+              backgroundColor: const Color(0xFFFF7F50).withOpacity(0.1),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // 5. Notifications
+  Widget _buildNotificationsView() {
+    final notifications = [
+      {'msg': 'Fee due date extended to May 15', 'time': '2 hrs ago'},
+      {'msg': 'Parent-Teacher meeting on May 5 at 10 AM', 'time': '1 day ago'},
+      {'msg': 'Science project submission reminder', 'time': '2 days ago'},
+    ];
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: notifications.length,
+      itemBuilder: (context, i) {
+        final n = notifications[i];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: const Icon(Icons.notifications_active, color: Color(0xFFFF7F50)),
+            title: Text(n['msg']!),
+            subtitle: Text(n['time']!, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+          ),
+        );
+      },
     );
   }
 }
