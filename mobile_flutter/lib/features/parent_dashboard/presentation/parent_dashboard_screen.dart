@@ -122,7 +122,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'SNS Academy',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
