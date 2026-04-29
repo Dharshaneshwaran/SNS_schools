@@ -16,6 +16,24 @@ export class UsersService {
     return this.users.find((user) => user.id === id) ?? null;
   }
 
+  updatePassword(id: string, newPassword: string): boolean {
+    const user = this.findById(id);
+    if (!user) return false;
+    user.password = newPassword;
+    return true;
+  }
+
+  updateProfile(
+    id: string,
+    data: { name?: string; email?: string },
+  ): boolean {
+    const user = this.findById(id);
+    if (!user) return false;
+    if (data.name) user.name = data.name;
+    if (data.email) user.email = data.email.toLowerCase();
+    return true;
+  }
+
   private buildSeedUsers(): AuthUser[] {
     const sharedPassword = process.env.DEMO_USER_PASSWORD ?? 'ChangeMe123!';
 

@@ -67,6 +67,62 @@ export class AuthService {
     };
   }
 
+  changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = this.usersService.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+
+    if (!this.safeCompare(currentPassword, user.password)) {
+      throw new UnauthorizedException('Current password is incorrect.');
+    }
+
+    if (newPassword.length < 6) {
+      throw new UnprocessableEntityException(
+        'New password must be at least 6 characters.',
+      );
+    }
+
+    this.usersService.updatePassword(userId, newPassword);
+
+    return { message: 'Password changed successfully.' };
+  }
+
+  updateProfile(userId: string, data: { name?: string; email?: string }) {
+    const user = this.usersService.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+
+    if (data.email && data.email !== user.email) {
+      const existing = this.usersService.findByEmail(data.email);
+      if (existing && existing.id !== userId) {
+        throw new UnprocessableEntityException('Email is already in use.');
+      }
+    }
+
+    this.usersService.updateProfile(userId, data);
+    const updated = this.usersService.findById(userId);
+
+    return {
+      message: 'Profile updated successfully.',
+      user: {
+        id: updated!.id,
+        name: updated!.name,
+        email: updated!.email,
+        role: updated!.role,
+        department: updated!.department,
+        status: updated!.status,
+      },
+    };
+  }
+
   verifyAccessToken(token: string): AuthTokenPayload {
     return this.verifyToken(token, appConfig.jwtSecret, 'access');
   }
