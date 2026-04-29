@@ -22,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   bool _obscurePassword = true;
-  String _selectedRole = 'teacher'; // 'teacher' or 'parent'
+  String? _selectedRole;
 
   @override
   void initState() {
@@ -48,6 +48,278 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.05, 0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+            child: child,
+          ),
+        );
+      },
+      child: _selectedRole == null
+          ? _RoleSelectionPage(
+              key: const ValueKey('role'),
+              onRoleSelected: (role) {
+                setState(() {
+                  _selectedRole = role;
+                  if (role == 'parent') _emailController.clear();
+                });
+              },
+            )
+          : _LoginFormPage(
+              key: const ValueKey('form'),
+              selectedRole: _selectedRole!,
+              emailController: _emailController,
+              passwordController: _passwordController,
+              obscurePassword: _obscurePassword,
+              isSubmitting: widget.isSubmitting,
+              message: widget.message,
+              onTogglePassword: () {
+                setState(() => _obscurePassword = !_obscurePassword);
+              },
+              onBack: () {
+                setState(() {
+                  _selectedRole = null;
+                  _emailController.text = AppConfig.defaultEmail;
+                  _passwordController.text = AppConfig.defaultPassword;
+                });
+              },
+              onSubmit: _handleSubmit,
+            ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// PAGE 1: Role Selection — White + Orange theme
+// ─────────────────────────────────────────────
+class _RoleSelectionPage extends StatelessWidget {
+  const _RoleSelectionPage({super.key, required this.onRoleSelected});
+
+  final void Function(String role) onRoleSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logo
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.school, color: Color(0xFFFF7F50), size: 34),
+                      const SizedBox(width: 10),
+                      Text(
+                        'SNS',
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: const Color(0xFF2D3436),
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Academy',
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: const Color(0xFFFF7F50),
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 48),
+
+                  // Card
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: const Color(0xFFECEFF1)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 30,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Access Dashboard',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: const Color(0xFF2D3436),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Welcome back! Please select your role to continue.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Color(0xFF636E72), fontSize: 14),
+                        ),
+                        const SizedBox(height: 32),
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _WhiteRoleCard(
+                                title: 'Teacher',
+                                icon: Icons.present_to_all_outlined,
+                                onTap: () => onRoleSelected('teacher'),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _WhiteRoleCard(
+                                title: 'Parent',
+                                icon: Icons.people_outline_rounded,
+                                onTap: () => onRoleSelected('parent'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  const Text(
+                    '© 2026 SNS Academy ERP.\nEmpowering Education Through Design Thinking.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Color(0xFFB0BEC5), fontSize: 10),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WhiteRoleCard extends StatefulWidget {
+  const _WhiteRoleCard({
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  State<_WhiteRoleCard> createState() => _WhiteRoleCardState();
+}
+
+class _WhiteRoleCardState extends State<_WhiteRoleCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(vertical: 28),
+        transform: _pressed
+            ? (Matrix4.identity()..scale(0.96, 0.96, 1.0))
+            : Matrix4.identity(),
+        transformAlignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: _pressed ? const Color(0xFFFF7F50) : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _pressed ? const Color(0xFFFF7F50) : const Color(0xFFE2E8F0),
+          ),
+          boxShadow: _pressed
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFFFF7F50).withValues(alpha: 0.3),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : [],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              widget.icon,
+              color: _pressed ? Colors.white : const Color(0xFFFF7F50),
+              size: 36,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              widget.title,
+              style: TextStyle(
+                color: _pressed ? Colors.white : const Color(0xFF2D3436),
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// PAGE 2: Login Form — Orange/White/Black gradient
+// ─────────────────────────────────────────────
+class _LoginFormPage extends StatelessWidget {
+  const _LoginFormPage({
+    super.key,
+    required this.selectedRole,
+    required this.emailController,
+    required this.passwordController,
+    required this.obscurePassword,
+    required this.isSubmitting,
+    required this.message,
+    required this.onTogglePassword,
+    required this.onBack,
+    required this.onSubmit,
+  });
+
+  final String selectedRole;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final bool obscurePassword;
+  final bool isSubmitting;
+  final String message;
+  final VoidCallback onTogglePassword;
+  final VoidCallback onBack;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -56,258 +328,217 @@ class _LoginScreenState extends State<LoginScreen> {
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
+            begin: Alignment.topCenter,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF121212),
-              Color(0xFF1E1E1E),
-              Color(0xFF2A1C18),
+              Color(0xFFFFFFFF),
+              Color(0xFFFFF5F0),
               Color(0xFFFF7F50),
+              Color(0xFF1A1A1A),
+              Color(0xFF121212),
             ],
-            stops: [0.0, 0.4, 0.7, 1.0],
+            stops: [0.0, 0.2, 0.45, 0.75, 1.0],
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 28.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 450),
+                constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Logo Header
+                    // Logo
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.school,
-                          color: Color(0xFFFF7F50),
-                          size: 38,
-                        ),
-                        const SizedBox(width: 12),
+                        const Icon(Icons.school, color: Color(0xFFFF7F50), size: 34),
+                        const SizedBox(width: 10),
                         Text(
                           'SNS',
                           style: theme.textTheme.headlineMedium?.copyWith(
-                            color: Colors.white,
+                            color: const Color(0xFF2D3436),
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 1.0,
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 4),
                         Text(
                           'Academy',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             color: const Color(0xFFFF7F50),
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 1.0,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 36),
 
-                    // Glassmorphic Form Card
+                    // Glassmorphic card
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 36,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.06),
+                        color: Colors.white.withValues(alpha: 0.92),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.12),
-                          width: 1.2,
-                        ),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
+                            color: Colors.black.withValues(alpha: 0.12),
                             blurRadius: 30,
-                            offset: const Offset(0, 15),
+                            offset: const Offset(0, 12),
                           ),
                         ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Back button
+                          GestureDetector(
+                            onTap: onBack,
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.arrow_back_rounded, color: Color(0xFF636E72), size: 18),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Back',
+                                  style: TextStyle(
+                                    color: Color(0xFF636E72),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Title
                           Text(
-                            _selectedRole == 'teacher'
-                                ? 'Teacher Login'
-                                : 'Parent Login',
+                            selectedRole == 'teacher' ? 'Teacher Login' : 'Parent Login',
                             style: theme.textTheme.headlineSmall?.copyWith(
-                              color: Colors.white,
+                              color: const Color(0xFF2D3436),
                               fontWeight: FontWeight.bold,
                               letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           Text(
-                            _selectedRole == 'teacher'
+                            selectedRole == 'teacher'
                                 ? 'Enter your email and password'
                                 : 'Enter your mobile number and password',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
-                              fontSize: 15,
-                            ),
+                            style: const TextStyle(color: Color(0xFF636E72), fontSize: 13),
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 28),
 
-                          // Email/Mobile Input
+                          // Email/Mobile
                           Text(
-                            _selectedRole == 'teacher'
-                                ? 'Email Address'
-                                : 'Mobile Number',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                            selectedRole == 'teacher' ? 'Email Address' : 'Mobile Number',
+                            style: const TextStyle(
+                              color: Color(0xFF4A5568),
                               fontWeight: FontWeight.w600,
-                              fontSize: 13,
+                              fontSize: 12,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           TextField(
-                            controller: _emailController,
-                            style: const TextStyle(color: Colors.white),
-                            keyboardType: _selectedRole == 'teacher'
+                            controller: emailController,
+                            style: const TextStyle(color: Color(0xFF2D3436), fontSize: 14),
+                            keyboardType: selectedRole == 'teacher'
                                 ? TextInputType.emailAddress
                                 : TextInputType.phone,
                             decoration: InputDecoration(
-                              hintText: _selectedRole == 'teacher'
+                              hintText: selectedRole == 'teacher'
                                   ? 'teacher@sns-erp.local'
                                   : 'Enter mobile number',
-                              hintStyle:
-                                  TextStyle(color: Colors.white.withOpacity(0.3)),
+                              hintStyle: const TextStyle(color: Color(0xFFB0BEC5), fontSize: 14),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.06),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 16,
-                              ),
+                              fillColor: const Color(0xFFF8FAFC),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                               enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.white.withOpacity(0.12),
-                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFFF7F50),
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(color: Color(0xFFFF7F50), width: 1.5),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Password
+                          const Text(
+                            'Password',
+                            style: TextStyle(
+                              color: Color(0xFF4A5568),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: passwordController,
+                            style: const TextStyle(color: Color(0xFF2D3436), fontSize: 14),
+                            obscureText: obscurePassword,
+                            decoration: InputDecoration(
+                              hintText: '••••••••',
+                              hintStyle: const TextStyle(color: Color(0xFFB0BEC5), fontSize: 14),
+                              filled: true,
+                              fillColor: const Color(0xFFF8FAFC),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  color: const Color(0xFF94A3B8),
+                                  size: 18,
                                 ),
+                                onPressed: onTogglePassword,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(color: Color(0xFFFF7F50), width: 1.5),
                               ),
                             ),
                           ),
                           const SizedBox(height: 24),
 
-                          // Password Input
-                          Text(
-                            'Password',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          TextField(
-                            controller: _passwordController,
-                            style: const TextStyle(color: Colors.white),
-                            obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              hintText: '••••••••',
-                              hintStyle:
-                                  TextStyle(color: Colors.white.withOpacity(0.3)),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.06),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 16,
-                              ),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  color: Colors.white.withOpacity(0.4),
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.white.withOpacity(0.12),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFFF7F50),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Role Toggle Button
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  _selectedRole = _selectedRole == 'teacher'
-                                      ? 'parent'
-                                      : 'teacher';
-                                  _emailController.clear();
-                                });
-                              },
-                              child: Text(
-                                _selectedRole == 'teacher'
-                                    ? 'Login as Parent'
-                                    : 'Login as Teacher',
-                                style: const TextStyle(
-                                  color: Color(0xFFFF7F50),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Login Button
+                          // Sign In
                           SizedBox(
                             width: double.infinity,
-                            height: 52,
+                            height: 46,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: widget.isSubmitting
+                                backgroundColor: isSubmitting
                                     ? const Color(0xAAFF7F50)
                                     : const Color(0xFFFF7F50),
-                                elevation: 4,
-                                shadowColor:
-                                    const Color(0xFFFF7F50).withOpacity(0.35),
+                                elevation: 3,
+                                shadowColor: const Color(0xFFFF7F50).withValues(alpha: 0.3),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: widget.isSubmitting ? null : _handleSubmit,
-                              child: widget.isSubmitting
+                              onPressed: isSubmitting ? null : onSubmit,
+                              child: isSubmitting
                                   ? const SizedBox(
-                                      width: 24,
-                                      height: 24,
+                                      width: 20,
+                                      height: 20,
                                       child: CircularProgressIndicator(
                                         color: Colors.white,
-                                        strokeWidth: 2.5,
+                                        strokeWidth: 2,
                                       ),
                                     )
                                   : const Text(
                                       'Sign In',
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 16,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.5,
                                       ),
@@ -315,32 +546,29 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
 
-                          if (widget.message.isNotEmpty) ...[
-                            const SizedBox(height: 24),
+                          if (message.isNotEmpty) ...[
+                            const SizedBox(height: 18),
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
-                                color: widget.message.toLowerCase().contains('welcome')
-                                    ? Colors.green.withOpacity(0.15)
-                                    : Colors.red.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
+                                color: message.toLowerCase().contains('welcome')
+                                    ? const Color(0xFFE8F5E9)
+                                    : const Color(0xFFFEF2F2),
+                                borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: widget.message.toLowerCase().contains('welcome')
-                                      ? Colors.green.withOpacity(0.3)
-                                      : Colors.red.withOpacity(0.3),
+                                  color: message.toLowerCase().contains('welcome')
+                                      ? const Color(0xFF81C784)
+                                      : const Color(0xFFFCA5A5),
                                 ),
                               ),
                               child: Text(
-                                widget.message,
+                                message,
                                 style: TextStyle(
-                                  color: widget.message.toLowerCase().contains('welcome')
-                                      ? Colors.green[200]
-                                      : Colors.red[200],
-                                  fontSize: 14,
+                                  color: message.toLowerCase().contains('welcome')
+                                      ? const Color(0xFF2E7D32)
+                                      : const Color(0xFFC62828),
+                                  fontSize: 12,
                                 ),
                               ),
                             ),
@@ -351,11 +579,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
 
                     Text(
-                      '© 2026 SNS Academy ERP. Empowering Education Through Design Thinking.',
+                      '© 2026 SNS Academy ERP.\nEmpowering Education Through Design Thinking.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.3),
-                        fontSize: 11,
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 10,
                       ),
                     ),
                   ],

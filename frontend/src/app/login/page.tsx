@@ -42,20 +42,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen overflow-hidden" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)" }}>
+    <div className="flex min-h-screen overflow-hidden" style={{ fontFamily: "var(--font-inter, 'Inter', sans-serif)", background: "#FFFFFF" }}>
       {/* Left Side */}
       <div 
-        className="w-full lg:w-1/2 flex flex-col justify-center items-center relative text-white z-10"
+        className="w-full lg:w-1/2 flex flex-col justify-center items-center relative z-10"
         style={{ 
-          background: "linear-gradient(135deg, #121212 0%, #1a1a1a 40%, #1E1E1E 60%, #FF7F50 150%)",
-          boxShadow: "8px 0 40px rgba(0, 0, 0, 0.3)"
+          background: "#FFFFFF",
         }}
       >
         {/* Logo */}
         <Link 
           href="/" 
           className="absolute top-10 left-10 lg:top-12 lg:left-14 no-underline font-extrabold text-2xl flex items-center gap-3"
-          style={{ color: "white" }}
+          style={{ color: "#2D3436" }}
         >
           <GraduationCap style={{ color: "#FF7F50" }} weight="fill" size={34} />
           <span>SNS <span style={{ color: "#FF7F50" }}>Academy</span></span>
@@ -75,13 +74,11 @@ export default function LoginPage() {
         >
           <div
             style={{
-              background: "rgba(255, 255, 255, 0.06)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              borderRadius: 20,
-              border: "1px solid rgba(255, 255, 255, 0.12)",
-              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
-              padding: "48px 40px",
+              background: "#FFFFFF",
+              borderRadius: 24,
+              border: "1px solid #ECEFF1",
+              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)",
+              padding: "40px 32px",
             }}
           >
             <AnimatePresence mode="wait">
@@ -97,18 +94,19 @@ export default function LoginPage() {
                   <h2 
                     style={{ 
                       fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
-                      fontSize: 28, 
+                      fontSize: 26, 
                       fontWeight: 700, 
                       marginBottom: 8,
-                      color: "white",
+                      color: "#2D3436",
                       letterSpacing: "-0.02em"
                     }}
                   >
                     Access Dashboard
                   </h2>
-                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginBottom: 40, lineHeight: 1.5 }}>
+                  <p style={{ color: "#636E72", fontSize: 14, marginBottom: 32, lineHeight: 1.5 }}>
                     Welcome back! Please select your role to continue.
                   </p>
+
                   
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <button 
@@ -118,31 +116,36 @@ export default function LoginPage() {
                         flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: 16,
-                        padding: "36px 20px",
+                        gap: 12,
+                        padding: "24px 16px",
                         borderRadius: 16,
-                        background: "rgba(255, 255, 255, 0.04)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                        color: "white",
+                        background: "#F8FAFC",
+                        border: "1px solid #E2E8F0",
+                        color: "#2D3436",
                         cursor: "pointer",
-                        transition: "all 0.3s ease",
+                        transition: "all 0.2s ease-in-out",
                       }}
-                      className="hover:!bg-[#FF7F50] hover:!border-[#FF7F50]"
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = "#FF7F50";
                         e.currentTarget.style.borderColor = "#FF7F50";
-                        e.currentTarget.style.transform = "translateY(-4px)";
-                        e.currentTarget.style.boxShadow = "0 12px 30px rgba(255, 127, 80, 0.35)";
+                        e.currentTarget.style.color = "#FFFFFF";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow = "0 8px 20px rgba(255, 127, 80, 0.25)";
+                        const icon = e.currentTarget.querySelector('svg');
+                        if (icon) icon.style.color = '#FFFFFF';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
-                        e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                        e.currentTarget.style.background = "#F8FAFC";
+                        e.currentTarget.style.borderColor = "#E2E8F0";
+                        e.currentTarget.style.color = "#2D3436";
                         e.currentTarget.style.transform = "translateY(0)";
                         e.currentTarget.style.boxShadow = "none";
+                        const icon = e.currentTarget.querySelector('svg');
+                        if (icon) icon.style.color = '#FF7F50';
                       }}
                     >
-                      <ChalkboardTeacher size={44} weight="duotone" style={{ color: "#FF7F50" }} />
-                      <span style={{ fontWeight: 600, fontSize: 15, fontFamily: "var(--font-poppins, 'Poppins', sans-serif)" }}>Teacher</span>
+                      <ChalkboardTeacher size={36} weight="duotone" style={{ color: "#FF7F50", transition: "color 0.2s" }} />
+                      <span style={{ fontWeight: 600, fontSize: 14, fontFamily: "var(--font-poppins, 'Poppins', sans-serif)" }}>Teacher</span>
                     </button>
                     <button 
                       onClick={() => setRole('parent')}
@@ -151,33 +154,40 @@ export default function LoginPage() {
                         flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: 16,
-                        padding: "36px 20px",
+                        gap: 12,
+                        padding: "24px 16px",
                         borderRadius: 16,
-                        background: "rgba(255, 255, 255, 0.04)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                        color: "white",
+                        background: "#F8FAFC",
+                        border: "1px solid #E2E8F0",
+                        color: "#2D3436",
                         cursor: "pointer",
-                        transition: "all 0.3s ease",
+                        transition: "all 0.2s ease-in-out",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = "#FF7F50";
                         e.currentTarget.style.borderColor = "#FF7F50";
-                        e.currentTarget.style.transform = "translateY(-4px)";
-                        e.currentTarget.style.boxShadow = "0 12px 30px rgba(255, 127, 80, 0.35)";
+                        e.currentTarget.style.color = "#FFFFFF";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow = "0 8px 20px rgba(255, 127, 80, 0.25)";
+                        const icon = e.currentTarget.querySelector('svg');
+                        if (icon) icon.style.color = '#FFFFFF';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
-                        e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                        e.currentTarget.style.background = "#F8FAFC";
+                        e.currentTarget.style.borderColor = "#E2E8F0";
+                        e.currentTarget.style.color = "#2D3436";
                         e.currentTarget.style.transform = "translateY(0)";
                         e.currentTarget.style.boxShadow = "none";
+                        const icon = e.currentTarget.querySelector('svg');
+                        if (icon) icon.style.color = '#FF7F50';
                       }}
                     >
-                      <Users size={44} weight="duotone" style={{ color: "#FF7F50" }} />
-                      <span style={{ fontWeight: 600, fontSize: 15, fontFamily: "var(--font-poppins, 'Poppins', sans-serif)" }}>Parent</span>
+                      <Users size={36} weight="duotone" style={{ color: "#FF7F50", transition: "color 0.2s" }} />
+                      <span style={{ fontWeight: 600, fontSize: 14, fontFamily: "var(--font-poppins, 'Poppins', sans-serif)" }}>Parent</span>
                     </button>
                   </div>
                 </motion.div>
+
               ) : (
                 /* Step 2: Login Form */
                 <motion.div 
@@ -193,7 +203,7 @@ export default function LoginPage() {
                       display: "flex",
                       alignItems: "center",
                       gap: 8,
-                      color: "rgba(255,255,255,0.5)",
+                      color: "#636E72",
                       background: "none",
                       border: "none",
                       cursor: "pointer",
@@ -204,7 +214,7 @@ export default function LoginPage() {
                       transition: "color 0.2s",
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.color = "#FF7F50"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.5)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "#636E72"; }}
                   >
                     <ArrowLeft size={18} weight="bold" /> Back
                   </button>
@@ -213,17 +223,17 @@ export default function LoginPage() {
                     <h2 
                       style={{ 
                         fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
-                        fontSize: 28, 
+                        fontSize: 26, 
                         fontWeight: 700, 
                         marginBottom: 8,
-                        color: "white",
+                        color: "#2D3436",
                         textTransform: "capitalize",
                         letterSpacing: "-0.02em"
                       }}
                     >
                       {role} Login
                     </h2>
-                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, lineHeight: 1.5 }}>
+                    <p style={{ color: "#636E72", fontSize: 14, lineHeight: 1.5 }}>
                       Enter your {role === 'parent' ? 'mobile number' : 'email'} and password
                     </p>
                   </div>
@@ -235,17 +245,17 @@ export default function LoginPage() {
                       style={{
                         marginBottom: 24,
                         padding: "14px 16px",
-                        background: "rgba(239, 68, 68, 0.15)",
-                        border: "1px solid rgba(239, 68, 68, 0.3)",
+                        background: "#FEF2F2",
+                        border: "1px solid #FCA5A5",
                         borderRadius: 12,
-                        color: "#fca5a5",
+                        color: "#991B1B",
                         fontSize: 14,
                         display: "flex",
                         alignItems: "center",
                         gap: 12,
                       }}
                     >
-                      <Warning size={20} weight="fill" style={{ color: "#f87171", flexShrink: 0 }} />
+                      <Warning size={20} weight="fill" style={{ color: "#EF4444", flexShrink: 0 }} />
                       <span>{error}</span>
                     </motion.div>
                   )}
@@ -258,7 +268,7 @@ export default function LoginPage() {
                           display: "block", 
                           fontSize: 13, 
                           fontWeight: 600, 
-                          color: "rgba(255,255,255,0.7)", 
+                          color: "#4A5568", 
                           marginBottom: 8,
                           fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
                           letterSpacing: "0.02em"
@@ -274,22 +284,24 @@ export default function LoginPage() {
                         required
                         style={{
                           width: "100%",
-                          padding: "14px 18px",
+                          padding: "12px 16px",
                           borderRadius: 12,
-                          background: "rgba(255, 255, 255, 0.06)",
-                          border: "1px solid rgba(255, 255, 255, 0.12)",
+                          background: "#F8FAFC",
+                          border: "1px solid #E2E8F0",
                           outline: "none",
-                          color: "white",
-                          fontSize: 15,
+                          color: "#2D3436",
+                          fontSize: 14,
                           transition: "all 0.2s ease",
                         }}
                         onFocus={(e) => {
                           e.currentTarget.style.borderColor = "#FF7F50";
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                          e.currentTarget.style.background = "#FFFFFF";
+                          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(255, 127, 80, 0.1)";
                         }}
                         onBlur={(e) => {
-                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
+                          e.currentTarget.style.borderColor = "#E2E8F0";
+                          e.currentTarget.style.background = "#F8FAFC";
+                          e.currentTarget.style.boxShadow = "none";
                         }}
                       />
                     </div>
@@ -301,7 +313,7 @@ export default function LoginPage() {
                           display: "block", 
                           fontSize: 13, 
                           fontWeight: 600, 
-                          color: "rgba(255,255,255,0.7)", 
+                          color: "#4A5568", 
                           marginBottom: 8,
                           fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
                           letterSpacing: "0.02em"
@@ -318,22 +330,24 @@ export default function LoginPage() {
                           required
                           style={{
                             width: "100%",
-                            padding: "14px 50px 14px 18px",
+                            padding: "12px 46px 12px 16px",
                             borderRadius: 12,
-                            background: "rgba(255, 255, 255, 0.06)",
-                            border: "1px solid rgba(255, 255, 255, 0.12)",
+                            background: "#F8FAFC",
+                            border: "1px solid #E2E8F0",
                             outline: "none",
-                            color: "white",
-                            fontSize: 15,
+                            color: "#2D3436",
+                            fontSize: 14,
                             transition: "all 0.2s ease",
                           }}
                           onFocus={(e) => {
                             e.currentTarget.style.borderColor = "#FF7F50";
-                            e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                            e.currentTarget.style.background = "#FFFFFF";
+                            e.currentTarget.style.boxShadow = "0 0 0 3px rgba(255, 127, 80, 0.1)";
                           }}
                           onBlur={(e) => {
-                            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
-                            e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
+                            e.currentTarget.style.borderColor = "#E2E8F0";
+                            e.currentTarget.style.background = "#F8FAFC";
+                            e.currentTarget.style.boxShadow = "none";
                           }}
                         />
                         <button 
@@ -341,10 +355,10 @@ export default function LoginPage() {
                           onClick={() => setShowPassword(!showPassword)}
                           style={{
                             position: "absolute",
-                            right: 16,
+                            right: 14,
                             top: "50%",
                             transform: "translateY(-50%)",
-                            color: "rgba(255,255,255,0.4)",
+                            color: "#94A3B8",
                             background: "none",
                             border: "none",
                             cursor: "pointer",
@@ -353,7 +367,7 @@ export default function LoginPage() {
                             alignItems: "center",
                           }}
                         >
-                          {showPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
+                          {showPassword ? <EyeSlash size={18} weight="bold" /> : <Eye size={18} weight="bold" />}
                         </button>
                       </div>
                     </div>
@@ -380,31 +394,31 @@ export default function LoginPage() {
                       disabled={isLoading}
                       style={{
                         width: "100%",
-                        padding: "16px 0",
-                        borderRadius: 14,
+                        padding: "14px 0",
+                        borderRadius: 12,
                         background: isLoading ? "rgba(255, 127, 80, 0.6)" : "#FF7F50",
                         color: "white",
                         border: "none",
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: 600,
                         cursor: isLoading ? "not-allowed" : "pointer",
                         fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
-                        boxShadow: "0 8px 24px rgba(255, 127, 80, 0.35)",
+                        boxShadow: "0 6px 18px rgba(255, 127, 80, 0.25)",
                         transition: "all 0.3s ease",
                         letterSpacing: "0.02em"
                       }}
                       onMouseEnter={(e) => {
                         if (!isLoading) {
                           e.currentTarget.style.background = "#e66a3e";
-                          e.currentTarget.style.transform = "translateY(-2px)";
-                          e.currentTarget.style.boxShadow = "0 12px 30px rgba(255, 127, 80, 0.45)";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                          e.currentTarget.style.boxShadow = "0 8px 24px rgba(255, 127, 80, 0.35)";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isLoading) {
                           e.currentTarget.style.background = "#FF7F50";
                           e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow = "0 8px 24px rgba(255, 127, 80, 0.35)";
+                          e.currentTarget.style.boxShadow = "0 6px 18px rgba(255, 127, 80, 0.25)";
                         }
                       }}
                     >
@@ -425,14 +439,16 @@ export default function LoginPage() {
             left: 0,
             width: "100%",
             textAlign: "center",
-            fontSize: 12,
-            color: "rgba(255,255,255,0.3)",
+            fontSize: 11,
+            color: "#94A3B8",
             padding: "0 16px",
           }}
         >
+
           <p>&copy; 2026 SNS Academy ERP. Empowering Education Through Design Thinking.</p>
         </div>
       </div>
+
 
       {/* Right Side: Image */}
       <div 

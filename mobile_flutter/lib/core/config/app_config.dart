@@ -9,9 +9,8 @@ class AppConfig {
     if (kIsWeb) {
       return 'http://localhost:5000';
     } else {
-      // Use 10.0.2.2 for Android emulator (maps to host's localhost).
-      // For physical devices, replace with your computer's LAN IP.
-      return 'http://10.0.2.2:5000';
+      // Physical device: use your computer's LAN IP
+      return 'http://192.168.23.127:5000';
     }
   }
 
