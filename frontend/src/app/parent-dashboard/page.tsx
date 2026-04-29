@@ -74,23 +74,33 @@ export default function ParentDashboard() {
       </div>
 
       <main className="flex-1 h-screen overflow-y-auto w-full min-w-0">
-        {/* Mobile Header Component */}
+        {/* Premium Mobile Header Component */}
         <div 
-          className="md:hidden flex items-center justify-between px-6 py-4 sticky top-0 z-30 shadow-sm"
+          className="md:hidden grid grid-cols-3 items-center px-5 py-3 sticky top-0 z-30 shadow-[0_2px_12px_rgba(0,0,0,0.03)]"
           style={{ background: theme.sidebarBg, borderBottom: `1px solid ${theme.border}` }}
         >
-          <button 
-            onClick={() => setIsSidebarOpen(true)}
-            className="p-2 -ml-2 text-[#FF7F50] rounded-md transition-colors"
-          >
-            <List size={32} weight="bold" />
-          </button>
-          <div className="flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2">
-            <span className="font-bold text-base font-poppins" style={{ color: theme.text }}>SNS Academy</span>
-            <span className="text-[10px] text-[#FF7F50] font-bold tracking-wider leading-none mt-0.5">PARENT</span>
+          <div className="flex justify-start">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-1.5 -ml-1.5 text-[#FF7F50] rounded-xl active:bg-orange-50 active:scale-95 transition-all"
+            >
+              <List size={28} weight="bold" />
+            </button>
           </div>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF7F50] to-[#e66a3e] text-white flex items-center justify-center font-bold text-sm shadow-md">
-            {activeStudent.avatar}
+          
+          <div className="flex flex-col items-center justify-center">
+            <span className="font-extrabold text-[15px] tracking-tight font-poppins leading-none" style={{ color: theme.text }}>
+              SNS Academy
+            </span>
+            <span className="text-[9px] text-[#FF7F50] font-bold tracking-[0.15em] uppercase mt-1">
+              Parent
+            </span>
+          </div>
+
+          <div className="flex justify-end">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF7F50] to-[#e66a3e] text-white flex items-center justify-center font-bold text-xs shadow-[0_2px_8px_rgba(255,127,80,0.3)] ring-2 ring-white">
+              {activeStudent.avatar}
+            </div>
           </div>
         </div>
 
