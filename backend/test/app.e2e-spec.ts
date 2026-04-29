@@ -22,12 +22,13 @@ describe('AppController (e2e)', () => {
       .expect(200)
       .expect(({ body }) => {
         expect(body.status).toBe('ok');
+        expect(body.service).toBe('sns-erp-backend');
       });
   });
 
   it('/auth/login (POST)', () => {
-    process.env.DEMO_USER_EMAIL = 'admin@sns-erp.local';
     process.env.DEMO_USER_PASSWORD = 'ChangeMe123!';
+    process.env.DEMO_USER_EMAIL = 'teacher@sns-erp.local';
 
     return request(app.getHttpServer())
       .post('/auth/login')
@@ -37,8 +38,10 @@ describe('AppController (e2e)', () => {
       })
       .expect(201)
       .expect(({ body }) => {
-        expect(body.accessToken).toBe('demo-auth-token');
+        expect(body.accessToken).toEqual(expect.any(String));
+        expect(body.refreshToken).toEqual(expect.any(String));
         expect(body.user.email).toBe('admin@sns-erp.local');
+        expect(body.user.role).toBe('admin');
       });
   });
 
