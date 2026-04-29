@@ -44,9 +44,8 @@ export class UsersService {
       ),
       this.createSeedUser(
         'teacher-1',
-        process.env.DEMO_USER_NAME?.trim() || 'Teacher User',
-        process.env.DEMO_USER_EMAIL?.trim().toLowerCase() ||
-          'teacher@sns-erp.local',
+        'Teacher User',
+        'teacher@sns-erp.local',
         'teacher',
         'Mathematics',
         sharedPassword,

@@ -141,7 +141,7 @@ class _SnsErpAppState extends State<SnsErpApp> {
               : DashboardScreen(
                   session: _session!,
                   onLogout: () {
-                    void _logout();
+                    _logout();
                   },
                 ),
     );

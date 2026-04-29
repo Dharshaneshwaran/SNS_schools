@@ -9,7 +9,7 @@ async function bootstrap() {
     .filter(Boolean);
 
   app.enableCors({
-    origin: allowedOrigins?.length ? allowedOrigins : true,
+    origin: true,
     credentials: true,
   });
 
