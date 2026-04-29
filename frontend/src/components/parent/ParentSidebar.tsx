@@ -170,12 +170,17 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
 
       {/* Bottom */}
       <div style={{ padding: "16px 12px", borderTop: `1px solid ${theme.border}` }}>
-        <button style={{
-          width: "100%", display: "flex", alignItems: "center", gap: 12,
-          padding: "11px 14px", borderRadius: 12, background: "transparent",
-          color: theme.textMuted, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
-          transition: "all 0.2s", fontFamily: "var(--font-inter,'Inter',sans-serif)",
-        }}
+        <button 
+          onClick={() => {
+            // In a real app, clear auth tokens here before redirecting
+            window.location.href = '/login';
+          }}
+          style={{
+            width: "100%", display: "flex", alignItems: "center", gap: 12,
+            padding: "11px 14px", borderRadius: 12, background: "transparent",
+            color: theme.textMuted, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
+            transition: "all 0.2s", fontFamily: "var(--font-inter,'Inter',sans-serif)",
+          }}
           onMouseEnter={(e) => { e.currentTarget.style.background = theme.isDark ? "rgba(255,127,80,0.1)" : "#fff0ed"; e.currentTarget.style.color = theme.accent; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = theme.textMuted; }}
         >

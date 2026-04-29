@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 
 import '../../../../core/models/auth_session.dart';
 import '../../../auth/data/auth_api_service.dart';
+import '../../../auth/data/auth_storage_service.dart';
 
 class SettingsTab extends StatefulWidget {
   final AuthSession session;
@@ -19,6 +22,8 @@ class SettingsTab extends StatefulWidget {
 
 class _SettingsTabState extends State<SettingsTab> {
   final _authApiService = const AuthApiService();
+  final _authStorage = AuthStorageService();
+  final _localAuth = LocalAuthentication();
   
   // Profile Form
   final _profileFormKey = GlobalKey<FormState>();
@@ -33,11 +38,60 @@ class _SettingsTabState extends State<SettingsTab> {
   final _confirmPasswordCtrl = TextEditingController();
   bool _isPasswordLoading = false;
 
+  // Biometrics
+  bool _biometricsEnabled = false;
+
   @override
   void initState() {
     super.initState();
     _emailCtrl = TextEditingController(text: widget.session.user.email);
     _phoneCtrl = TextEditingController(text: '+91 98765 43210'); // Mock phone for now
+    _loadBiometricPref();
+  }
+
+  Future<void> _loadBiometricPref() async {
+    final enabled = await _authStorage.getBiometricsEnabled();
+    setState(() {
+      _biometricsEnabled = enabled;
+    });
+  }
+
+  Future<void> _toggleBiometrics(bool value) async {
+    if (value) {
+      // Trying to enable
+      try {
+        final canCheckBiometrics = await _localAuth.canCheckBiometrics;
+        final isDeviceSupported = await _localAuth.isDeviceSupported();
+
+        if (!canCheckBiometrics || !isDeviceSupported) {
+          _showSnackBar('Biometric authentication is not supported or not set up on this device.', true);
+          return;
+        }
+
+        final didAuthenticate = await _localAuth.authenticate(
+          localizedReason: 'Please authenticate to enable App Lock',
+          biometricOnly: false,
+          persistAcrossBackgrounding: true,
+        );
+
+        if (didAuthenticate) {
+          await _authStorage.setBiometricsEnabled(true);
+          setState(() {
+            _biometricsEnabled = true;
+          });
+          _showSnackBar('App Lock enabled successfully!', false);
+        }
+      } on PlatformException catch (e) {
+        _showSnackBar('Error: ${e.message}', true);
+      }
+    } else {
+      // Disable
+      await _authStorage.setBiometricsEnabled(false);
+      setState(() {
+        _biometricsEnabled = false;
+      });
+      _showSnackBar('App Lock disabled.', false);
+    }
   }
 
   @override
@@ -115,6 +169,48 @@ class _SettingsTabState extends State<SettingsTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // Security & App Lock Section
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.security, color: Color(0xFFFF7F50)),
+                  SizedBox(width: 8),
+                  Text('Security & App Lock', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text('Require fingerprint or device PIN to open the app.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              const SizedBox(height: 16),
+              
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Enable App Lock (Biometrics)', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Ask for fingerprint on app start'),
+                value: _biometricsEnabled,
+                onChanged: _toggleBiometrics,
+                activeColor: const Color(0xFFFF7F50),
+              ),
+            ],
+          ),
+        ),
+        
+        const SizedBox(height: 24),
+
         // Profile Section
         Container(
           padding: const EdgeInsets.all(20),

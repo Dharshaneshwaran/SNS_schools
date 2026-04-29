@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 
 import 'core/constants/app_roles.dart';
 import 'core/models/auth_session.dart';
@@ -18,10 +20,12 @@ class SnsErpApp extends StatefulWidget {
 class _SnsErpAppState extends State<SnsErpApp> {
   final AuthApiService _authApiService = const AuthApiService();
   final AuthStorageService _authStorageService = AuthStorageService();
+  final LocalAuthentication _localAuth = LocalAuthentication();
 
   AuthSession? _session;
   bool _isBootstrapping = true;
   bool _isSubmitting = false;
+  bool _isBiometricLocked = false;
   String _message =
       'Use the teacher account to access the mobile dashboard foundation.';
 
@@ -46,6 +50,8 @@ class _SnsErpAppState extends State<SnsErpApp> {
         accessToken: storedSession.accessToken,
       );
 
+      final isBiometricsEnabled = await _authStorageService.getBiometricsEnabled();
+
       setState(() {
         _session = AuthSession(
           accessToken: storedSession.accessToken,
@@ -54,17 +60,36 @@ class _SnsErpAppState extends State<SnsErpApp> {
           user: user,
         );
         _isBootstrapping = false;
+        if (isBiometricsEnabled) {
+          _isBiometricLocked = true;
+        }
       });
+
+      if (isBiometricsEnabled) {
+        _promptBiometrics();
+      }
+
     } catch (_) {
       try {
         final refreshedSession = await _authApiService.refresh(
           refreshToken: storedSession.refreshToken,
         );
         await _authStorageService.saveSession(refreshedSession);
+        
+        final isBiometricsEnabled = await _authStorageService.getBiometricsEnabled();
+
         setState(() {
           _session = refreshedSession;
           _isBootstrapping = false;
+          if (isBiometricsEnabled) {
+            _isBiometricLocked = true;
+          }
         });
+
+        if (isBiometricsEnabled) {
+          _promptBiometrics();
+        }
+
       } catch (_) {
         await _authStorageService.clearSession();
         setState(() {
@@ -72,6 +97,23 @@ class _SnsErpAppState extends State<SnsErpApp> {
           _isBootstrapping = false;
         });
       }
+    }
+  }
+
+  Future<void> _promptBiometrics() async {
+    try {
+      final didAuthenticate = await _localAuth.authenticate(
+        localizedReason: 'Unlock SNS ERP',
+        biometricOnly: false,
+        persistAcrossBackgrounding: true,
+      );
+      if (didAuthenticate) {
+        setState(() {
+          _isBiometricLocked = false;
+        });
+      }
+    } on PlatformException catch (_) {
+      // Handle error quietly or let them retry
     }
   }
 
@@ -94,10 +136,21 @@ class _SnsErpAppState extends State<SnsErpApp> {
       }
 
       await _authStorageService.saveSession(nextSession);
+      
+      final isBiometricsEnabled = await _authStorageService.getBiometricsEnabled();
+
       setState(() {
         _session = nextSession;
         _message = 'Welcome back, ${nextSession.user.name}.';
+        if (isBiometricsEnabled) {
+          _isBiometricLocked = true;
+        }
       });
+
+      if (isBiometricsEnabled) {
+        _promptBiometrics();
+      }
+
     } catch (error) {
       setState(() {
         _message = error.toString().replaceFirst('Exception: ', '');
@@ -115,6 +168,7 @@ class _SnsErpAppState extends State<SnsErpApp> {
       _session = null;
       _message =
           'Use the teacher or parent account to access the mobile app.';
+      _isBiometricLocked = false;
     });
   }
 
@@ -139,15 +193,17 @@ class _SnsErpAppState extends State<SnsErpApp> {
                   message: _message,
                   onSubmit: _handleLogin,
                 )
-              : _session!.user.role == AppRoles.parent
-                  ? ParentDashboardScreen(
-                      session: _session!,
-                      onLogout: _logout,
-                    )
-                  : DashboardScreen(
-                      session: _session!,
-                      onLogout: _logout,
-                    ),
+              : _isBiometricLocked
+                  ? _LockScreen(onUnlock: _promptBiometrics, onLogout: _logout)
+                  : _session!.user.role == AppRoles.parent
+                      ? ParentDashboardScreen(
+                          session: _session!,
+                          onLogout: _logout,
+                        )
+                      : DashboardScreen(
+                          session: _session!,
+                          onLogout: _logout,
+                        ),
     );
   }
 }
@@ -160,6 +216,54 @@ class _BootScreen extends StatelessWidget {
     return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(),
+      ),
+    );
+  }
+}
+
+class _LockScreen extends StatelessWidget {
+  final VoidCallback onUnlock;
+  final VoidCallback onLogout;
+
+  const _LockScreen({required this.onUnlock, required this.onLogout});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.lock, size: 80, color: Color(0xFFFF7F50)),
+            const SizedBox(height: 24),
+            const Text(
+              'App Locked',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Verify your identity to continue',
+              style: TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 48),
+            ElevatedButton.icon(
+              onPressed: onUnlock,
+              icon: const Icon(Icons.fingerprint),
+              label: const Text('Unlock'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF7F50),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              ),
+            ),
+            const SizedBox(height: 24),
+            TextButton(
+              onPressed: onLogout,
+              child: const Text('Sign Out', style: TextStyle(color: Colors.grey)),
+            )
+          ],
+        ),
       ),
     );
   }

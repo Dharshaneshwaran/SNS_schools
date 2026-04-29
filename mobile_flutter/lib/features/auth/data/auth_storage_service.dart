@@ -32,4 +32,13 @@ class AuthStorageService {
   Future<void> clearSession() {
     return _storage.delete(key: _sessionKey);
   }
+
+  Future<void> setBiometricsEnabled(bool enabled) async {
+    await _storage.write(key: 'biometrics_enabled', value: enabled.toString());
+  }
+
+  Future<bool> getBiometricsEnabled() async {
+    final value = await _storage.read(key: 'biometrics_enabled');
+    return value == 'true';
+  }
 }
