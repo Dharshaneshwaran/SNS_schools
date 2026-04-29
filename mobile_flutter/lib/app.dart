@@ -6,6 +6,7 @@ import 'features/auth/data/auth_api_service.dart';
 import 'features/auth/data/auth_storage_service.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/parent_dashboard/presentation/parent_dashboard_screen.dart';
 
 class SnsErpApp extends StatefulWidget {
   const SnsErpApp({super.key});
@@ -86,9 +87,9 @@ class _SnsErpAppState extends State<SnsErpApp> {
         password: password,
       );
 
-      if (nextSession.user.role != AppRoles.teacher) {
+      if (nextSession.user.role != AppRoles.teacher && nextSession.user.role != AppRoles.parent) {
         throw Exception(
-          'This account belongs to the web dashboard. Please use a teacher login for the mobile app.',
+          'This account belongs to the web dashboard. Please use a teacher or parent login for the mobile app.',
         );
       }
 
@@ -113,7 +114,7 @@ class _SnsErpAppState extends State<SnsErpApp> {
     setState(() {
       _session = null;
       _message =
-          'Use the teacher account to access the mobile dashboard foundation.';
+          'Use the teacher or parent account to access the mobile app.';
     });
   }
 
@@ -138,12 +139,15 @@ class _SnsErpAppState extends State<SnsErpApp> {
                   message: _message,
                   onSubmit: _handleLogin,
                 )
-              : DashboardScreen(
-                  session: _session!,
-                  onLogout: () {
-                    _logout();
-                  },
-                ),
+              : _session!.user.role == AppRoles.parent
+                  ? ParentDashboardScreen(
+                      session: _session!,
+                      onLogout: _logout,
+                    )
+                  : DashboardScreen(
+                      session: _session!,
+                      onLogout: _logout,
+                    ),
     );
   }
 }
