@@ -189,23 +189,6 @@ class _EventsGalleryTabState extends State<EventsGalleryTab> {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
-      appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(Icons.photo_library, color: Color(0xFFFF7F50)),
-            const SizedBox(width: 8),
-            Text(
-              'Events Gallery',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-      ),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
