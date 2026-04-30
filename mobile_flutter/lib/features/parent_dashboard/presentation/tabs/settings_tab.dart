@@ -79,8 +79,10 @@ class _SettingsTabState extends State<SettingsTab> {
 
         final didAuthenticate = await _localAuth.authenticate(
           localizedReason: 'Please authenticate to enable App Lock',
-          biometricOnly: false,
-          persistAcrossBackgrounding: true,
+          options: const AuthenticationOptions(
+            biometricOnly: false,
+            stickyAuth: true,
+          ),
         );
 
         if (didAuthenticate) {
@@ -215,7 +217,7 @@ class _SettingsTabState extends State<SettingsTab> {
                     widget.onThemeChanged!(val);
                   }
                 },
-                activeColor: const Color(0xFFFF7F50),
+                activeThumbColor: const Color(0xFFFF7F50),
               ),
               const Divider(height: 24),
               SwitchListTile(
@@ -231,7 +233,7 @@ class _SettingsTabState extends State<SettingsTab> {
                     false,
                   );
                 },
-                activeColor: const Color(0xFFFF7F50),
+                activeThumbColor: const Color(0xFFFF7F50),
               ),
               const Divider(height: 24),
               Row(
@@ -305,7 +307,7 @@ class _SettingsTabState extends State<SettingsTab> {
                 subtitle: const Text('Ask for fingerprint on app start'),
                 value: _biometricsEnabled,
                 onChanged: _toggleBiometrics,
-                activeColor: const Color(0xFFFF7F50),
+                activeThumbColor: const Color(0xFFFF7F50),
               ),
             ],
           ),

@@ -19,7 +19,7 @@ import { useAuth } from "../../hooks/use-auth";
 import { getDashboardRoute } from "../../lib/role-access";
 
 export default function LoginPage() {
-  const [role, setRole] = useState<null | "teacher" | "parent">(null);
+  const [role, setRole] = useState<null | "admin" | "teacher" | "parent">(null);
   const [showPassword, setShowPassword] = useState(false);
   const [emailOrMobile, setEmailOrMobile] = useState("");
   const [password, setPassword] = useState("");
