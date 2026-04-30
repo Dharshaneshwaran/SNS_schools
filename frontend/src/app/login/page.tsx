@@ -154,8 +154,9 @@ export default function LoginPage() {
                     </p>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
                     {[
+                      { key: "admin" as const, icon: <Shield size={40} weight="duotone" />, label: "Admin" },
                       { key: "teacher" as const, icon: <ChalkboardTeacher size={40} weight="duotone" />, label: "Teacher" },
                       { key: "parent" as const, icon: <Users size={40} weight="duotone" />, label: "Parent" },
                     ].map(({ key, icon, label }) => (
@@ -225,9 +226,11 @@ export default function LoginPage() {
 
                   <div style={{ marginBottom: 28 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                      {role === "teacher"
-                        ? <ChalkboardTeacher size={22} style={{ color: "#FF7F50" }} weight="duotone" />
-                        : <Users size={22} style={{ color: "#FF7F50" }} weight="duotone" />
+                      {role === "admin"
+                        ? <Shield size={22} style={{ color: "#FF7F50" }} weight="duotone" />
+                        : role === "teacher"
+                          ? <ChalkboardTeacher size={22} style={{ color: "#FF7F50" }} weight="duotone" />
+                          : <Users size={22} style={{ color: "#FF7F50" }} weight="duotone" />
                       }
                       <h2
                         style={{
@@ -279,7 +282,7 @@ export default function LoginPage() {
                         type={role === "parent" ? "tel" : "email"}
                         value={emailOrMobile}
                         onChange={(e) => setEmailOrMobile(e.target.value)}
-                        placeholder={role === "parent" ? "+91 9XXXXXXXXX" : "teacher@sns-erp.local"}
+                        placeholder={role === "admin" ? "admin@sns-erp.local" : role === "parent" ? "+91 9XXXXXXXXX" : "teacher@sns-erp.local"}
                         required
                         style={inputStyle}
                         onFocus={(e) => {

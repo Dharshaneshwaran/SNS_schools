@@ -1,59 +1,60 @@
 @import "tailwindcss";
 
 @theme {
-    --color-primary: #FF7F50;
-    --color-primary-light: #ff9d7a;
-    --color-primary-dark: #e66a3e;
-    --color-secondary: #FFFFFF;
-    --color-accent: #121212;
-    --color-accent-light: #1E1E1E;
-    --color-text-main: #2D3436;
-    --color-text-muted: #636E72;
-
-    --font-inter: var(--font-inter), "Inter", sans-serif;
-    --font-poppins: var(--font-poppins), "Poppins", sans-serif;
-
-    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
-    --shadow-medium: 0 15px 40px rgba(255, 127, 80, 0.15);
-
-    --color-background: #f4f7fb;
-    --color-foreground: #18233d;
-    --font-sans: "Inter", "Segoe UI", sans-serif;
-}
-
-*, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-    font-size: 16px;
-}
-
-body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: var(--bg-primary, #FFFFFF);
-    color: var(--text-primary, #2D3436);
-    line-height: 1.6;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    transition: background-color 0.3s ease, color 0.3s ease;
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-strong: var(--accent-strong);
+  --color-border: var(--border);
 }
 
 :root {
-    --bg-primary: #F8F9FA;
-    --bg-secondary: #FFFFFF;
-    --accent: #FF6A00;
-    --accent-glow: rgba(255, 106, 0, 0.15);
-    --text-primary: #1A1A1A;
-    --text-secondary: #666666;
-    --border: rgba(0, 0, 0, 0.08);
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-    --radius-sm: 12px;
-    --radius-md: 20px;
-    --radius-lg: 32px;
+  --background: #f4f7fb;
+  --foreground: #18233d;
+  --primary: #FF7F50;
+  --accent: #FF7F50;
+  --accent-soft: rgba(255, 127, 80, 0.1);
+  --accent-strong: #e66a3e;
+  --border: rgba(0, 0, 0, 0.08);
+  --card-bg: #ffffff;
+  --sidebar: #ffffff;
+  --sidebar-text: #31415f;
+  --sidebar-active: #ecebff;
+  --panel: rgba(255, 255, 255, 0.92);
+  --panel-strong: #ffffff;
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply rounded-[2rem] border border-[var(--border)] bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.05)] backdrop-blur-md;
+  }
+  
+  .premium-shadow {
+    @apply shadow-[0_20px_50px_rgba(0,0,0,0.04)];
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
 }
 
 [data-theme='dark'] {
@@ -572,18 +573,6 @@ h1, h2, h3, h4 {
     color: #aaa;
 }
 
-/* ─── Dashboard backward compat ─── */
-:root {
-    --panel: rgba(255,255,255,0.92);
-    --panel-strong: #ffffff;
-    --muted: #64748b;
-    --border: rgba(148,163,184,0.22);
-    --sidebar: #ffffff;
-    --sidebar-text: #31415f;
-    --sidebar-active: #ecebff;
-    --accent-soft: #eef0ff;
-    --accent: #4f46e5;
-}
 
 /* ─── Responsive ─── */
 @media (max-width: 1024px) {
