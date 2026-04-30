@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/models/auth_session.dart';
 import '../../../core/models/student.dart';
+import 'tabs/dashboard_tab.dart';
 import 'tabs/events_gallery_tab.dart';
 import 'tabs/profile_tab.dart';
 import 'tabs/diary_tab.dart';
@@ -57,12 +58,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   }
 
   final List<String> _pageTitles = [
+    'Dashboard',
     'Events Gallery',
-    'Profile',
-    'Diary',
-    'Academic',
-    'Transport',
+    'Diary & Homework',
+    'Notifications',
+    'Academic Reports',
+    'Transport Tracking',
     'Settings',
+    'My Profile',
   ];
 
   void _selectTab(int index) {

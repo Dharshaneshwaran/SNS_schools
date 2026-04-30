@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/models/student.dart';
+import '../../../../core/models/student.dart';
 
 class DashboardTab extends StatelessWidget {
   final Student student;
