@@ -9,11 +9,12 @@ import AcademicSection from "../../components/parent/sections/AcademicSection";
 import TransportSection from "../../components/parent/sections/TransportSection";
 import SettingsSection from "../../components/parent/sections/SettingsSection";
 import DashboardHome from "../../components/parent/sections/DashboardHome";
+import { ChatPage } from "../../components/dashboard/chat-page";
 import { Bell, MagnifyingGlass, Sun, Moon, ChatCircleDots, List } from "@phosphor-icons/react";
 
 import { DashboardTheme } from "../../types/theme";
 
-export type MenuKey = "dashboard" | "events" | "profile" | "diary" | "notifications" | "academic" | "transport" | "settings";
+export type MenuKey = "dashboard" | "events" | "profile" | "diary" | "notifications" | "academic" | "transport" | "settings" | "chat";
 
 const students = [
   { id: 1, name: "Arjun Sharma", class: "8", section: "A", avatar: "AS" },
@@ -50,6 +51,7 @@ export default function ParentDashboard() {
       case "academic":      return <AcademicSection student={activeStudent} theme={theme} />;
       case "transport":     return <TransportSection theme={theme} />;
       case "settings":      return <SettingsSection theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
+      case "chat":          return <div className="h-[calc(100vh-130px)] -mt-4"><ChatPage /></div>;
       default:              return <EventsGallery theme={theme} />;
     }
   };

@@ -8,7 +8,7 @@ import DashboardOverview from "../../components/teacher/DashboardOverview";
 import ClassesSubjects from "../../components/teacher/ClassesSubjects";
 import ScheduleManager from "../../components/teacher/ScheduleManager";
 import AssignmentsExams from "../../components/teacher/AssignmentsExams";
-import CommunicationHub from "../../components/teacher/CommunicationHub";
+import { ChatPage } from "../../components/dashboard/chat-page";
 import LearningResources from "../../components/teacher/LearningResources";
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings, BarChart3, HelpCircle } from "lucide-react";
@@ -29,7 +29,7 @@ export default function TeacherDashboard() {
       case "classes": return <ClassesSubjects />;
       case "schedule": return <ScheduleManager />;
       case "tasks": return <AssignmentsExams />;
-      case "communication": return <CommunicationHub />;
+      case "communication": return <div className="h-[calc(100vh-160px)] -mx-6 lg:-mx-10 -mt-8"><ChatPage /></div>;
       case "resources": return <LearningResources />;
       case "tools": return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
