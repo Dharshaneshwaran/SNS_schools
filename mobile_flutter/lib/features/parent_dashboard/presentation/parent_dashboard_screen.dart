@@ -101,9 +101,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       ),
       drawer: _buildDrawer(theme),
       body: [
+        DashboardTab(student: selectedStudent),
         const EventsGalleryTab(),
-        ProfileTab(student: selectedStudent),
         DiaryTab(student: selectedStudent),
+        DiaryTab(student: selectedStudent), // Placeholder for Notifications
         AcademicTab(student: selectedStudent),
         TransportTab(student: selectedStudent),
         SettingsTab(
@@ -116,6 +117,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             });
           },
         ),
+        ProfileTab(student: selectedStudent),
       ][_currentIndex],
     );
   }
@@ -346,12 +348,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       ),
                     ),
                   ),
-                  _buildNavItem(0, 'Events Gallery', Icons.photo_library_outlined, Icons.photo_library),
-                  _buildNavItem(1, 'Profile', Icons.person_outline, Icons.person),
-                  _buildNavItem(2, 'Diary', Icons.menu_book_outlined, Icons.menu_book, badge: '3'),
-                  _buildNavItem(3, 'Academic', Icons.bar_chart_outlined, Icons.bar_chart),
-                  _buildNavItem(4, 'Transport', Icons.directions_bus_outlined, Icons.directions_bus),
-                  _buildNavItem(5, 'Settings', Icons.settings_outlined, Icons.settings),
+                  _buildNavItem(0, 'Dashboard', Icons.dashboard_outlined, Icons.dashboard),
+                  _buildNavItem(1, 'Events Gallery', Icons.photo_library_outlined, Icons.photo_library),
+                  _buildNavItem(2, 'Diary & Homework', Icons.menu_book_outlined, Icons.menu_book, badge: '3'),
+                  _buildNavItem(3, 'Notifications', Icons.notifications_none_rounded, Icons.notifications_rounded),
+                  _buildNavItem(4, 'Academic Reports', Icons.bar_chart_outlined, Icons.bar_chart),
+                  _buildNavItem(5, 'Transport Tracking', Icons.directions_bus_outlined, Icons.directions_bus),
+                  _buildNavItem(6, 'Settings', Icons.settings_outlined, Icons.settings),
+                  _buildNavItem(7, 'My Profile', Icons.person_outline, Icons.person),
                 ],
               ),
             ),

@@ -202,38 +202,56 @@ class _EventsGalleryTabState extends State<EventsGalleryTab> {
               ),
             ),
           ),
+          // Stories Section - Mirroring Web
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: 40,
-              child: ListView(
+            child: Container(
+              height: 110,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: ["All", "Sports", "Academic", "Cultural", "Meeting", "Health"]
-                    .map((cat) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ActionChip(
-                            label: Text(
-                              cat,
-                              style: TextStyle(
-                                color: cat == "All" ? Colors.white : Colors.grey[700],
-                                fontWeight: FontWeight.w600,
-                              ),
+                itemCount: events.length,
+                itemBuilder: (context, index) {
+                  final event = events[index];
+                  return Container(
+                    margin: const EdgeInsets.only(right: 16),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFF09433), Color(0xFFE6683C), Color(0xFFDC2743), Color(0xFFCC2366), Color(0xFFBC1888)],
+                              begin: Alignment.bottomLeft,
+                              end: Alignment.topRight,
                             ),
-                            backgroundColor: cat == "All" ? const Color(0xFFFF7F50) : Colors.white,
-                            side: cat == "All"
-                                ? BorderSide.none
-                                : BorderSide(color: Colors.grey[300]!),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            onPressed: () {},
                           ),
-                        ))
-                    .toList(),
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundImage: AssetImage(event.image),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          event.title.split(' ')[0],
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ),
-          const SliverPadding(padding: EdgeInsets.only(top: 16)),
+          const SliverPadding(padding: EdgeInsets.only(top: 8)),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
