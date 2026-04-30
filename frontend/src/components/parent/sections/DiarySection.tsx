@@ -12,7 +12,6 @@ const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: "classtimetable", label: "Class Timetable", icon: <Clock size={16} /> },
   { key: "examtimetable",  label: "Exam Timetable",  icon: <CalendarCheck size={16} /> },
   { key: "events",         label: "Upcoming Events", icon: <CalendarBlank size={16} /> },
-  { key: "notifications",  label: "Notifications",   icon: <Bell size={16} /> },
 ];
 
 const hwData = [
@@ -50,73 +49,103 @@ const notifications = [
 
 import { DashboardTheme } from "../../../types/theme";
 
-export default function DiarySection({ student, theme }: { student: Student; theme: DashboardTheme }) {
-  const [activeTab, setActiveTab] = useState<Tab>("homework");
+export default function DiarySection({ student, theme, showOnlyNotifications = false }: { student: Student; theme: DashboardTheme; showOnlyNotifications?: boolean }) {
+  const [activeTab, setActiveTab] = useState<Tab>(showOnlyNotifications ? "notifications" : "homework");
 
   return (
-    <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-          <BookOpen size={26} weight="duotone" color="#FF7F50" />
-          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: theme.text }}>Diary</h1>
-        </div>
-        <p style={{ color: theme.textMuted, fontSize: 14 }}>Homework, timetables & notifications for {student.name}</p>
-      </div>
-
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.key;
-          return (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              style={{
-                display: "flex", alignItems: "center", gap: 7,
-                padding: "9px 16px", borderRadius: 10, cursor: "pointer",
-                fontFamily: "var(--font-inter,'Inter',sans-serif)",
-                fontSize: 13, fontWeight: isActive ? 600 : 500,
-                background: isActive ? "#FF7F50" : theme.cardBg,
-                color: isActive ? "white" : theme.textMuted,
-                boxShadow: isActive ? "0 4px 12px rgba(255,127,80,0.3)" : theme.isDark ? "none" : "0 1px 6px rgba(0,0,0,0.06)",
-                border: isActive ? "none" : `1px solid ${theme.border}`,
-                transition: "all 0.2s",
-              }}>
-              {tab.icon} {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      {!showOnlyNotifications && (
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", background: theme.isDark ? "rgba(255,255,255,0.05)" : "#f1f5f9", padding: "6px", borderRadius: 16, width: "fit-content" }}>
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "10px 20px", borderRadius: 12, border: "none",
+                  cursor: "pointer", fontSize: 14, fontWeight: 700,
+                  background: isActive ? (theme.isDark ? "rgba(255,255,255,0.1)" : "#FFFFFF") : "transparent",
+                  color: isActive ? "#FF7F50" : theme.textMuted,
+                  boxShadow: isActive ? "0 4px 12px rgba(0,0,0,0.05)" : "none",
+                  transition: "all 0.2s",
+                  fontFamily: "var(--font-inter,'Inter',sans-serif)",
+                }}>
+                {tab.icon} {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Content */}
       <motion.div key={activeTab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         {activeTab === "homework" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {hwData.map((hw, i) => (
-              <div key={i} style={{ background: theme.cardBg, borderRadius: 14, padding: "18px 20px", boxShadow: theme.isDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.3s ease" }}>
+              <motion.div
+                key={i}
+                className="premium-card"
+                style={{
+                  padding: "24px 32px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
                 <div>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#FF7F50", textTransform: "uppercase", letterSpacing: "0.05em" }}>{hw.subject}</span>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: theme.text, margin: "4px 0" }}>{hw.task}</p>
-                  <p style={{ fontSize: 12, color: theme.textMuted }}>Due: {hw.due}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: hw.status === "Submitted" ? "#10b981" : "#FF7F50" }} />
+                    <span style={{ fontSize: 12, fontWeight: 800, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>{hw.subject}</span>
+                  </div>
+                  <p style={{ fontSize: 18, fontWeight: 800, color: theme.text, marginBottom: 6 }}>{hw.task}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: theme.textMuted, fontSize: 14, fontWeight: 600 }}>
+                    <CalendarBlank size={16} />
+                    Due: {hw.due}
+                  </div>
                 </div>
-                <span style={{ padding: "5px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: hw.status === "Submitted" ? "rgba(16,185,129,0.1)" : "rgba(255,127,80,0.1)", color: hw.status === "Submitted" ? "#059669" : "#FF7F50" }}>{hw.status}</span>
-              </div>
+                <div style={{
+                  padding: "10px 20px",
+                  borderRadius: 14,
+                  fontSize: 13,
+                  fontWeight: 800,
+                  background: hw.status === "Submitted" ? "rgba(16,185,129,0.08)" : "rgba(255,127,80,0.08)",
+                  color: hw.status === "Submitted" ? "#10b981" : "#FF7F50",
+                }}>
+                  {hw.status}
+                </div>
+              </motion.div>
             ))}
           </div>
         )}
 
         {activeTab === "classtimetable" && (
-          <div style={{ background: theme.cardBg, borderRadius: 16, overflow: "hidden", boxShadow: theme.isDark ? "none" : "0 4px 20px rgba(0,0,0,0.07)", border: `1px solid ${theme.border}`, transition: "all 0.3s ease" }}>
+          <div className="premium-card" style={{ overflow: "hidden" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ background: "linear-gradient(90deg,#FF7F50,#e66a3e)" }}>
-                  <th style={{ padding: "14px 16px", textAlign: "left", color: "white", fontSize: 13, fontWeight: 600 }}>Day</th>
-                  {["P1","P2","P3","P4","P5","P6"].map(p => <th key={p} style={{ padding: "14px 12px", textAlign: "center", color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 500 }}>{p}</th>)}
+                <tr style={{ background: theme.isDark ? "rgba(255,255,255,0.02)" : "#F8FAFC" }}>
+                  <th style={{ padding: "20px 24px", textAlign: "left", color: theme.textMuted, fontSize: 12, fontWeight: 800, textTransform: "uppercase" }}>DAY</th>
+                  {["P1","P2","P3","P4","P5","P6"].map(p => (
+                    <th key={p} style={{ padding: "20px 12px", textAlign: "center", color: theme.textMuted, fontSize: 12, fontWeight: 800 }}>{p}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {classTT.map((row, i) => (
-                  <tr key={i} style={{ borderBottom: `1px solid ${theme.border}`, background: i % 2 === 0 ? theme.isDark ? "rgba(255,255,255,0.02)" : "#fafafa" : "transparent" }}>
-                    <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600, color: theme.text }}>{row.day}</td>
-                    {row.periods.map((p, j) => <td key={j} style={{ padding: "12px", textAlign: "center", fontSize: 12, color: theme.textMuted }}>{p}</td>)}
+                  <tr key={i} style={{ borderBottom: `1px solid ${theme.border}` }}>
+                    <td style={{ padding: "20px 24px", fontSize: 15, fontWeight: 800, color: theme.text }}>{row.day}</td>
+                    {row.periods.map((p, j) => (
+                      <td key={j} style={{ padding: "20px 12px", textAlign: "center" }}>
+                        <span style={{ 
+                          fontSize: 13, 
+                          fontWeight: 700, 
+                          color: theme.text,
+                          padding: "6px 12px",
+                          borderRadius: 10,
+                          background: theme.isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9"
+                        }}>{p}</span>
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
@@ -125,48 +154,105 @@ export default function DiarySection({ student, theme }: { student: Student; the
         )}
 
         {activeTab === "examtimetable" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {examTT.map((e, i) => (
-              <div key={i} style={{ background: theme.cardBg, borderRadius: 14, padding: "18px 20px", boxShadow: theme.isDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", gap: 16, transition: "all 0.3s ease" }}>
-                <div style={{ width: 48, height: 48, borderRadius: 12, background: "linear-gradient(135deg,#FF7F50,#e66a3e)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, textAlign: "center", flexShrink: 0, lineHeight: 1.2 }}>{e.subject.slice(0,3)}</div>
+              <motion.div
+                key={i}
+                className="premium-card"
+                style={{
+                  padding: "24px 32px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 24,
+                }}
+              >
+                <div style={{ 
+                  width: 64, height: 64, borderRadius: 18, 
+                  background: "linear-gradient(135deg, #FF7F50, #e66a3e)", 
+                  color: "white", display: "flex", alignItems: "center", justifyContent: "center", 
+                  fontSize: 14, fontWeight: 900, textAlign: "center", flexShrink: 0, 
+                  boxShadow: "0 10px 20px rgba(255,127,80,0.25)",
+                }}>{e.subject.slice(0,3).toUpperCase()}</div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 700, fontSize: 15, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>{e.subject}</p>
-                  <p style={{ fontSize: 13, color: theme.textMuted, marginTop: 2 }}>{e.date} · {e.time} · {e.duration}</p>
+                  <p style={{ fontWeight: 900, fontSize: 20, color: theme.text, letterSpacing: "-0.01em" }}>{e.subject}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 20, marginTop: 6 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: theme.textMuted, fontSize: 14, fontWeight: 600 }}>
+                      <CalendarBlank size={16} /> {e.date}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: theme.textMuted, fontSize: 14, fontWeight: 600 }}>
+                      <Clock size={16} /> {e.time}
+                    </div>
+                  </div>
                 </div>
-              </div>
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ fontSize: 12, fontWeight: 800, color: "#FF7F50", textTransform: "uppercase", marginBottom: 4 }}>Duration</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: theme.text }}>{e.duration}</p>
+                </div>
+              </motion.div>
             ))}
           </div>
         )}
 
         {activeTab === "events" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {upcomingEvents.map((ev, i) => (
-              <div key={i} style={{ background: theme.cardBg, borderRadius: 14, padding: "16px 20px", boxShadow: theme.isDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.3s ease" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <CalendarBlank size={20} color="#FF7F50" weight="duotone" />
+              <motion.div
+                key={i}
+                className="premium-card"
+                style={{
+                  padding: "24px 32px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 16, background: "rgba(255,127,80,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <CalendarBlank size={28} color="#FF7F50" weight="bold" />
+                  </div>
                   <div>
-                    <p style={{ fontWeight: 600, fontSize: 14, color: theme.text }}>{ev.name}</p>
-                    <p style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>{ev.date}</p>
+                    <p style={{ fontWeight: 800, fontSize: 18, color: theme.text }}>{ev.name}</p>
+                    <p style={{ fontSize: 14, color: theme.textMuted, fontWeight: 600, marginTop: 4 }}>{ev.date}</p>
                   </div>
                 </div>
-                <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "rgba(255,127,80,0.1)", color: "#FF7F50" }}>{ev.type}</span>
-              </div>
+                <span style={{ 
+                  padding: "8px 16px", borderRadius: 12, fontSize: 13, fontWeight: 800, 
+                  background: theme.isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9",
+                  color: "#FF7F50",
+                }}>{ev.type}</span>
+              </motion.div>
             ))}
           </div>
         )}
 
         {activeTab === "notifications" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {notifications.map((n, i) => (
-              <div key={i} style={{ background: theme.cardBg, borderRadius: 14, padding: "16px 20px", boxShadow: theme.isDark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: `1px solid ${theme.border}`, display: "flex", alignItems: "flex-start", gap: 14, transition: "all 0.3s ease" }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,127,80,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Bell size={18} color="#FF7F50" weight="duotone" />
+              <motion.div
+                key={i}
+                className="premium-card"
+                style={{
+                  padding: "32px",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 24,
+                }}
+              >
+                <div style={{ 
+                  width: 56, height: 56, borderRadius: 16, 
+                  background: n.type === "alert" ? "#fef2f2" : "rgba(255,127,80,0.08)", 
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>
+                  <Bell size={28} color={n.type === "alert" ? "#ef4444" : "#FF7F50"} weight="bold" />
                 </div>
-                <div>
-                  <p style={{ fontSize: 14, fontWeight: 500, color: theme.text }}>{n.msg}</p>
-                  <p style={{ fontSize: 12, color: theme.textMuted, marginTop: 4 }}>{n.time}</p>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 18, fontWeight: 700, color: theme.text, lineHeight: 1.5 }}>{n.msg}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FF7F50" }} />
+                    <p style={{ fontSize: 13, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>{n.time}</p>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

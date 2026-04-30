@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  GraduationCap,
   ArrowLeft,
   ChalkboardTeacher,
   Users,
@@ -59,6 +58,7 @@ export default function LoginPage() {
     >
       {/* ── Left Panel: Form ── */}
       <div
+        className="mesh-bg"
         style={{
           width: "100%",
           maxWidth: 560,
@@ -67,25 +67,14 @@ export default function LoginPage() {
           justifyContent: "center",
           alignItems: "center",
           position: "relative",
-          background: "linear-gradient(160deg, #0f0f0f 0%, #1a1a1a 50%, #1e1e1e 100%)",
+          background: "#FFFFFF",
           zIndex: 10,
           flexShrink: 0,
         }}
       >
-        {/* Subtle orange glow at bottom */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: -100,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 400,
-            height: 300,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,127,80,0.18) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
+        {/* Background Decorative Elements */}
+        <div className="bg-glow" style={{ top: "-5%", left: "-5%", width: 400, height: 400, background: "radial-gradient(circle, rgba(255, 127, 80, 0.1), transparent 70%)" }} />
+        <div className="bg-glow" style={{ bottom: "-5%", right: "-5%", width: 350, height: 350, background: "radial-gradient(circle, rgba(79, 70, 229, 0.06), transparent 70%)", animationDelay: "-3s" }} />
 
         {/* Logo */}
         <Link
@@ -96,15 +85,22 @@ export default function LoginPage() {
             left: 36,
             display: "flex",
             alignItems: "center",
-            gap: 10,
+            gap: 12,
             textDecoration: "none",
-            color: "white",
+            color: "#121212",
             fontWeight: 800,
-            fontSize: 20,
+            fontSize: 22,
             fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
           }}
         >
-          <GraduationCap style={{ color: "#FF7F50" }} weight="fill" size={30} />
+          <div style={{ width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img 
+              src="/images/logo.png" 
+              alt="Logo" 
+              style={{ width: "100%", height: "auto", objectFit: "contain" }} 
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </div>
           SNS <span style={{ color: "#FF7F50" }}>Academy</span>
         </Link>
 
@@ -117,13 +113,12 @@ export default function LoginPage() {
         >
           <div
             style={{
-              background: "rgba(255,255,255,0.05)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              borderRadius: 20,
-              border: "1px solid rgba(255,255,255,0.1)",
-              boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+              background: "#FFFFFF",
+              borderRadius: 24,
+              border: "1px solid rgba(0,0,0,0.1)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.08)",
               padding: "44px 40px",
+              width: "100%",
             }}
           >
             <AnimatePresence mode="wait">
@@ -142,14 +137,14 @@ export default function LoginPage() {
                         fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
                         fontSize: 26,
                         fontWeight: 700,
-                        color: "white",
+                        color: "#121212",
                         marginBottom: 8,
                         letterSpacing: "-0.02em",
                       }}
                     >
                       Welcome Back
                     </h2>
-                    <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 14, lineHeight: 1.6 }}>
+                    <p style={{ color: "#636E72", fontSize: 14, lineHeight: 1.6 }}>
                       Select your role to access the SNS Academy ERP portal.
                     </p>
                   </div>
@@ -181,7 +176,7 @@ export default function LoginPage() {
                     }}
                   >
                     <Shield size={18} style={{ color: "#FF7F50", flexShrink: 0 }} weight="fill" />
-                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12.5, lineHeight: 1.5 }}>
+                    <p style={{ color: "#636E72", fontSize: 12.5, lineHeight: 1.5 }}>
                       Secured with end-to-end encryption. Your data is safe.
                     </p>
                   </div>
@@ -207,7 +202,7 @@ export default function LoginPage() {
                       display: "flex",
                       alignItems: "center",
                       gap: 6,
-                      color: "rgba(255,255,255,0.4)",
+                      color: "#636E72",
                       background: "none",
                       border: "none",
                       cursor: "pointer",
@@ -218,7 +213,7 @@ export default function LoginPage() {
                       transition: "color 0.2s",
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.color = "#FF7F50"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = "#636E72"; }}
                   >
                     <ArrowLeft size={16} weight="bold" /> Back to role selection
                   </button>
@@ -234,7 +229,7 @@ export default function LoginPage() {
                           fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
                           fontSize: 24,
                           fontWeight: 700,
-                          color: "white",
+                          color: "#121212",
                           letterSpacing: "-0.02em",
                           textTransform: "capitalize",
                         }}
@@ -242,7 +237,7 @@ export default function LoginPage() {
                         {role} Login
                       </h2>
                     </div>
-                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13.5 }}>
+                    <p style={{ color: "#636E72", fontSize: 13.5 }}>
                       Enter your {role === "parent" ? "mobile number" : "email address"} and password
                     </p>
                   </div>
@@ -321,7 +316,7 @@ export default function LoginPage() {
                             right: 14,
                             top: "50%",
                             transform: "translateY(-50%)",
-                            color: "rgba(255,255,255,0.35)",
+                            color: "#636E72",
                             background: "none",
                             border: "none",
                             cursor: "pointer",
@@ -330,7 +325,7 @@ export default function LoginPage() {
                             alignItems: "center",
                           }}
                         >
-                          {showPassword ? <EyeSlash size={18} weight="bold" /> : <Eye size={18} weight="bold" />}
+                          {showPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
                         </button>
                       </div>
                     </div>
@@ -351,34 +346,33 @@ export default function LoginPage() {
                       disabled={isLoading}
                       style={{
                         width: "100%",
-                        padding: "15px 0",
-                        borderRadius: 12,
+                        padding: "16px 0",
+                        borderRadius: 8,
                         background: isLoading ? "rgba(255,127,80,0.5)" : "#FF7F50",
                         color: "white",
                         border: "none",
-                        fontSize: 15,
-                        fontWeight: 600,
+                        fontSize: 14,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
                         cursor: isLoading ? "not-allowed" : "pointer",
                         fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
-                        boxShadow: "0 8px 24px rgba(255,127,80,0.3)",
-                        transition: "all 0.3s ease",
+                        transition: "all 0.2s ease",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: 8,
+                        gap: 10,
                       }}
                       onMouseEnter={(e) => {
                         if (!isLoading) {
-                          e.currentTarget.style.background = "#e66a3e";
+                          e.currentTarget.style.background = "#121212";
                           e.currentTarget.style.transform = "translateY(-2px)";
-                          e.currentTarget.style.boxShadow = "0 12px 32px rgba(255,127,80,0.4)";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isLoading) {
                           e.currentTarget.style.background = "#FF7F50";
                           e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow = "0 8px 24px rgba(255,127,80,0.3)";
                         }
                       }}
                     >
@@ -402,7 +396,7 @@ export default function LoginPage() {
             width: "100%",
             textAlign: "center",
             fontSize: 11.5,
-            color: "rgba(255,255,255,0.22)",
+            color: "#636E72",
           }}
         >
           © 2026 SNS Academy ERP · Empowering Education Through Design Thinking
@@ -419,8 +413,8 @@ export default function LoginPage() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          minHeight: "100vh",
         }}
-        className="hidden lg:flex"
       >
         {/* Background image */}
         <div
@@ -432,12 +426,12 @@ export default function LoginPage() {
             backgroundPosition: "center",
           }}
         />
-        {/* Dark gradient overlay — not covering text */}
+        {/* Dark gradient overlay for text readability */}
         <div
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(135deg, rgba(18,18,18,0.75) 0%, rgba(255,127,80,0.25) 100%)",
+            background: "linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(255,127,80,0.35) 100%)",
           }}
         />
 
@@ -452,18 +446,18 @@ export default function LoginPage() {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 8,
-                padding: "8px 18px",
-                borderRadius: 50,
-                background: "rgba(255,127,80,0.2)",
-                border: "1px solid rgba(255,127,80,0.4)",
-                color: "#FF7F50",
-                fontSize: 13,
-                fontWeight: 600,
+                padding: "6px 14px",
+                background: "#FF7F50",
+                color: "white",
+                fontSize: 11,
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.15em",
                 marginBottom: 24,
+                borderRadius: 4,
               }}
             >
-              <Sparkle size={16} weight="fill" /> SNS Academy ERP
+              SNS Academy ERP
             </div>
 
             <h2
@@ -471,7 +465,7 @@ export default function LoginPage() {
                 fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
                 fontSize: "clamp(1.8rem, 3vw, 2.6rem)",
                 fontWeight: 700,
-                color: "white",
+                color: "#ffffff",
                 lineHeight: 1.25,
                 marginBottom: 16,
                 letterSpacing: "-0.02em",
@@ -479,7 +473,7 @@ export default function LoginPage() {
             >
               Empowering Education<br />Through Innovation
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 15, lineHeight: 1.7, maxWidth: 380, margin: "0 auto" }}>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, fontWeight: 500, lineHeight: 1.7, maxWidth: 420, margin: "0 auto" }}>
               A unified platform for parents, teachers, and administrators — 
               bridging the gap between school and home.
             </p>
@@ -500,11 +494,12 @@ export default function LoginPage() {
                   style={{
                     padding: "6px 16px",
                     borderRadius: 50,
-                    background: "rgba(255,255,255,0.1)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    color: "rgba(255,255,255,0.75)",
+                    background: "white",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    color: "#121212",
                     fontSize: 12,
                     fontWeight: 500,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
                   }}
                 >
                   {badge}
@@ -530,49 +525,60 @@ function RoleCard({
   onClick: () => void;
 }) {
   return (
-    <button
+    <motion.button
       onClick={onClick}
+      whileHover={{ y: -8, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 14,
-        padding: "32px 16px",
-        borderRadius: 16,
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        color: "white",
+        gap: 18,
+        padding: "40px 24px",
+        borderRadius: 24,
+        background: "rgba(255, 255, 255, 0.8)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(0,0,0,0.06)",
+        color: "#121212",
         cursor: "pointer",
-        transition: "all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.03)",
+        position: "relative",
+        overflow: "hidden"
       }}
       onMouseEnter={(e) => {
-        const el = e.currentTarget;
-        el.style.background = "#FF7F50";
-        el.style.borderColor = "#FF7F50";
-        el.style.transform = "translateY(-4px)";
-        el.style.boxShadow = "0 14px 32px rgba(255,127,80,0.35)";
+        e.currentTarget.style.borderColor = "#FF7F50";
+        e.currentTarget.style.background = "#fff";
+        e.currentTarget.style.boxShadow = "0 20px 40px rgba(255,127,80,0.12)";
       }}
       onMouseLeave={(e) => {
-        const el = e.currentTarget;
-        el.style.background = "rgba(255,255,255,0.04)";
-        el.style.borderColor = "rgba(255,255,255,0.08)";
-        el.style.transform = "translateY(0)";
-        el.style.boxShadow = "none";
+        e.currentTarget.style.borderColor = "rgba(0,0,0,0.06)";
+        e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
+        e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.03)";
       }}
     >
-      <span style={{ color: "#FF7F50", transition: "color 0.3s" }}>{icon}</span>
-      <span style={{ fontWeight: 600, fontSize: 14 }}>{label}</span>
-    </button>
+      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "40%", background: "linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)", pointerEvents: "none" }} />
+      
+      <div style={{ 
+        width: 64, height: 64, borderRadius: 20, 
+        background: "rgba(255,127,80,0.1)", 
+        display: "flex", alignItems: "center", justifyContent: "center",
+        color: "#FF7F50", transition: "all 0.3s" 
+      }}>
+        {icon}
+      </div>
+      <span style={{ fontWeight: 800, fontSize: 16, letterSpacing: "-0.01em" }}>{label}</span>
+    </motion.button>
   );
 }
 
 const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: 12,
-  fontWeight: 600,
-  color: "rgba(255,255,255,0.55)",
+  fontWeight: 700,
+  color: "#333",
   marginBottom: 7,
   fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
   letterSpacing: "0.04em",
@@ -581,13 +587,14 @@ const labelStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  padding: "13px 16px",
-  borderRadius: 10,
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.1)",
+  padding: "16px 20px",
+  borderRadius: 16,
+  background: "rgba(0,0,0,0.02)",
+  border: "1px solid rgba(0,0,0,0.08)",
   outline: "none",
-  color: "white",
-  fontSize: 14,
-  transition: "all 0.2s ease",
+  color: "#121212",
+  fontSize: 15,
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   fontFamily: "var(--font-inter, 'Inter', sans-serif)",
+  fontWeight: 500,
 };

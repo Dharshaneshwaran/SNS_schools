@@ -16,19 +16,12 @@ import { DashboardTheme } from "../../../types/theme";
 
 export default function TransportSection({ theme }: { theme: DashboardTheme }) {
   return (
-    <div>
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-          <Bus size={26} weight="duotone" color="#FF7F50" />
-          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: theme.text }}>Transport</h1>
-        </div>
-        <p style={{ color: theme.textMuted, fontSize: 14 }}>Bus route, timings and driver information</p>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
         {/* Route Card */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-          style={{ background: theme.cardBg, borderRadius: 18, padding: "24px", boxShadow: theme.isDark ? "none" : "0 4px 20px rgba(0,0,0,0.07)", border: `1px solid ${theme.border}`, gridColumn: "1 / -1", transition: "all 0.3s ease" }}>
+          className="premium-card"
+          style={{ padding: "32px", gridColumn: "1 / -1", transition: "all 0.3s ease" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
             <div>
               <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 17, color: theme.text }}>{busInfo.routeNo}</p>
@@ -39,8 +32,8 @@ export default function TransportSection({ theme }: { theme: DashboardTheme }) {
                 { label: "Pick-up", value: busInfo.pickup, icon: <Clock size={14} /> },
                 { label: "Drop-off", value: busInfo.drop, icon: <Clock size={14} /> },
               ].map((t, i) => (
-                <div key={i} style={{ textAlign: "center", padding: "10px 20px", borderRadius: 12, background: i === 0 ? "rgba(255,127,80,0.08)" : "rgba(16,185,129,0.08)", border: `1px solid ${i === 0 ? "rgba(255,127,80,0.2)" : "rgba(16,185,129,0.2)"}` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 4, color: i === 0 ? "#FF7F50" : "#10B981", justifyContent: "center", marginBottom: 2 }}>{t.icon}<span style={{ fontSize: 11, fontWeight: 600 }}>{t.label}</span></div>
+                <div key={i} style={{ textAlign: "center", padding: "10px 20px", borderRadius: 12, background: i === 0 ? theme.primary + "14" : theme.accent + "14", border: `1px solid ${i === 0 ? theme.primary + "33" : theme.accent + "33"}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, color: i === 0 ? theme.primary : theme.accent, justifyContent: "center", marginBottom: 2 }}>{t.icon}<span style={{ fontSize: 11, fontWeight: 600 }}>{t.label}</span></div>
                   <p style={{ fontWeight: 700, fontSize: 16, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>{t.value}</p>
                 </div>
               ))}
@@ -53,8 +46,8 @@ export default function TransportSection({ theme }: { theme: DashboardTheme }) {
             {busInfo.stops.map((stop, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <div style={{ width: 14, height: 14, borderRadius: "50%", background: i === 0 ? "#FF7F50" : i === busInfo.stops.length - 1 ? "#10B981" : theme.isDark ? "rgba(255,255,255,0.1)" : "#ddd", border: `2px solid ${i === 0 ? "#FF7F50" : i === busInfo.stops.length - 1 ? "#10B981" : theme.isDark ? "rgba(255,255,255,0.2)" : "#ccc"}`, flexShrink: 0 }} />
-                  {i < busInfo.stops.length - 1 && <div style={{ width: 2, height: 28, background: theme.isDark ? "rgba(255,255,255,0.05)" : "#eee" }} />}
+                  <div style={{ width: 14, height: 14, borderRadius: "50%", background: i === 0 ? "#FF7F50" : i === busInfo.stops.length - 1 ? "#10B981" : theme.border, border: `2px solid ${i === 0 ? "#FF7F50" : i === busInfo.stops.length - 1 ? "#10B981" : theme.border}`, flexShrink: 0 }} />
+                  {i < busInfo.stops.length - 1 && <div style={{ width: 2, height: 28, background: theme.border }} />}
                 </div>
                 <div style={{ padding: "8px 0" }}>
                   <p style={{ fontSize: 14, fontWeight: i === 0 || i === busInfo.stops.length - 1 ? 700 : 500, color: i === 0 ? "#FF7F50" : i === busInfo.stops.length - 1 ? "#10B981" : theme.text }}>
@@ -68,7 +61,8 @@ export default function TransportSection({ theme }: { theme: DashboardTheme }) {
 
         {/* Driver Info */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
-          style={{ background: theme.cardBg, borderRadius: 18, padding: "24px", boxShadow: theme.isDark ? "none" : "0 4px 20px rgba(0,0,0,0.07)", border: `1px solid ${theme.border}`, transition: "all 0.3s ease" }}>
+          className="premium-card"
+          style={{ padding: "32px", transition: "all 0.3s ease" }}>
           <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text, marginBottom: 18 }}>Driver Information</p>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
             <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#FF7F50,#e66a3e)", color: "white", fontWeight: 700, fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>R</div>
@@ -93,7 +87,8 @@ export default function TransportSection({ theme }: { theme: DashboardTheme }) {
 
         {/* Map placeholder */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
-          style={{ background: theme.cardBg, borderRadius: 18, overflow: "hidden", boxShadow: theme.isDark ? "none" : "0 4px 20px rgba(0,0,0,0.07)", border: `1px solid ${theme.border}`, transition: "all 0.3s ease" }}>
+          className="premium-card"
+          style={{ overflow: "hidden", transition: "all 0.3s ease" }}>
           <div style={{ height: "100%", minHeight: 180, background: theme.isDark ? "rgba(255,255,255,0.02)" : "linear-gradient(135deg,#f4f6fb,#e8ecf4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
             <MapPin size={40} color="#FF7F50" weight="duotone" />
             <p style={{ fontWeight: 600, color: theme.textMuted, fontSize: 14 }}>Live Tracking</p>

@@ -44,6 +44,7 @@ class _SettingsTabState extends State<SettingsTab> {
 
   // Preferences
   bool _biometricsEnabled = false;
+  bool _splashEnabled = true;
   String _selectedLanguage = 'English';
 
   @override
@@ -56,9 +57,11 @@ class _SettingsTabState extends State<SettingsTab> {
 
   Future<void> _loadPrefs() async {
     final bioEnabled = await _authStorage.getBiometricsEnabled();
+    final splashOn = await _authStorage.getSplashEnabled();
     final lang = await _authStorage.getLanguage();
     setState(() {
       _biometricsEnabled = bioEnabled;
+      _splashEnabled = splashOn;
       _selectedLanguage = lang;
     });
   }
@@ -211,6 +214,22 @@ class _SettingsTabState extends State<SettingsTab> {
                   if (widget.onThemeChanged != null) {
                     widget.onThemeChanged!(val);
                   }
+                },
+                activeColor: const Color(0xFFFF7F50),
+              ),
+              const Divider(height: 24),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Startup Animation', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Show particle animation on app launch'),
+                value: _splashEnabled,
+                onChanged: (val) async {
+                  await _authStorage.setSplashEnabled(val);
+                  setState(() => _splashEnabled = val);
+                  _showSnackBar(
+                    val ? 'Startup animation enabled' : 'Startup animation disabled',
+                    false,
+                  );
                 },
                 activeColor: const Color(0xFFFF7F50),
               ),

@@ -8,7 +8,7 @@ import {
   Trophy,
   UserCircle,
   CalendarCheck,
-  CreditCard,
+  Bus,
   Notebook,
   ChartLineUp,
   BellRinging,
@@ -29,10 +29,9 @@ const fadeUp = {
 };
 
 const stats = [
-  { value: "5000+", label: "Students Enrolled" },
+  { value: "1000+", label: "Happy Students" },
   { value: "200+",  label: "Expert Teachers"   },
-  { value: "98%",   label: "Parent Satisfaction"},
-  { value: "15+",   label: "Years of Excellence"},
+  { value: "Since",  label: "2014"            },
 ];
 
 const aboutItems = [
@@ -56,7 +55,7 @@ const aboutItems = [
 const features = [
   { icon: <UserCircle size={30} weight="duotone" />, title: "Student Dashboard",     desc: "360-degree view of student progress and activities." },
   { icon: <CalendarCheck size={30} weight="duotone" />, title: "Attendance Tracking", desc: "Real-time updates and monthly attendance reports." },
-  { icon: <CreditCard size={30} weight="duotone" />,    title: "Fee Management",     desc: "Secure online payments and automated receipts." },
+  { icon: <Bus size={30} weight="duotone" />,          title: "Bus Tracking",        desc: "Live location updates and route management." },
   { icon: <Notebook size={30} weight="duotone" />,      title: "Homework & Diary",   desc: "Daily assignments and teacher notes at your fingertips." },
   { icon: <ChartLineUp size={30} weight="duotone" />,   title: "Academic Reports",   desc: "Detailed performance analytics and exam results." },
   { icon: <BellRinging size={30} weight="duotone" />,   title: "Notifications",      desc: "Instant alerts for school events and emergencies." },
@@ -66,28 +65,18 @@ const features = [
 
 export default function Home() {
   return (
-    <main style={{ overflowX: "hidden" }}>
+    <main style={{ overflowX: "hidden", position: "relative" }}>
       <Header />
 
       {/* ════════════════════════════════
           HERO
       ════════════════════════════════ */}
-      <section className="hero-section">
-        {/* decorative blobs */}
-        <div style={{
-          position: "absolute", top: -100, right: -80,
-          width: 500, height: 500, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,127,80,0.18) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }} />
-        <div style={{
-          position: "absolute", bottom: -60, left: -60,
-          width: 360, height: 360, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,127,80,0.08) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }} />
-
-        <div className="page-container" style={{ width: "100%" }}>
+      <section className="hero-section mesh-bg" style={{ position: "relative", overflow: "hidden" }}>
+        {/* Background Decorative Elements */}
+        <div className="bg-glow" style={{ top: "-10%", left: "-10%", width: 600, height: 600, background: "radial-gradient(circle, rgba(255, 127, 80, 0.12), transparent 70%)" }} />
+        <div className="bg-glow" style={{ bottom: "-10%", right: "-10%", width: 500, height: 500, background: "radial-gradient(circle, rgba(79, 70, 229, 0.08), transparent 70%)", animationDelay: "-5s" }} />
+        
+        <div className="page-container" style={{ position: "relative", zIndex: 1 }}>
           <div className="hero-grid">
 
             {/* ── Left: Text ── */}
@@ -312,9 +301,6 @@ export default function Home() {
               <div className="cta-btns">
                 <Link href="/login" className="btn btn-primary">
                   Access Dashboard <ArrowRight size={18} weight="bold" />
-                </Link>
-                <Link href="#contact" className="btn btn-ghost">
-                  Contact Sales
                 </Link>
               </div>
             </div>

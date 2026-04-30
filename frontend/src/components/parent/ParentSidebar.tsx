@@ -1,22 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  GraduationCap, User, BookOpen, ChartBar,
+  Bell, User, BookOpen, ChartBar,
   Bus, Gear, Images, CaretDown, SignOut,
 } from "@phosphor-icons/react";
 import { MenuKey } from "../../app/parent-dashboard/page";
 import { DashboardTheme } from "../../types/theme";
-
-const menuItems: { key: MenuKey; label: string; icon: React.ReactNode }[] = [
-  { key: "events",    label: "Events Gallery", icon: <Images size={20} weight="duotone" /> },
-  { key: "profile",   label: "Profile",        icon: <User size={20} weight="duotone" /> },
-  { key: "diary",     label: "Diary",          icon: <BookOpen size={20} weight="duotone" /> },
-  { key: "academic",  label: "Academic",       icon: <ChartBar size={20} weight="duotone" /> },
-  { key: "transport", label: "Transport",      icon: <Bus size={20} weight="duotone" /> },
-  { key: "settings",  label: "Settings",       icon: <Gear size={20} weight="duotone" /> },
-];
+import { clearSession } from "../../lib/session-storage";
 
 type Student = { id: number; name: string; class: string; section: string; avatar: string };
 
@@ -27,165 +20,270 @@ interface Props {
   activeMenu: MenuKey;
   setActiveMenu: (m: MenuKey) => void;
   theme: DashboardTheme;
-  onMenuClick?: () => void;
 }
 
-export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, theme, onMenuClick }: Props) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, theme }: Props) {
+  const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    clearSession();
+    router.push("/login");
+  };
+
+  const sections: {
+    title: string;
+    items: {
+      key: MenuKey;
+      label: string;
+      icon: any;
+    }[];
+  }[] = [
+    {
+      title: "MENU",
+      items: [
+        { key: "events",    label: "Events Gallery", icon: Images },
+        { key: "diary",     label: "Diary & Homework", icon: BookOpen },
+        { key: "notifications", label: "Notifications", icon: Bell },
+      ]
+    },
+    {
+      title: "TOOLS",
+      items: [
+        { key: "academic",  label: "Academic Reports", icon: ChartBar },
+        { key: "transport", label: "Transport Tracking", icon: Bus },
+        { key: "settings",  label: "Settings",       icon: Gear },
+      ]
+    }
+  ];
 
   return (
-    <aside 
-      className="w-[280px] flex flex-col h-[100dvh] flex-shrink-0 z-50 relative transition-colors duration-300"
-      style={{
-        background: theme.sidebarBg,
-        borderRight: `1px solid ${theme.border}`,
-        boxShadow: theme.isDark ? "none" : "4px 0 24px rgba(0,0,0,0.02)",
-      }}
-    >
-      {/* Logo */}
-      <div style={{ padding: "28px 24px 20px", borderBottom: `1px solid ${theme.border}` }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: theme.accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <GraduationCap size={22} weight="fill" color="white" />
+    <aside className="hide-scrollbar" style={{
+      width: 280,
+      height: "100vh",
+      background: theme.sidebarBg,
+      borderRight: `1px solid ${theme.border}`,
+      display: "flex",
+      flexDirection: "column",
+      flexShrink: 0,
+      zIndex: 50,
+      transition: "all 0.3s ease",
+      overflow: "visible"
+    }}>
+      {/* Logo Section */}
+      <div style={{ padding: "28px 24px 20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ 
+            width: 40, height: 40, 
+            display: "flex", alignItems: "center", justifyContent: "center",
+            background: "#fff",
+            borderRadius: 12,
+            boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+            padding: 6,
+            border: "1px solid rgba(0,0,0,0.04)"
+          }}>
+            <img src="/images/logo.png" alt="Logo" style={{ width: "100%", height: "auto", objectFit: "contain" }} />
           </div>
           <div>
-            <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text, lineHeight: 1 }}>SNS Academy</p>
-            <p style={{ fontSize: 11, color: theme.accent, fontWeight: 600, letterSpacing: "0.05em", marginTop: 2 }}>PARENT PORTAL</p>
+            <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 800, fontSize: 16, color: theme.text, lineHeight: 1.1 }}>SNS Academy</p>
+            <p style={{ fontSize: 9, color: "#FF7F50", fontWeight: 800, letterSpacing: "0.08em", marginTop: 4, textTransform: "uppercase" }}>Parent Portal</p>
           </div>
         </div>
       </div>
 
-      {/* Student Profile + Switcher */}
-      <div style={{ padding: "20px 16px", borderBottom: `1px solid ${theme.border}` }}>
-        <div
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          style={{
-            borderRadius: 14,
-            background: theme.isDark ? "rgba(255,255,255,0.03)" : "linear-gradient(135deg, #fff5f0, #fff)",
-            border: theme.isDark ? `1px solid ${theme.border}` : "1px solid rgba(255,127,80,0.2)",
-            padding: "14px 16px",
-            cursor: "pointer",
-            transition: "all 0.2s",
-          }}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStudent.id}
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.25 }}
-              style={{ display: "flex", alignItems: "center", gap: 12 }}
-            >
-              <div style={{
-                width: 46, height: 46, borderRadius: "50%",
-                background: "linear-gradient(135deg,#FF7F50,#e66a3e)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "white", fontWeight: 700, fontSize: 16,
-                boxShadow: "0 4px 12px rgba(255,127,80,0.35)",
-                flexShrink: 0,
-              }}>
-                {activeStudent.avatar}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontWeight: 700, fontSize: 14, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{activeStudent.name}</p>
-                <p style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>Class {activeStudent.class} – Sec {activeStudent.section}</p>
-              </div>
-              <motion.div animate={{ rotate: dropdownOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                <CaretDown size={16} color={theme.accent} weight="bold" />
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {dropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.25 }}
-                style={{ overflow: "hidden" }}
-              >
-                <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${theme.border}` }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: "0.08em", marginBottom: 8 }}>SWITCH STUDENT</p>
-                  {students.map((s) => (
-                    <div
-                      key={s.id}
-                      onClick={(e) => { e.stopPropagation(); setActiveStudent(s); setDropdownOpen(false); }}
-                      style={{
-                        display: "flex", alignItems: "center", gap: 10,
-                        padding: "8px 10px", borderRadius: 10, marginBottom: 4,
-                        background: activeStudent.id === s.id ? "rgba(255,127,80,0.1)" : "transparent",
-                        cursor: "pointer", transition: "background 0.2s",
-                      }}
-                    >
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: theme.accent, color: "white", fontWeight: 700, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{s.avatar}</div>
-                      <div>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: theme.text }}>{s.name}</p>
-                        <p style={{ fontSize: 11, color: theme.textMuted }}>Class {s.class}-{s.section}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* Student Switcher */}
+      <div style={{ padding: "0 16px 24px", position: "relative" }}>
+        <div style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          background: theme.isDark ? "rgba(255,127,80,0.1)" : "rgba(255,127,80,0.05)",
+          border: `1px solid ${theme.isDark ? "rgba(255,127,80,0.2)" : "rgba(255,127,80,0.1)"}`,
+          borderRadius: 14,
+          overflow: "hidden"
+        }}>
+          <button 
+            onClick={() => setActiveMenu("profile")}
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "12px 0 12px 16px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              textAlign: "left"
+            }}
+          >
+            <div style={{ 
+              width: 32, height: 32, 
+              borderRadius: 10, 
+              background: "linear-gradient(135deg,#FF7F50,#e66a3e)",
+              color: "white", fontWeight: 800, fontSize: 12,
+              display: "flex", alignItems: "center", justifyContent: "center"
+            }}>
+              {activeStudent.avatar}
+            </div>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 700, color: theme.text, lineHeight: 1.2 }}>{activeStudent.name}</p>
+              <p style={{ fontSize: 10, color: theme.textMuted, fontWeight: 600 }}>Class {activeStudent.class}-{activeStudent.section}</p>
+            </div>
+          </button>
+          
+          <button 
+            onClick={() => setShowStudentDropdown(!showStudentDropdown)}
+            style={{
+              padding: "12px 16px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              borderLeft: `1px solid ${theme.isDark ? "rgba(255,127,80,0.2)" : "rgba(255,127,80,0.1)"}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <CaretDown size={14} weight="bold" color={theme.accent} style={{ transform: showStudentDropdown ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+          </button>
         </div>
+
+        <AnimatePresence>
+          {showStudentDropdown && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: 16,
+                right: 16,
+                background: theme.cardBg,
+                borderRadius: 14,
+                border: `1px solid ${theme.border}`,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                zIndex: 100,
+                marginTop: 8,
+                overflow: "hidden"
+              }}
+            >
+              {students.map((student) => (
+                <button
+                  key={student.id}
+                  onClick={() => {
+                    setActiveStudent(student);
+                    setShowStudentDropdown(false);
+                  }}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "12px 16px",
+                    background: activeStudent.id === student.id ? "rgba(255,127,80,0.05)" : "transparent",
+                    border: "none",
+                    borderBottom: `1px solid ${theme.border}`,
+                    cursor: "pointer",
+                    transition: "background 0.2s"
+                  }}
+                >
+                  <div style={{ 
+                    width: 28, height: 28, 
+                    borderRadius: 8, 
+                    background: activeStudent.id === student.id ? "linear-gradient(135deg,#FF7F50,#e66a3e)" : "#f1f5f9",
+                    color: activeStudent.id === student.id ? "white" : "#94a3b8",
+                    fontWeight: 800, fontSize: 10,
+                    display: "flex", alignItems: "center", justifyContent: "center"
+                  }}>
+                    {student.avatar}
+                  </div>
+                  <div style={{ textAlign: "left" }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: theme.text }}>{student.name}</p>
+                    <p style={{ fontSize: 10, color: theme.textMuted }}>Class {student.class}-{student.section}</p>
+                  </div>
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Nav Menu */}
-      <nav style={{ flex: 1, padding: "16px 12px", overflowY: "auto" }}>
-        <p style={{ fontSize: 10, fontWeight: 700, color: theme.textMuted, letterSpacing: "0.08em", padding: "0 12px", marginBottom: 10 }}>NAVIGATION</p>
-        {menuItems.map((item) => {
-          const isActive = activeMenu === item.key;
-          return (
-            <button
-              key={item.key}
-              onClick={() => { setActiveMenu(item.key); onMenuClick?.(); }}
-              style={{
-                width: "100%",
-                display: "flex", alignItems: "center", gap: 12,
-                padding: "11px 14px", borderRadius: 12, marginBottom: 4,
-                background: isActive ? "linear-gradient(90deg,#FF7F50,#e66a3e)" : "transparent",
-                color: isActive ? "white" : theme.isDark ? theme.textMuted : "#555",
-                border: "none", cursor: "pointer",
-                fontWeight: isActive ? 600 : 500,
-                fontSize: 14, textAlign: "left",
-                transition: "all 0.25s cubic-bezier(0.165,0.84,0.44,1)",
-                boxShadow: isActive ? "0 4px 16px rgba(255,127,80,0.3)" : "none",
-                fontFamily: "var(--font-inter,'Inter',sans-serif)",
-              }}
-              onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = theme.isDark ? "rgba(255,255,255,0.05)" : "#fff5f0"; }}
-              onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
-            >
-              <span style={{ opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
-              {item.label}
-              {item.key === "diary" && (
-                <span style={{ marginLeft: "auto", width: 18, height: 18, borderRadius: "50%", background: isActive ? "rgba(255,255,255,0.3)" : theme.accent, color: "white", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>3</span>
-              )}
-            </button>
-          );
-        })}
-      </nav>
+      {/* Navigation Sections */}
+      <div style={{ flex: 1, padding: "0 12px", overflowY: "auto", overflowX: "visible" }} className="hide-scrollbar">
+        {sections.map((section) => (
+          <div key={section.title} style={{ marginBottom: 24 }}>
+            <p style={{ 
+              fontSize: 10, 
+              fontWeight: 800, 
+              color: theme.textMuted, 
+              letterSpacing: "0.12em", 
+              padding: "0 16px", 
+              marginBottom: 14 
+            }}>{section.title}</p>
+            
+            {section.items.map((item) => {
+              const isActive = activeMenu === item.key;
+              const Icon = item.icon;
+              return (
+                <motion.button
+                  key={item.key}
+                  onClick={() => setActiveMenu(item.key)}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 14,
+                    padding: "12px 16px",
+                    borderRadius: 12,
+                    border: "none",
+                    background: isActive ? "rgba(255, 127, 80, 0.08)" : "transparent",
+                    color: isActive ? "#FF7F50" : theme.textMuted,
+                    cursor: "pointer",
+                    marginBottom: 4,
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <Icon size={20} weight={isActive ? "bold" : "regular"} />
+                  <span style={{ 
+                    fontSize: 14.5, 
+                    fontWeight: isActive ? 700 : 600,
+                  }}>
+                    {item.label}
+                  </span>
+                </motion.button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
 
-      {/* Bottom */}
-      <div style={{ padding: "16px 12px", borderTop: `1px solid ${theme.border}` }}>
-        <button 
-          onClick={() => {
-            // In a real app, clear auth tokens here before redirecting
-            window.location.href = '/login';
-          }}
+      {/* Footer / Sign Out */}
+      <div style={{ padding: "16px", borderTop: `1px solid ${theme.border}` }}>
+        <motion.button
+          onClick={handleSignOut}
+          whileHover={{ background: theme.isDark ? "rgba(239,68,68,0.15)" : "#FEF2F2", color: theme.danger }}
           style={{
-            width: "100%", display: "flex", alignItems: "center", gap: 12,
-            padding: "11px 14px", borderRadius: 12, background: "transparent",
-            color: theme.textMuted, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500,
-            transition: "all 0.2s", fontFamily: "var(--font-inter,'Inter',sans-serif)",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            padding: "14px",
+            borderRadius: 14,
+            border: "none",
+            background: "transparent",
+            color: theme.textMuted,
+            cursor: "pointer",
+            transition: "all 0.2s",
+            fontWeight: 700,
+            fontSize: 14
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = theme.isDark ? "rgba(255,127,80,0.1)" : "#fff0ed"; e.currentTarget.style.color = theme.accent; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = theme.textMuted; }}
         >
-          <SignOut size={20} weight="duotone" /> Sign Out
-        </button>
+          <SignOut size={20} weight="bold" />
+          <span>Sign Out</span>
+        </motion.button>
       </div>
     </aside>
   );

@@ -9,6 +9,7 @@ import 'features/auth/data/auth_storage_service.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/parent_dashboard/presentation/parent_dashboard_screen.dart';
+import 'features/splash/presentation/splash_screen.dart';
 
 class SnsErpApp extends StatefulWidget {
   const SnsErpApp({super.key});
@@ -24,6 +25,7 @@ class _SnsErpAppState extends State<SnsErpApp> {
 
   AuthSession? _session;
   bool _isBootstrapping = true;
+  bool _isSplashDone = false;
   bool _isSubmitting = false;
   bool _isBiometricLocked = false;
   String _message =
@@ -40,8 +42,11 @@ class _SnsErpAppState extends State<SnsErpApp> {
   Future<void> _bootstrapSession() async {
     final storedSession = await _authStorageService.readSession();
     final isDark = await _authStorageService.getDarkModeEnabled();
+    final splashEnabled = await _authStorageService.getSplashEnabled();
     setState(() {
       _isDarkMode = isDark;
+      // If splash is disabled, skip it immediately
+      if (!splashEnabled) _isSplashDone = true;
     });
 
     if (storedSession == null) {
@@ -207,27 +212,33 @@ class _SnsErpAppState extends State<SnsErpApp> {
         scaffoldBackgroundColor: const Color(0xFF121212),
         useMaterial3: true,
       ),
-      home: _isBootstrapping
-          ? const _BootScreen()
-          : _session == null
-              ? LoginScreen(
-                  isSubmitting: _isSubmitting,
-                  message: _message,
-                  onSubmit: _handleLogin,
-                )
-              : _isBiometricLocked
-                  ? _LockScreen(onUnlock: _promptBiometrics, onLogout: _logout)
-                  : _session!.user.role == AppRoles.parent
-                      ? ParentDashboardScreen(
-                          session: _session!,
-                          onLogout: _logout,
-                          isDarkMode: _isDarkMode,
-                          onThemeChanged: _updateTheme,
-                        )
-                      : DashboardScreen(
-                          session: _session!,
-                          onLogout: _logout,
-                        ),
+      home: !_isSplashDone
+          ? SplashScreen(onFinish: () {
+              setState(() {
+                _isSplashDone = true;
+              });
+            })
+          : _isBootstrapping
+              ? const _BootScreen()
+              : _session == null
+                  ? LoginScreen(
+                      isSubmitting: _isSubmitting,
+                      message: _message,
+                      onSubmit: _handleLogin,
+                    )
+                  : _isBiometricLocked
+                      ? _LockScreen(onUnlock: _promptBiometrics, onLogout: _logout)
+                      : _session!.user.role == AppRoles.parent
+                          ? ParentDashboardScreen(
+                              session: _session!,
+                              onLogout: _logout,
+                              isDarkMode: _isDarkMode,
+                              onThemeChanged: _updateTheme,
+                            )
+                          : DashboardScreen(
+                              session: _session!,
+                              onLogout: _logout,
+                            ),
     );
   }
 }

@@ -2,115 +2,16 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Gear, PencilSimple, Moon, Sun, Lock, Globe, CheckCircle, XCircle, SpinnerGap } from "@phosphor-icons/react";
+import { Gear, PencilSimple, Moon, Sun, Lock, Globe } from "@phosphor-icons/react";
 import { DashboardTheme } from "../../../types/theme";
-import { apiRequest } from "../../../services/api-client";
-
-function getAccessToken(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem("sns-erp-session");
-    if (!raw) return null;
-    const session = JSON.parse(raw);
-    return session.accessToken ?? null;
-  } catch {
-    return null;
-  }
-}
-
-type ToastType = { message: string; type: "success" | "error" } | null;
 
 export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { theme: DashboardTheme; isDarkMode: boolean; setIsDarkMode: (v: boolean) => void }) {
   const [language, setLanguage] = useState("English");
-  const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState<ToastType>(null);
+  const [saved, setSaved] = useState(false);
 
-  const [profileData, setProfileData] = useState({
-    fullName: "Parent Name",
-    email: "parent@email.com",
-    mobile: "+91 9876543210",
-    city: "Coimbatore"
-  });
-
-  const [passwordData, setPasswordData] = useState({
-    current: "",
-    new: "",
-    confirm: ""
-  });
-
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
-  };
-
-  const handleSaveProfile = async () => {
-    const token = getAccessToken();
-    if (!token) {
-      showToast("You are not logged in. Please log in again.", "error");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      await apiRequest<{ message: string }>("/auth/profile", {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          name: profileData.fullName,
-          email: profileData.email,
-        }),
-      });
-      showToast("Profile updated successfully!", "success");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to update profile.";
-      showToast(message, "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleChangePassword = async () => {
-    if (!passwordData.current) {
-      showToast("Please enter your current password.", "error");
-      return;
-    }
-    if (!passwordData.new) {
-      showToast("Please enter a new password.", "error");
-      return;
-    }
-    if (passwordData.new.length < 6) {
-      showToast("New password must be at least 6 characters.", "error");
-      return;
-    }
-    if (passwordData.new !== passwordData.confirm) {
-      showToast("New passwords do not match!", "error");
-      return;
-    }
-
-    const token = getAccessToken();
-    if (!token) {
-      showToast("You are not logged in. Please log in again.", "error");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      await apiRequest<{ message: string }>("/auth/change-password", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          currentPassword: passwordData.current,
-          newPassword: passwordData.new,
-        }),
-      });
-      showToast("Password changed successfully! Use your new password to log in next time.", "success");
-      setPasswordData({ current: "", new: "", confirm: "" });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to change password.";
-      showToast(message, "error");
-    } finally {
-      setSaving(false);
-    }
+  const handleSave = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
   };
 
   const cardStyle: React.CSSProperties = {
@@ -154,90 +55,30 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
   };
 
   return (
-    <div>
-      {/* Toast Notification */}
-      {toast && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          style={{
-            position: "fixed",
-            top: 20,
-            right: 20,
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "14px 20px",
-            borderRadius: 12,
-            background: toast.type === "success" ? "#10B981" : "#EF4444",
-            color: "white",
-            fontSize: 14,
-            fontWeight: 600,
-            boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-            fontFamily: "var(--font-inter,'Inter',sans-serif)",
-          }}
-        >
-          {toast.type === "success" ? <CheckCircle size={20} weight="fill" /> : <XCircle size={20} weight="fill" />}
-          {toast.message}
-        </motion.div>
-      )}
-
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-          <Gear size={26} weight="duotone" color="#FF7F50" />
-          <h1 style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontSize: 24, fontWeight: 700, color: theme.text }}>Settings</h1>
-        </div>
-        <p style={{ color: theme.textMuted, fontSize: 14 }}>Manage your account preferences</p>
-      </div>
-
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       {/* Edit Profile */}
-      <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <PencilSimple size={18} color="#FF7F50" weight="duotone" />
-            <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Edit Profile</p>
-          </div>
-          <button
-            onClick={handleSaveProfile}
-            disabled={saving}
-            style={{
-              padding: "8px 20px", borderRadius: 10,
-              background: "linear-gradient(90deg,#FF7F50,#e66a3e)", color: "white",
-              border: "none", cursor: saving ? "not-allowed" : "pointer",
-              fontWeight: 600, fontSize: 13, opacity: saving ? 0.7 : 1,
-              transition: "all 0.3s", fontFamily: "var(--font-poppins,'Poppins',sans-serif)",
-              boxShadow: "0 2px 10px rgba(255,127,80,0.25)",
-              display: "flex", alignItems: "center", gap: 6,
-            }}
-          >
-            {saving && <SpinnerGap size={14} className="animate-spin" />}
-            {saving ? "Saving..." : "Update Profile"}
-          </button>
+      <div className="premium-card" style={{ padding: "32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+          <PencilSimple size={18} color="#FF7F50" weight="duotone" />
+          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Edit Profile</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
-            { label: "Full Name", key: "fullName", type: "text" },
-            { label: "Email", key: "email", type: "email" },
-            { label: "Mobile", key: "mobile", type: "tel" },
-            { label: "City", key: "city", type: "text" },
+            { label: "Full Name", placeholder: "Parent Name", type: "text" },
+            { label: "Email", placeholder: "parent@email.com", type: "email" },
+            { label: "Mobile", placeholder: "+91 XXXXXXXXXX", type: "tel" },
+            { label: "City", placeholder: "Coimbatore", type: "text" },
           ].map((f, i) => (
             <div key={i}>
               <label style={labelStyle2}>{f.label}</label>
-              <input 
-                type={f.type} 
-                value={profileData[f.key as keyof typeof profileData]}
-                onChange={(e) => setProfileData({ ...profileData, [f.key]: e.target.value })}
-                style={inputStyle2} 
-              />
+              <input type={f.type} placeholder={f.placeholder} style={inputStyle2} />
             </div>
           ))}
         </div>
       </div>
 
       {/* Preferences */}
-      <div style={cardStyle}>
+      <div className="premium-card" style={{ padding: "32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <Sun size={18} color="#FF7F50" weight="duotone" />
           <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Preferences</p>
@@ -270,48 +111,30 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
       </div>
 
       {/* Password Reset */}
-      <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Lock size={18} color="#FF7F50" weight="duotone" />
-            <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Change Password</p>
-          </div>
-          <button
-            onClick={handleChangePassword}
-            disabled={saving || !passwordData.current || !passwordData.new}
-            style={{
-              padding: "8px 20px", borderRadius: 10,
-              background: (!passwordData.current || !passwordData.new) ? (theme.isDark ? "#333" : "#ddd") : "linear-gradient(90deg,#FF7F50,#e66a3e)",
-              color: (!passwordData.current || !passwordData.new) ? theme.textMuted : "white",
-              border: "none", cursor: (!passwordData.current || !passwordData.new || saving) ? "not-allowed" : "pointer",
-              fontWeight: 600, fontSize: 13, opacity: saving ? 0.7 : 1,
-              transition: "all 0.3s", fontFamily: "var(--font-poppins,'Poppins',sans-serif)",
-              boxShadow: (!passwordData.current || !passwordData.new) ? "none" : "0 2px 10px rgba(255,127,80,0.25)",
-              display: "flex", alignItems: "center", gap: 6,
-            }}
-          >
-            {saving && <SpinnerGap size={14} className="animate-spin" />}
-            {saving ? "Changing..." : "Change Password"}
-          </button>
+      <div className="premium-card" style={{ padding: "32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+          <Lock size={18} color="#FF7F50" weight="duotone" />
+          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Password Reset</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 400 }}>
-          {[
-            { label: "Current Password", key: "current" },
-            { label: "New Password", key: "new" },
-            { label: "Confirm New Password", key: "confirm" }
-          ].map((f, i) => (
+          {["Current Password", "New Password", "Confirm New Password"].map((pl, i) => (
             <div key={i}>
-              <label style={labelStyle2}>{f.label}</label>
-              <input 
-                type="password" 
-                value={passwordData[f.key as keyof typeof passwordData]}
-                onChange={(e) => setPasswordData({ ...passwordData, [f.key]: e.target.value })}
-                placeholder="••••••••" 
-                style={inputStyle2} 
-              />
+              <label style={labelStyle2}>{pl}</label>
+              <input type="password" placeholder="••••••••" style={inputStyle2} />
             </div>
           ))}
+          <button style={{ background: "none", border: "none", color: "#FF7F50", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", padding: 0 }}>
+            Forgot Password?
+          </button>
         </div>
+      </div>
+
+      {/* Save Button */}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
+        <button onClick={handleSave}
+          style={{ padding: "13px 32px", borderRadius: 12, background: saved ? "#10B981" : "linear-gradient(90deg,#FF7F50,#e66a3e)", color: "white", border: "none", cursor: "pointer", fontWeight: 600, fontSize: 15, transition: "background 0.3s", boxShadow: "0 4px 14px rgba(255,127,80,0.3)", fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>
+          {saved ? "✓ Saved!" : "Save Changes"}
+        </button>
       </div>
     </div>
   );
@@ -325,7 +148,6 @@ const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
       transition: "background 0.3s", display: "flex", alignItems: "center",
       justifyContent: on ? "flex-end" : "flex-start",
     }}>
-    <motion.div layout style={{ width: 20, height: 20, borderRadius: "50%", background: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }} />
+    <motion.div animate={{ x: on ? 20 : 0 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} style={{ width: 20, height: 20, borderRadius: "50%", background: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }} />
   </button>
 );
-
