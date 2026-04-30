@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell, User, BookOpen, ChartBar,
-  Bus, Gear, Images, CaretDown, SignOut,
+  Bus, Gear, Images, CaretDown, SignOut, House
 } from "@phosphor-icons/react";
 import { MenuKey } from "../../app/parent-dashboard/page";
 import { DashboardTheme } from "../../types/theme";
@@ -42,9 +42,10 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
     {
       title: "MENU",
       items: [
-        { key: "events",    label: "Events Gallery", icon: Images },
-        { key: "diary",     label: "Diary & Homework", icon: BookOpen },
-        { key: "notifications", label: "Notifications", icon: Bell },
+        { key: "dashboard",     label: "Dashboard",      icon: House },
+        { key: "events",        label: "Events Gallery", icon: Images },
+        { key: "diary",         label: "Diary & Homework", icon: BookOpen },
+        { key: "notifications", label: "Notifications",  icon: Bell },
       ]
     },
     {

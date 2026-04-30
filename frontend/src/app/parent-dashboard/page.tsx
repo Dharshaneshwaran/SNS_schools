@@ -13,7 +13,7 @@ import { Bell, MagnifyingGlass, Sun, Moon, ChatCircleDots } from "@phosphor-icon
 
 import { DashboardTheme } from "../../types/theme";
 
-export type MenuKey = "events" | "profile" | "diary" | "notifications" | "academic" | "transport" | "settings";
+export type MenuKey = "dashboard" | "events" | "profile" | "diary" | "notifications" | "academic" | "transport" | "settings";
 
 const students = [
   { id: 1, name: "Arjun Sharma", class: "8", section: "A", avatar: "AS" },
@@ -21,7 +21,7 @@ const students = [
 ];
 
 export default function ParentDashboard() {
-  const [activeMenu, setActiveMenu] = useState<MenuKey>("events");
+  const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
   const [activeStudent, setActiveStudent] = useState(students[0]);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -41,6 +41,7 @@ export default function ParentDashboard() {
 
   const renderContent = () => {
     switch (activeMenu) {
+      case "dashboard":     return <DashboardHome theme={theme} />;
       case "events":        return <EventsGallery theme={theme} />;
       case "profile":       return <ProfileSection student={activeStudent} theme={theme} />;
       case "diary":         return <DiarySection student={activeStudent} theme={theme} />;
