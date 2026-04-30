@@ -29,9 +29,11 @@ const initialMessages = [
 
 export function ChatPage() {
   const { session } = useAuth();
-  const [selectedContact, setSelectedContact] = useState(contacts[0]);
+  const [localContacts, setLocalContacts] = useState(contacts);
+  const [selectedContact, setSelectedContact] = useState(localContacts[0]);
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const isParent = session?.user?.role === "parent";
 
@@ -48,6 +50,40 @@ export function ChatPage() {
     setInput("");
   };
 
+  const handleNewGroup = () => {
+    const groupName = prompt("Enter new group name:");
+    if (groupName && groupName.trim()) {
+      const newGroup = {
+        id: localContacts.length + 1,
+        name: groupName.trim(),
+        type: "Group",
+        lastMsg: "Group created",
+        time: "Just now",
+        unread: 0
+      };
+      setLocalContacts([newGroup, ...localContacts]);
+      setSelectedContact(newGroup);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const newMsg = {
+        id: messages.length + 1,
+        sender: session?.user?.name || "User",
+        text: `📎 Attached file: ${file.name}`,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isMe: true
+      };
+      setMessages([...messages, newMsg]);
+    }
+  };
+
+  const filteredContacts = localContacts.filter(contact => 
+    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="flex h-[calc(100vh-90px)] w-full overflow-hidden bg-[#f0f2f5]">
       {/* Sidebar: Contacts */}
@@ -59,17 +95,17 @@ export function ChatPage() {
           </div>
           <div className="flex items-center gap-6 text-slate-500">
             {!isParent && (
-              <button title="New Group" className="hover:text-slate-700 transition-colors">
+              <button title="New Group" onClick={handleNewGroup} className="hover:text-slate-700 transition-colors">
                 <UsersThree size={22} weight="bold" />
               </button>
             )}
-            <button title="Status" className="hover:text-slate-700 transition-colors">
+            <button title="Status" onClick={() => alert("Status updates coming soon!")} className="hover:text-slate-700 transition-colors">
               <Circle size={22} weight="bold" />
             </button>
-            <button title="New Chat" className="hover:text-slate-700 transition-colors">
+            <button title="New Chat" onClick={() => alert("Select a user to start chatting")} className="hover:text-slate-700 transition-colors">
               <ChatCircleDots size={22} weight="bold" />
             </button>
-            <button title="Menu" className="hover:text-slate-700 transition-colors">
+            <button title="Menu" onClick={() => alert("Settings menu coming soon")} className="hover:text-slate-700 transition-colors">
               <DotsThreeVertical size={22} weight="bold" />
             </button>
           </div>
@@ -81,6 +117,8 @@ export function ChatPage() {
             <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search or start new chat" 
               className="w-full bg-[#f0f2f5] rounded-lg pl-10 pr-4 py-1.5 text-sm outline-none placeholder:text-slate-500"
             />
@@ -89,7 +127,7 @@ export function ChatPage() {
 
         {/* Contacts List */}
         <div className="flex-1 overflow-y-auto bg-white">
-          {contacts.map((contact) => (
+          {filteredContacts.length > 0 ? filteredContacts.map((contact) => (
             <button 
               key={contact.id}
               onClick={() => setSelectedContact(contact)}
@@ -117,7 +155,11 @@ export function ChatPage() {
                 </div>
               </div>
             </button>
-          ))}
+          )) : (
+             <div className="p-8 text-center text-sm text-slate-500">
+                No chats found for "{searchQuery}"
+             </div>
+          )}
         </div>
       </div>
 
@@ -135,8 +177,12 @@ export function ChatPage() {
             </div>
           </div>
           <div className="flex items-center gap-6 text-slate-500 pr-2">
-            <MagnifyingGlass size={20} weight="bold" />
-            <DotsThreeVertical size={20} weight="bold" />
+            <button onClick={() => alert("Search within chat coming soon")} className="hover:text-slate-700 transition-colors">
+               <MagnifyingGlass size={20} weight="bold" />
+            </button>
+            <button onClick={() => alert("Chat options coming soon")} className="hover:text-slate-700 transition-colors">
+               <DotsThreeVertical size={20} weight="bold" />
+            </button>
           </div>
         </div>
 
@@ -186,8 +232,13 @@ export function ChatPage() {
         {/* Authentic WhatsApp Input Bar */}
         <div className="bg-[#f0f2f5] px-4 py-2 flex items-center gap-4 flex-shrink-0">
           <div className="flex items-center gap-4 text-slate-500">
-            <Smiley size={26} />
-            <Plus size={26} />
+            <button onClick={() => alert("Emoji picker coming soon")} className="hover:text-slate-700 transition-colors">
+              <Smiley size={26} />
+            </button>
+            <label className="hover:text-slate-700 transition-colors cursor-pointer">
+              <Plus size={26} />
+              <input type="file" className="hidden" onChange={handleFileUpload} />
+            </label>
           </div>
           <div className="flex-1 bg-white rounded-lg px-4 py-2.5">
             <input 
