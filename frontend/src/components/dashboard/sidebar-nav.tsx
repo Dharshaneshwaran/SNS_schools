@@ -21,10 +21,11 @@ import {
   CalendarCheck,
   UserPlus,
   Student,
-  ChatCircleDots
+  ChatCircleDots,
+  UserCircle
 } from "@phosphor-icons/react";
 
-const items = [
+const adminItems = [
   { label: "Dashboard", href: "/dashboard", icon: <Layout size={20} weight="duotone" /> },
   { label: "Notifications", href: "/dashboard/notifications", icon: <Bell size={20} weight="duotone" /> },
   { label: "Attendance", href: "/dashboard/attendance", icon: <UserList size={20} weight="duotone" /> },
@@ -40,10 +41,24 @@ const items = [
   { label: "Chat", href: "/dashboard/chat", icon: <ChatCircleDots size={20} weight="duotone" /> },
 ];
 
+const teacherItems = [
+  { label: "Home Feed", href: "/dashboard", icon: <Layout size={20} weight="duotone" /> },
+  { label: "My Profile", href: "/dashboard/profile", icon: <UserCircle size={20} weight="duotone" /> },
+  { label: "Notifications", href: "/dashboard/notifications", icon: <Bell size={20} weight="duotone" /> },
+  { label: "Attendance", href: "/dashboard/attendance", icon: <UserList size={20} weight="duotone" /> },
+  { label: "Timetable", href: "/dashboard/timetable", icon: <Calendar size={20} weight="duotone" /> },
+  { label: "Substitution", href: "/dashboard/substitution", icon: <ArrowsLeftRight size={20} weight="duotone" /> },
+  { label: "Homework Chat", href: "/dashboard/chat", icon: <ChatCircleDots size={20} weight="duotone" /> },
+  { label: "Exams & Marks", href: "/dashboard/results", icon: <GraduationCap size={20} weight="duotone" /> },
+];
+
 export function SidebarNav() {
   const pathname = usePathname();
   const { session, logout } = useAuth();
   const isAdmin = session?.user.role === "admin" || session?.user.role === "superadmin";
+  const isTeacher = session?.user.role === "teacher";
+
+  const items = isAdmin ? adminItems : (isTeacher ? teacherItems : []);
 
   return (
     <aside className="h-full flex flex-col rounded-[2rem] border border-[var(--border)] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.05)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:self-start">
@@ -57,7 +72,7 @@ export function SidebarNav() {
               sns erp
             </p>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#FF7F50]">
-              Admin Panel
+              {isAdmin ? 'Admin Panel' : (isTeacher ? 'Teacher Portal' : 'User Portal')}
             </p>
           </div>
         </div>
