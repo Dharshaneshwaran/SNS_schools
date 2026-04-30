@@ -14,7 +14,7 @@ import {
 import { useState } from "react";
 import { DashboardTheme } from "../../../types/theme";
 
-const categories = ["All", "Sports", "Academic", "Cultural", "Meeting", "Health"];
+
 
 const events = [
   { 
@@ -68,7 +68,7 @@ const events = [
 ];
 
 export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
-  const [activeCategory, setActiveCategory] = useState("All");
+
   const [likedEvents, setLikedEvents] = useState<number[]>([]);
   const [expandedCaptions, setExpandedCaptions] = useState<number[]>([]);
 
@@ -84,9 +84,7 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
     );
   };
 
-  const filteredEvents = activeCategory === "All" 
-    ? events 
-    : events.filter(e => e.category === activeCategory);
+
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
@@ -130,48 +128,7 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
         ))}
       </div>
 
-      {/* Category Filter Chips - Inspired by Flutter ActionChip */}
-      <div style={{ 
-        display: "flex", 
-        gap: 12, 
-        overflowX: "auto", 
-        paddingBottom: 8,
-        paddingLeft: 4,
-        msOverflowStyle: "none",
-        scrollbarWidth: "none"
-      }} className="hide-scrollbar">
-        {categories.map((cat) => (
-          <motion.button
-            key={cat}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setActiveCategory(cat)}
-            style={{
-              padding: "8px 20px",
-              borderRadius: 100,
-              border: activeCategory === cat 
-                ? "none" 
-                : `1px solid ${theme.border}`,
-              background: activeCategory === cat 
-                ? theme.primary 
-                : theme.cardBg,
-              color: activeCategory === cat 
-                ? "white" 
-                : theme.text,
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: "pointer",
-              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-              whiteSpace: "nowrap",
-              boxShadow: activeCategory === cat 
-                ? `0 4px 12px ${theme.primary}40` 
-                : "none"
-            }}
-          >
-            {cat}
-          </motion.button>
-        ))}
-      </div>
+
 
       <div style={{ 
         maxWidth: "640px", 
@@ -183,7 +140,7 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
         paddingBottom: 60 
       }}>
         <AnimatePresence mode="popLayout">
-          {filteredEvents.map((event, i) => {
+          {events.map((event, i) => {
             const isLiked = likedEvents.includes(event.id);
             const isExpanded = expandedCaptions.includes(event.id);
             const captionParts = event.description.split(" #");
