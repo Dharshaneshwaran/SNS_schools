@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className={`${inter.variable} ${poppins.variable} min-h-full flex flex-col font-sans`}>
+      <body className={`${inter.variable} ${poppins.variable} min-h-full font-sans`}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

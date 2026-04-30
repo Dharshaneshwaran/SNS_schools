@@ -413,8 +413,8 @@ export default function LoginPage() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          minHeight: "100vh",
         }}
-        className="hidden lg:flex"
       >
         {/* Background image */}
         <div
@@ -426,12 +426,12 @@ export default function LoginPage() {
             backgroundPosition: "center",
           }}
         />
-        {/* Light gradient overlay */}
+        {/* Dark gradient overlay for text readability */}
         <div
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,127,80,0.1) 100%)",
+            background: "linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(255,127,80,0.35) 100%)",
           }}
         />
 
@@ -465,7 +465,7 @@ export default function LoginPage() {
                 fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
                 fontSize: "clamp(1.8rem, 3vw, 2.6rem)",
                 fontWeight: 700,
-                color: "#121212",
+                color: "#ffffff",
                 lineHeight: 1.25,
                 marginBottom: 16,
                 letterSpacing: "-0.02em",
@@ -473,7 +473,7 @@ export default function LoginPage() {
             >
               Empowering Education<br />Through Innovation
             </h2>
-            <p style={{ color: "#2d3436", fontSize: 16, fontWeight: 500, lineHeight: 1.7, maxWidth: 420, margin: "0 auto" }}>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 16, fontWeight: 500, lineHeight: 1.7, maxWidth: 420, margin: "0 auto" }}>
               A unified platform for parents, teachers, and administrators — 
               bridging the gap between school and home.
             </p>

@@ -13,6 +13,7 @@ Launch individual architecture segments independently.
 cd frontend
 npm run dev
 ```
+Access it at: [http://localhost:3001](http://localhost:3001)
 
 ### API endpoints (Server)
 ```bash

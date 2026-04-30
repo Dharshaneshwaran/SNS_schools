@@ -53,7 +53,7 @@ export default function ParentDashboard() {
   };
 
   return (
-    <div className="mesh-bg" style={{ display: "flex", height: "100vh", background: theme.bg, transition: "background 0.3s ease", position: "relative", overflow: "hidden" }}>
+    <div className={`mesh-bg${isDarkMode ? " dark-mode" : ""}`} style={{ display: "flex", height: "100vh", background: theme.bg, transition: "background 0.3s ease", position: "relative", overflow: "hidden" }}>
       {/* Background Decorative Elements */}
       <div className="bg-glow" style={{ top: "-10%", left: "-10%", width: 700, height: 700, background: "radial-gradient(circle, rgba(255, 127, 80, 0.12), transparent 70%)", position: "absolute", zIndex: 0 }} />
       <div className="bg-glow" style={{ bottom: "-10%", right: "-10%", width: 600, height: 600, background: "radial-gradient(circle, rgba(79, 70, 229, 0.1), transparent 70%)", animationDelay: "-5s", position: "absolute", zIndex: 0 }} />
@@ -110,8 +110,11 @@ export default function ParentDashboard() {
               <button style={{ background: "none", border: "none", color: theme.textMuted, cursor: "pointer" }} onClick={() => setIsDarkMode(!isDarkMode)}>
                 {isDarkMode ? <Sun size={24} weight="bold" /> : <Moon size={24} weight="bold" />}
               </button>
-              <button style={{ background: "none", border: "none", color: theme.textMuted, cursor: "pointer", position: "relative" }}>
-                <Bell size={24} weight="regular" />
+              <button
+                onClick={() => setActiveMenu("notifications")}
+                style={{ background: "none", border: "none", color: activeMenu === "notifications" ? "#FF7F50" : theme.textMuted, cursor: "pointer", position: "relative" }}
+              >
+                <Bell size={24} weight={activeMenu === "notifications" ? "fill" : "regular"} />
                 <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: "#FF7F50", border: `2px solid ${theme.bg}` }}></span>
               </button>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell, User, BookOpen, ChartBar,
@@ -8,6 +9,7 @@ import {
 } from "@phosphor-icons/react";
 import { MenuKey } from "../../app/parent-dashboard/page";
 import { DashboardTheme } from "../../types/theme";
+import { clearSession } from "../../lib/session-storage";
 
 type Student = { id: number; name: string; class: string; section: string; avatar: string };
 
@@ -22,6 +24,12 @@ interface Props {
 
 export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, theme }: Props) {
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    clearSession();
+    router.push("/login");
+  };
 
   const sections: {
     title: string;
@@ -254,6 +262,7 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
       {/* Footer / Sign Out */}
       <div style={{ padding: "16px", borderTop: `1px solid ${theme.border}` }}>
         <motion.button
+          onClick={handleSignOut}
           whileHover={{ background: theme.isDark ? "rgba(239,68,68,0.15)" : "#FEF2F2", color: theme.danger }}
           style={{
             width: "100%",

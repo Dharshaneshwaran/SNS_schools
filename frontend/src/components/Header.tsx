@@ -25,7 +25,7 @@ export default function Header() {
         background: scrolled ? "rgba(255, 255, 255, 0.75)" : "transparent",
         backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
         borderBottom: scrolled ? "1px solid rgba(255, 255, 255, 0.3)" : "none",
-        padding: scrolled ? "12px 0" : "24px 0",
+        padding: scrolled ? "10px 0" : "20px 0",
         boxShadow: scrolled ? "0 10px 30px rgba(0,0,0,0.04)" : "none",
       }}
     >
@@ -34,19 +34,19 @@ export default function Header() {
           <Link href="/" className="site-logo" style={{ 
             display: "flex", 
             alignItems: "center", 
-            gap: 14, 
+            gap: 12, 
             textDecoration: "none",
             color: "#121212",
-            fontWeight: 900,
-            fontSize: 24,
-            letterSpacing: "-0.03em",
-            fontFamily: "var(--font-poppins,'Poppins',sans-serif)"
+            fontWeight: 800,
+            fontSize: 22,
+            letterSpacing: "-0.02em",
+            fontFamily: "var(--font-poppins, 'Poppins', sans-serif)"
           }}>
             <div style={{ 
-              width: 44, height: 44, 
+              width: 40, height: 40, 
               display: "flex", alignItems: "center", justifyContent: "center",
               background: "#fff",
-              borderRadius: 14,
+              borderRadius: 12,
               boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
               padding: 6,
               border: "1px solid rgba(0,0,0,0.04)"

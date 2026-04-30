@@ -178,6 +178,14 @@ h1, h2, h3, h4 {
     position: relative;
 }
 
+/* Decorative glow elements — MUST be absolute so they don't affect flex/grid layout */
+.bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -198,6 +206,14 @@ h1, h2, h3, h4 {
 .premium-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 60px rgba(255, 127, 80, 0.06);
+}
+
+/* Dark mode overrides for dashboard cards */
+[data-theme="dark"] .premium-card,
+.dark-mode .premium-card {
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: none;
 }
 
 .active-nav-item {
@@ -225,11 +241,11 @@ h1, h2, h3, h4 {
     left: 0;
     width: 100%;
     z-index: 1000;
-    padding: 1.4rem 0;
+    padding: 1rem 0;
     transition: all 0.4s ease;
 }
 .site-header.scrolled {
-    padding: 0.9rem 0;
+    padding: 0.6rem 0;
     background: rgba(255,255,255,0.94);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -270,8 +286,8 @@ h1, h2, h3, h4 {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding-top: 100px;
-    padding-bottom: 80px;
+    padding-top: 80px;
+    padding-bottom: 60px;
     background: linear-gradient(140deg, #FFF5F0 0%, #FFFAF7 50%, #FFFFFF 100%);
     position: relative;
     overflow: hidden;

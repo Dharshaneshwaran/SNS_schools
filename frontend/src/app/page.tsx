@@ -76,7 +76,7 @@ export default function Home() {
         <div className="bg-glow" style={{ top: "-10%", left: "-10%", width: 600, height: 600, background: "radial-gradient(circle, rgba(255, 127, 80, 0.12), transparent 70%)" }} />
         <div className="bg-glow" style={{ bottom: "-10%", right: "-10%", width: 500, height: 500, background: "radial-gradient(circle, rgba(79, 70, 229, 0.08), transparent 70%)", animationDelay: "-5s" }} />
         
-        <div className="page-container" style={{ width: "100%", position: "relative", zIndex: 1 }}>
+        <div className="page-container" style={{ position: "relative", zIndex: 1 }}>
           <div className="hero-grid">
 
             {/* ── Left: Text ── */}
