@@ -59,7 +59,6 @@ class AuthStorageService {
     final value = await _storage.read(key: 'preferred_language');
     return value ?? 'English';
   }
-
   Future<void> setSplashEnabled(bool enabled) async {
     await _storage.write(key: 'splash_enabled', value: enabled.toString());
   }

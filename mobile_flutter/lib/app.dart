@@ -43,6 +43,7 @@ class _SnsErpAppState extends State<SnsErpApp> {
     final storedSession = await _authStorageService.readSession();
     final isDark = await _authStorageService.getDarkModeEnabled();
     final splashEnabled = await _authStorageService.getSplashEnabled();
+    
     setState(() {
       _isDarkMode = isDark;
       // If splash is disabled, skip it immediately
@@ -115,8 +116,10 @@ class _SnsErpAppState extends State<SnsErpApp> {
     try {
       final didAuthenticate = await _localAuth.authenticate(
         localizedReason: 'Unlock SNS ERP',
-        biometricOnly: false,
-        persistAcrossBackgrounding: true,
+        options: const AuthenticationOptions(
+          biometricOnly: false,
+          stickyAuth: true,
+        ),
       );
       if (didAuthenticate) {
         setState(() {

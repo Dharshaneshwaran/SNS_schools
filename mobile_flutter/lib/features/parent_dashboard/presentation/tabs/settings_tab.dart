@@ -438,7 +438,7 @@ class _SettingsTabState extends State<SettingsTab> {
                   validator: (val) => val == null || val.length < 6 ? 'Min 6 characters' : null,
                 ),
                 const SizedBox(height: 16),
-
+ 
                 TextFormField(
                   controller: _confirmPasswordCtrl,
                   obscureText: true,

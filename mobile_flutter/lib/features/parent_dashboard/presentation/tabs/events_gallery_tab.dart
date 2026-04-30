@@ -202,7 +202,8 @@ class _EventsGalleryTabState extends State<EventsGalleryTab> {
               ),
             ),
           ),
-          // Stories Section - Mirroring Web
+          
+          // Stories Section
           SliverToBoxAdapter(
             child: Container(
               height: 110,
@@ -251,7 +252,41 @@ class _EventsGalleryTabState extends State<EventsGalleryTab> {
               ),
             ),
           ),
-          const SliverPadding(padding: EdgeInsets.only(top: 8)),
+
+          // Category Pills
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 40,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: ["All", "Sports", "Academic", "Cultural", "Meeting", "Health"]
+                    .map((cat) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ActionChip(
+                            label: Text(
+                              cat,
+                              style: TextStyle(
+                                color: cat == "All" ? Colors.white : Colors.grey[700],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            backgroundColor: cat == "All" ? const Color(0xFFFF7F50) : Colors.white,
+                            side: cat == "All"
+                                ? BorderSide.none
+                                : BorderSide(color: Colors.grey[300]!),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            onPressed: () {},
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+          ),
+          const SliverPadding(padding: EdgeInsets.only(top: 16)),
+
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {

@@ -12,7 +12,7 @@ export function PageSection({
   return (
     <section className="space-y-5">
       <div className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-white/95 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.05)] sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent-strong)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
           {eyebrow}
         </p>
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-5xl">

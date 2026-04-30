@@ -9,7 +9,7 @@ import AcademicSection from "../../components/parent/sections/AcademicSection";
 import TransportSection from "../../components/parent/sections/TransportSection";
 import SettingsSection from "../../components/parent/sections/SettingsSection";
 import DashboardHome from "../../components/parent/sections/DashboardHome";
-import { Bell, MagnifyingGlass, Sun, Moon, ChatCircleDots } from "@phosphor-icons/react";
+import { Bell, MagnifyingGlass, Sun, Moon, ChatCircleDots, List } from "@phosphor-icons/react";
 
 import { DashboardTheme } from "../../types/theme";
 
@@ -23,6 +23,7 @@ const students = [
 export default function ParentDashboard() {
   const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
   const [activeStudent, setActiveStudent] = useState(students[0]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const theme: DashboardTheme = {
@@ -54,35 +55,39 @@ export default function ParentDashboard() {
   };
 
   return (
-    <div className={`mesh-bg${isDarkMode ? " dark-mode" : ""}`} style={{ display: "flex", height: "100vh", background: theme.bg, transition: "background 0.3s ease", position: "relative", overflow: "hidden" }}>
+    <div className={`mesh-bg${isDarkMode ? " dark-mode" : ""} flex min-h-screen font-sans relative overflow-hidden`} style={{ background: theme.bg, transition: "background 0.3s ease" }}>
       {/* Background Decorative Elements */}
       <div className="bg-glow" style={{ top: "-10%", left: "-10%", width: 700, height: 700, background: "radial-gradient(circle, rgba(255, 127, 80, 0.12), transparent 70%)", position: "absolute", zIndex: 0 }} />
       <div className="bg-glow" style={{ bottom: "-10%", right: "-10%", width: 600, height: 600, background: "radial-gradient(circle, rgba(79, 70, 229, 0.1), transparent 70%)", animationDelay: "-5s", position: "absolute", zIndex: 0 }} />
-      <div className="bg-glow" style={{ top: "20%", right: "10%", width: 450, height: 450, background: "radial-gradient(circle, rgba(255, 127, 80, 0.08), transparent 70%)", animationDuration: "20s", position: "absolute", zIndex: 0 }} />
-      <div className="bg-glow" style={{ bottom: "20%", left: "30%", width: 300, height: 300, background: "radial-gradient(circle, rgba(79, 70, 229, 0.05), transparent 70%)", animationDelay: "-8s", animationDuration: "12s", position: "absolute", zIndex: 0 }} />
+      
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[60] md:hidden backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
-      <ParentSidebar
-        students={students}
-        activeStudent={activeStudent}
-        setActiveStudent={setActiveStudent}
-        activeMenu={activeMenu}
-        setActiveMenu={setActiveMenu}
-        theme={theme}
-      />
-      <main style={{ flex: 1, height: "100vh", overflowY: "auto", minWidth: 0, display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }} className="hide-scrollbar">
-        {/* Top Bar - Clean & Modern */}
-        <header style={{ 
-          height: 90, 
+      {/* Sidebar Wrapper */}
+      <div 
+        className={`fixed inset-y-0 left-0 z-[70] transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0 transition-transform duration-300 ease-in-out`}
+        style={{ background: theme.sidebarBg }}
+      >
+        <ParentSidebar
+          students={students}
+          activeStudent={activeStudent}
+          setActiveStudent={(s) => { setActiveStudent(s); setIsSidebarOpen(false); }}
+          activeMenu={activeMenu}
+          setActiveMenu={(m) => { setActiveMenu(m); setIsSidebarOpen(false); }}
+          theme={theme}
+        />
+      </div>
+
+      <main className="flex-1 h-screen overflow-y-auto w-full min-w-0 hide-scrollbar relative z-10 flex flex-col">
+        {/* Top Bar - Clean & Modern (Desktop) */}
+        <header className="hidden md:flex sticky top-0 h-[90px] backdrop-blur-xl border-b px-10 items-center justify-between z-40" style={{ 
           background: theme.isDark ? "rgba(18,18,18,0.7)" : "rgba(255,255,255,0.7)", 
-          backdropFilter: "blur(12px)",
-          borderBottom: `1px solid ${theme.border}`,
-          padding: "0 40px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "sticky",
-          top: 0,
-          zIndex: 40
+          borderColor: theme.border
         }}>
           {/* Search Bar */}
           <div style={{ flex: 1, maxWidth: 400 }}>
@@ -122,8 +127,39 @@ export default function ParentDashboard() {
           </div>
         </header>
 
-        <div style={{ padding: "40px 60px", flex: 1, position: "relative", zIndex: 2 }}>
-          <div style={{ marginBottom: 40 }}>
+        {/* Premium Mobile Header Component */}
+        <div 
+          className="md:hidden grid grid-cols-3 items-center px-5 py-3 sticky top-0 z-30 shadow-[0_2px_12px_rgba(0,0,0,0.03)]"
+          style={{ background: theme.sidebarBg, borderBottom: `1px solid ${theme.border}` }}
+        >
+          <div className="flex justify-start">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-1.5 -ml-1.5 text-[#FF7F50] rounded-xl active:bg-orange-50 active:scale-95 transition-all"
+            >
+              <List size={28} weight="bold" />
+            </button>
+          </div>
+          
+          <div className="flex flex-col items-center justify-center">
+            <span className="font-extrabold text-[15px] tracking-tight font-poppins leading-none" style={{ color: theme.text }}>
+              SNS Academy
+            </span>
+            <span className="text-[9px] text-[#FF7F50] font-bold tracking-[0.15em] uppercase mt-1">
+              Parent
+            </span>
+          </div>
+
+          <div className="flex justify-end">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF7F50] to-[#e66a3e] text-white flex items-center justify-center font-bold text-xs shadow-[0_2px_8px_rgba(255,127,80,0.3)] ring-2 ring-white">
+              {activeStudent.avatar}
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Page Content */}
+        <div className="p-4 md:p-8 lg:p-10">
+          <div className="mb-8 md:mb-10">
              <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
                 {activeStudent.name}
              </h2>

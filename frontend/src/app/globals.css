@@ -19,26 +19,78 @@
     --color-background: #f8fafc;
     --color-foreground: #0f172a;
     --font-sans: "Inter", "Segoe UI", sans-serif;
+
+    /* From mac branch */
+    --color-accent-soft: var(--accent-soft);
+    --color-accent-strong: var(--accent-strong);
+    --color-border: var(--border);
 }
 
-*, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root {
+  --background: #f4f7fb;
+  --foreground: #18233d;
+  --primary: #FF7F50;
+  --accent: #FF7F50;
+  --accent-soft: rgba(255, 127, 80, 0.1);
+  --accent-strong: #e66a3e;
+  --border: rgba(0, 0, 0, 0.08);
+  --card-bg: #ffffff;
+  --sidebar: #ffffff;
+  --sidebar-text: #31415f;
+  --sidebar-active: #ecebff;
+  --panel: rgba(255, 255, 255, 0.92);
+  --panel-strong: #ffffff;
 }
 
-html {
-    scroll-behavior: smooth;
-    font-size: 16px;
-}
-
-body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #FFFFFF;
-    color: #2D3436;
-    line-height: 1.6;
-    overflow-x: hidden;
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply rounded-[2rem] border border-[var(--border)] bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.05)] backdrop-blur-md;
+  }
+  
+  .premium-shadow {
+    @apply shadow-[0_20px_50px_rgba(0,0,0,0.04)];
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+[data-theme='dark'] {
+    --bg-primary: #0B0B0B;
+    --bg-secondary: #1A1A1A;
+    --accent: #FF6A00;
+    --accent-glow: rgba(255, 106, 0, 0.3);
+    --text-primary: #FFFFFF;
+    --text-secondary: #A0A0A0;
+    --border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.teacher-dashboard {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
 }
 
 input::placeholder {
@@ -682,6 +734,7 @@ h1, h2, h3, h4 {
     font-size: 0.85rem;
     color: #aaa;
 }
+
 
 /* ─── Responsive ─── */
 @media (max-width: 1024px) {
