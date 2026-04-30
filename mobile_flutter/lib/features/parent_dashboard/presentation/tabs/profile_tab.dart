@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/models/student.dart';
 
 class ProfileTab extends StatelessWidget {
-  const ProfileTab({super.key});
+  final Student student;
+  const ProfileTab({required this.student, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +16,7 @@ class ProfileTab extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -43,9 +45,9 @@ class ProfileTab extends StatelessWidget {
                   ],
                 ),
                 alignment: Alignment.center,
-                child: const Text(
-                  'YS',
-                  style: TextStyle(
+                child: Text(
+                  student.initials,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
@@ -54,14 +56,15 @@ class ProfileTab extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Yashwanth S',
+                student.name,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                'Class X - Section A',
+                '${student.className} - Section ${student.section}',
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: Colors.grey[600],
                 ),

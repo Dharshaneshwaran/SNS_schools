@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/models/student.dart';
+
 class AcademicTab extends StatefulWidget {
-  const AcademicTab({super.key});
+  final Student student;
+  const AcademicTab({required this.student, super.key});
 
   @override
   State<AcademicTab> createState() => _AcademicTabState();
@@ -42,10 +45,26 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       children: [
+        // Student Info Banner
         Container(
-          color: Colors.white,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: const Color(0xFFFF7F50).withValues(alpha: 0.1),
+          child: Text(
+            'Academic Records: ${widget.student.name}',
+            style: const TextStyle(
+              color: Color(0xFFFF7F50),
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+        ),
+        Container(
+          color: theme.cardColor,
           child: TabBar(
             controller: _subTabController,
             isScrollable: true,
@@ -59,11 +78,11 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
           child: TabBarView(
             controller: _subTabController,
             children: [
-              _buildAttendanceView(),
-              _buildExamReportView(),
-              _buildCalendarView(),
-              _buildScheduleView(),
-              _buildLeaveView(),
+              _buildAttendanceView(theme),
+              _buildExamReportView(theme),
+              _buildCalendarView(theme),
+              _buildScheduleView(theme),
+              _buildLeaveView(theme),
             ],
           ),
         ),
@@ -72,7 +91,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
   }
 
   // 1. Attendance View
-  Widget _buildAttendanceView() {
+  Widget _buildAttendanceView(ThemeData theme) {
     const attended = 82;
     const total = 90;
     const pct = (attended / total) * 100;
@@ -82,18 +101,18 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
       children: [
         Row(
           children: [
-            Expanded(child: _buildAttendanceMetric('Days Present', '$attended', Colors.green)),
+            Expanded(child: _buildAttendanceMetric(theme, 'Days Present', '$attended', Colors.green)),
             const SizedBox(width: 12),
-            Expanded(child: _buildAttendanceMetric('Days Absent', '${total - attended}', Colors.red)),
+            Expanded(child: _buildAttendanceMetric(theme, 'Days Absent', '${total - attended}', Colors.red)),
             const SizedBox(width: 12),
-            Expanded(child: _buildAttendanceMetric('Attendance %', '${pct.toStringAsFixed(1)}%', const Color(0xFFFF7F50))),
+            Expanded(child: _buildAttendanceMetric(theme, 'Attendance %', '${pct.toStringAsFixed(1)}%', const Color(0xFFFF7F50))),
           ],
         ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey[200]!),
           ),
@@ -103,7 +122,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Overall Attendance', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text('Overall Attendance', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: theme.colorScheme.onSurface)),
                   Text('${pct.toStringAsFixed(1)}%', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 16)),
                 ],
               ),
@@ -126,11 +145,11 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildAttendanceMetric(String label, String value, Color color) {
+  Widget _buildAttendanceMetric(ThemeData theme, String label, String value, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.grey[200]!),
       ),
@@ -145,7 +164,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
   }
 
   // 2. Exam Report
-  Widget _buildExamReportView() {
+  Widget _buildExamReportView(ThemeData theme) {
     final subjects = [
       {'name': 'Mathematics', 'marks': 92, 'max': 100, 'grade': 'A+'},
       {'name': 'Science', 'marks': 85, 'max': 100, 'grade': 'A'},
@@ -159,7 +178,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey[200]!),
           ),
@@ -167,11 +186,11 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
             children: subjects.map((s) {
               final score = s['marks'] as int;
               return ListTile(
-                title: Text(s['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
+                title: Text(s['name'] as String, style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
                 subtitle: Text('Score: $score/${s['max']}', style: TextStyle(color: Colors.grey[600])),
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(color: const Color(0xFFFF7F50).withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: const Color(0xFFFF7F50).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                   child: Text(s['grade'] as String, style: const TextStyle(color: Color(0xFFFF7F50), fontWeight: FontWeight.bold)),
                 ),
               );
@@ -183,7 +202,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
   }
 
   // 3. Academic Calendar
-  Widget _buildCalendarView() {
+  Widget _buildCalendarView(ThemeData theme) {
     final events = [
       {'month': 'April', 'list': ['Apr 20 – Sports Day', 'Apr 30 – Unit Test']},
       {'month': 'May', 'list': ['May 1 – Labour Day Holiday', 'May 10-16 – Term Exams', 'May 20 – Results Day']},
@@ -196,6 +215,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
       itemBuilder: (context, i) {
         final ev = events[i];
         return Card(
+          color: theme.cardColor,
           margin: const EdgeInsets.only(bottom: 16),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -210,7 +230,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
                     children: [
                       const Icon(Icons.circle, size: 8, color: Color(0xFFFF7F50)),
                       const SizedBox(width: 8),
-                      Text(item, style: const TextStyle(fontSize: 14)),
+                      Text(item, style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
                     ],
                   ),
                 )),
@@ -223,7 +243,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
   }
 
   // 4. Exam Schedule
-  Widget _buildScheduleView() {
+  Widget _buildScheduleView(ThemeData theme) {
     final schedule = [
       {'subject': 'Mathematics', 'date': 'May 10', 'hall': 'Hall A', 'seat': '25'},
       {'subject': 'Science', 'date': 'May 12', 'hall': 'Hall B', 'seat': '12'},
@@ -238,18 +258,18 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
-            columns: const [
-              DataColumn(label: Text('Subject')),
-              DataColumn(label: Text('Date')),
-              DataColumn(label: Text('Hall')),
-              DataColumn(label: Text('Seat')),
+            columns: [
+              DataColumn(label: Text('Subject', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('Date', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('Hall', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('Seat', style: TextStyle(color: theme.colorScheme.onSurface))),
             ],
             rows: schedule.map((e) {
               return DataRow(cells: [
-                DataCell(Text(e['subject']!, style: const TextStyle(fontWeight: FontWeight.bold))),
-                DataCell(Text(e['date']!)),
-                DataCell(Text(e['hall']!)),
-                DataCell(Text(e['seat']!)),
+                DataCell(Text(e['subject']!, style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface))),
+                DataCell(Text(e['date']!, style: TextStyle(color: theme.colorScheme.onSurface))),
+                DataCell(Text(e['hall']!, style: TextStyle(color: theme.colorScheme.onSurface))),
+                DataCell(Text(e['seat']!, style: TextStyle(color: theme.colorScheme.onSurface))),
               ]);
             }).toList(),
           ),
@@ -259,7 +279,7 @@ class _AcademicTabState extends State<AcademicTab> with SingleTickerProviderStat
   }
 
   // 5. Leave View
-  Widget _buildLeaveView() {
+  Widget _buildLeaveView(ThemeData theme) {
     if (_leaveSubmitted) {
       return Center(
         child: Column(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/models/auth_session.dart';
+import '../../../core/models/student.dart';
 import 'tabs/events_gallery_tab.dart';
 import 'tabs/profile_tab.dart';
 import 'tabs/diary_tab.dart';
@@ -27,9 +28,27 @@ class ParentDashboardScreen extends StatefulWidget {
 }
 
 class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
-  int _currentIndex = 0; // Default to Events Gallery
+  int _currentIndex = 0;
   bool _isStudentDropdownOpen = false;
   late AuthSession _currentSession;
+  int _selectedStudentIndex = 0;
+
+  final List<Student> _students = const [
+    Student(
+      id: '1',
+      name: 'Yuvraj Sharma',
+      className: 'Class X',
+      section: 'Sec A',
+      initials: 'YS',
+    ),
+    Student(
+      id: '2',
+      name: 'Arjun Sharma',
+      className: 'Class VII',
+      section: 'Sec B',
+      initials: 'AS',
+    ),
+  ];
 
   @override
   void initState() {
@@ -50,13 +69,20 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     setState(() {
       _currentIndex = index;
     });
-    Navigator.pop(context); // Close the drawer
+    Navigator.pop(context);
+  }
+
+  void _selectStudent(int index) {
+    setState(() {
+      _selectedStudentIndex = index;
+      _isStudentDropdownOpen = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final user = widget.session.user;
+    final selectedStudent = _students[_selectedStudentIndex];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -73,13 +99,13 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
         surfaceTintColor: Colors.transparent,
         iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
       ),
-      drawer: _buildDrawer(theme, user),
+      drawer: _buildDrawer(theme),
       body: [
         const EventsGalleryTab(),
-        const ProfileTab(),
-        const DiaryTab(),
-        const AcademicTab(),
-        const TransportTab(),
+        ProfileTab(student: selectedStudent),
+        DiaryTab(student: selectedStudent),
+        AcademicTab(student: selectedStudent),
+        TransportTab(student: selectedStudent),
         SettingsTab(
           session: _currentSession,
           isDarkMode: widget.isDarkMode,
@@ -94,7 +120,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
-  Widget _buildDrawer(ThemeData theme, dynamic user) {
+  Widget _buildDrawer(ThemeData theme) {
+    final selectedStudent = _students[_selectedStudentIndex];
+    final otherStudents = _students.asMap().entries.where((e) => e.key != _selectedStudentIndex).toList();
+
     return Drawer(
       backgroundColor: theme.cardColor,
       child: SafeArea(
@@ -155,8 +184,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFFF5F0), Colors.white],
+                  gradient: LinearGradient(
+                    colors: theme.brightness == Brightness.light 
+                        ? [const Color(0xFFFFF5F0), Colors.white]
+                        : [const Color(0xFF2D2D2D), const Color(0xFF1E1E1E)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -193,9 +224,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 ],
                               ),
                               alignment: Alignment.center,
-                              child: const Text(
-                                'YS',
-                                style: TextStyle(
+                              child: Text(
+                                selectedStudent.initials,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -208,17 +239,18 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    user.name,
-                                    style: const TextStyle(
+                                    selectedStudent.name,
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
+                                      color: theme.colorScheme.onSurface,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Class X - Sec A',
+                                    '${selectedStudent.className} - ${selectedStudent.section}',
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: Colors.grey[600],
@@ -237,59 +269,60 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         ),
                       ),
                     ),
-                    if (_isStudentDropdownOpen) ...[
+                    if (_isStudentDropdownOpen && otherStudents.isNotEmpty) ...[
                       Divider(color: Colors.grey[200], height: 1),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _isStudentDropdownOpen = false;
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 30,
-                                height: 30,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFFFF7F50),
-                                ),
-                                alignment: Alignment.center,
-                                child: const Text(
-                                  'AS',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
+                      ...otherStudents.map((entry) {
+                        final student = entry.value;
+                        final index = entry.key;
+                        return InkWell(
+                          onTap: () => _selectStudent(index),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFFF7F50),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Arjun Sharma',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Class VII - Sec B',
-                                    style: TextStyle(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    student.initials,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
                                       fontSize: 11,
-                                      color: Colors.grey[600],
                                     ),
                                   ),
-                                ],
-                              )
-                            ],
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      student.name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                        color: theme.colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${student.className} - ${student.section}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      )
+                        );
+                      }).toList(),
                     ]
                   ],
                 ),
@@ -359,6 +392,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
 
   Widget _buildNavItem(int index, String title, IconData outlineIcon, IconData filledIcon, {String? badge}) {
     final isActive = _currentIndex == index;
+    final theme = Theme.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
@@ -388,7 +422,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           title,
           style: TextStyle(
             fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-            color: isActive ? Colors.white : Colors.grey[800],
+            color: isActive ? Colors.white : theme.colorScheme.onSurface,
             fontSize: 14,
           ),
         ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/models/student.dart';
+
 class DiaryTab extends StatefulWidget {
-  const DiaryTab({super.key});
+  final Student student;
+  const DiaryTab({required this.student, super.key});
 
   @override
   State<DiaryTab> createState() => _DiaryTabState();
@@ -32,10 +35,26 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       children: [
+        // Student Info Banner
         Container(
-          color: Colors.white,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: const Color(0xFFFF7F50).withValues(alpha: 0.1),
+          child: Text(
+            'Daily Diary: ${widget.student.name}',
+            style: const TextStyle(
+              color: Color(0xFFFF7F50),
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+        ),
+        Container(
+          color: theme.cardColor,
           child: TabBar(
             controller: _subTabController,
             isScrollable: true,
@@ -49,11 +68,11 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
           child: TabBarView(
             controller: _subTabController,
             children: [
-              _buildHomeworkView(),
-              _buildClassTimetableView(),
-              _buildExamTimetableView(),
-              _buildEventsView(),
-              _buildNotificationsView(),
+              _buildHomeworkView(theme),
+              _buildClassTimetableView(theme),
+              _buildExamTimetableView(theme),
+              _buildEventsView(theme),
+              _buildNotificationsView(theme),
             ],
           ),
         ),
@@ -62,7 +81,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
   }
 
   // 1. Homework
-  Widget _buildHomeworkView() {
+  Widget _buildHomeworkView(ThemeData theme) {
     final hwData = [
       {'subject': 'Mathematics', 'task': 'Complete Exercise 5.3 – Trigonometry', 'due': 'Tomorrow', 'status': 'Pending'},
       {'subject': 'Science', 'task': 'Draw diagram of the human digestive system', 'due': 'Apr 30', 'status': 'Pending'},
@@ -76,6 +95,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
         final hw = hwData[i];
         final isSubmitted = hw['status'] == 'Submitted';
         return Card(
+          color: theme.cardColor,
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
             title: Text(hw['subject']!, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF7F50))),
@@ -83,7 +103,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 4),
-                Text(hw['task']!, style: const TextStyle(fontSize: 14)),
+                Text(hw['task']!, style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface)),
                 const SizedBox(height: 4),
                 Text('Due: ${hw['due']}', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
               ],
@@ -91,7 +111,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
             trailing: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: isSubmitted ? Colors.green.withOpacity(0.1) : const Color(0xFFFF7F50).withOpacity(0.1),
+                color: isSubmitted ? Colors.green.withValues(alpha: 0.1) : const Color(0xFFFF7F50).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(hw['status']!, style: TextStyle(color: isSubmitted ? Colors.green : const Color(0xFFFF7F50), fontWeight: FontWeight.bold, fontSize: 12)),
@@ -103,7 +123,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
   }
 
   // 2. Class Timetable
-  Widget _buildClassTimetableView() {
+  Widget _buildClassTimetableView(ThemeData theme) {
     final classTT = [
       {'day': 'Monday', 'periods': ['Math', 'Science', 'English', 'Hindi', 'Social', 'PT']},
       {'day': 'Tuesday', 'periods': ['English', 'Math', 'Science', 'Art', 'Hindi', 'Library']},
@@ -118,20 +138,20 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
-            columns: const [
-              DataColumn(label: Text('Day')),
-              DataColumn(label: Text('P1')),
-              DataColumn(label: Text('P2')),
-              DataColumn(label: Text('P3')),
-              DataColumn(label: Text('P4')),
-              DataColumn(label: Text('P5')),
-              DataColumn(label: Text('P6')),
+            columns: [
+              DataColumn(label: Text('Day', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('P1', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('P2', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('P3', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('P4', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('P5', style: TextStyle(color: theme.colorScheme.onSurface))),
+              DataColumn(label: Text('P6', style: TextStyle(color: theme.colorScheme.onSurface))),
             ],
             rows: classTT.map((row) {
               final periods = row['periods'] as List<String>;
               return DataRow(cells: [
-                DataCell(Text(row['day'] as String, style: const TextStyle(fontWeight: FontWeight.bold))),
-                ...periods.map((p) => DataCell(Text(p))).toList(),
+                DataCell(Text(row['day'] as String, style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface))),
+                ...periods.map((p) => DataCell(Text(p, style: TextStyle(color: theme.colorScheme.onSurface)))).toList(),
               ]);
             }).toList(),
           ),
@@ -141,7 +161,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
   }
 
   // 3. Exam Timetable
-  Widget _buildExamTimetableView() {
+  Widget _buildExamTimetableView(ThemeData theme) {
     final examTT = [
       {'subject': 'Mathematics', 'date': 'May 10, 2026', 'time': '9:00 AM', 'duration': '2.5 hrs'},
       {'subject': 'Science', 'date': 'May 12, 2026', 'time': '9:00 AM', 'duration': '2 hrs'},
@@ -155,6 +175,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
       itemBuilder: (context, i) {
         final e = examTT[i];
         return Card(
+          color: theme.cardColor,
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
             leading: CircleAvatar(
@@ -162,8 +183,8 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
               foregroundColor: Colors.white,
               child: Text(e['subject']!.substring(0, 3)),
             ),
-            title: Text(e['subject']!, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('${e['date']} · ${e['time']}\nDuration: ${e['duration']}'),
+            title: Text(e['subject']!, style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+            subtitle: Text('${e['date']} · ${e['time']}\nDuration: ${e['duration']}', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
           ),
         );
       },
@@ -171,7 +192,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
   }
 
   // 4. Events
-  Widget _buildEventsView() {
+  Widget _buildEventsView(ThemeData theme) {
     final upcomingEvents = [
       {'name': 'Unit Test – Math', 'date': 'Apr 30', 'type': 'Exam'},
       {'name': 'Sports Day Practice', 'date': 'May 2', 'type': 'Activity'},
@@ -184,14 +205,15 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
       itemBuilder: (context, i) {
         final ev = upcomingEvents[i];
         return Card(
+          color: theme.cardColor,
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
             leading: const Icon(Icons.event, color: Color(0xFFFF7F50)),
-            title: Text(ev['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(ev['date']!),
+            title: Text(ev['name']!, style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+            subtitle: Text(ev['date']!, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
             trailing: Chip(
               label: Text(ev['type']!, style: const TextStyle(fontSize: 12)),
-              backgroundColor: const Color(0xFFFF7F50).withOpacity(0.1),
+              backgroundColor: const Color(0xFFFF7F50).withValues(alpha: 0.1),
             ),
           ),
         );
@@ -200,7 +222,7 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
   }
 
   // 5. Notifications
-  Widget _buildNotificationsView() {
+  Widget _buildNotificationsView(ThemeData theme) {
     final notifications = [
       {'msg': 'Fee due date extended to May 15', 'time': '2 hrs ago'},
       {'msg': 'Parent-Teacher meeting on May 5 at 10 AM', 'time': '1 day ago'},
@@ -213,10 +235,11 @@ class _DiaryTabState extends State<DiaryTab> with SingleTickerProviderStateMixin
       itemBuilder: (context, i) {
         final n = notifications[i];
         return Card(
+          color: theme.cardColor,
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
             leading: const Icon(Icons.notifications_active, color: Color(0xFFFF7F50)),
-            title: Text(n['msg']!),
+            title: Text(n['msg']!, style: TextStyle(color: theme.colorScheme.onSurface)),
             subtitle: Text(n['time']!, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
           ),
         );

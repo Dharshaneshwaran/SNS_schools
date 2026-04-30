@@ -9,8 +9,9 @@ class AppConfig {
     if (kIsWeb) {
       return 'http://localhost:5000';
     } else {
-      // Physical device: use your computer's LAN IP
-      return 'http://192.168.1.15:5000';
+      // Physical device: use your computer's current LAN IP (192.168.23.127)
+      // Note: On college WiFi, client isolation might block this. Use a mobile hotspot if it fails.
+      return 'http://192.168.23.127:5000';
     }
   }
 
