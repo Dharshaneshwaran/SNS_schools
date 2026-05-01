@@ -112,8 +112,8 @@ export default function ParentDashboard() {
         </div>
 
         {/* Content Area */}
-        <div className={`flex-1 min-h-0 overflow-hidden flex flex-col ${activeMenu === 'chat' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
-          {activeMenu !== 'chat' && (
+        <div className={`flex-1 min-h-0 overflow-hidden flex flex-col ${activeMenu === 'messages' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
+          {activeMenu !== 'messages' && (
             <div className="mb-8 md:mb-10 shrink-0">
               <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
                 {activeStudent.name}
