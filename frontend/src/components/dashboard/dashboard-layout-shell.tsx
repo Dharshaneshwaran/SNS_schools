@@ -10,7 +10,7 @@ import { canAccessWebDashboard } from "../../lib/role-access";
 export function DashboardLayoutShell({
   children,
 }: {
-  children: React.Node;
+  children: React.ReactNode;
 }) {
   const router = useRouter();
   const { isBootstrapping, logout, session } = useAuth();
