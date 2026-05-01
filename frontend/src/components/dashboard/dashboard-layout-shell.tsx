@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Bell, MagnifyingGlass, Sun, Moon, ChatCircleDots, List, X } from "@phosphor-icons/react";
 import { SidebarNav } from "./sidebar-nav";
 import { useAuth } from "../../hooks/use-auth";
@@ -13,6 +13,7 @@ export function DashboardLayoutShell({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { isBootstrapping, logout, session } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
@@ -166,7 +167,7 @@ export function DashboardLayoutShell({
           </div>
         </header>
 
-        <section className={`flex-1 relative z-10 overflow-y-auto hide-scrollbar ${router.pathname === '/dashboard/chat' ? 'p-0' : 'p-6 lg:p-10'}`}>
+        <section className={`flex-1 relative z-10 overflow-y-auto hide-scrollbar ${pathname === '/dashboard/chat' ? 'p-0' : 'p-6 lg:p-10'}`}>
           {children}
         </section>
       </div>
