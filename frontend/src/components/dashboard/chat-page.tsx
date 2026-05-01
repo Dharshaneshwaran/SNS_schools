@@ -1,82 +1,138 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { 
   PaperPlaneTilt, 
-  Users, 
-  UserCircle,
   MagnifyingGlass,
   DotsThreeVertical,
-  Circle,
-  Smiley,
-  Plus,
-  UsersThree
+  Check,
+  Checks,
+  Paperclip,
+  Microphone,
+  Lock,
+  LockOpen,
+  ChatCircle,
+  CaretLeft,
+  Smiley
 } from "@phosphor-icons/react";
 import { useAuth } from "../../hooks/use-auth";
-
-const contacts = [
-  { id: 1, name: "Grade 10-A Parents", type: "Group", lastMsg: "When is the next meeting?", time: "10:30 AM", unread: 2 },
-  { id: 2, name: "Staff Lounge", type: "Group", lastMsg: "Lunch is ready!", time: "12:15 PM", unread: 0 },
-  { id: 3, name: "Dr. Sarah Connor", type: "Staff", lastMsg: "Syllabus updated.", time: "Yesterday", unread: 0 },
-  { id: 4, name: "Finance Office", type: "Staff", lastMsg: "Fee reports generated.", time: "2 days ago", unread: 0 },
-];
-
-const initialMessages = [
-  { id: 1, sender: "Dr. Sarah Connor", text: "Hello Admin, have you reviewed the Grade 10 results?", time: "10:15 AM", isMe: false },
-  { id: 2, sender: "Admin", text: "Yes Sarah, they look good. I'll publish them by 2 PM today.", time: "10:20 AM", isMe: true },
-  { id: 3, sender: "Dr. Sarah Connor", text: "Perfect. Thank you!", time: "10:21 AM", isMe: false },
-];
+import { chatService, type Contact, type Message } from "../../services/chat-service";
 
 export function ChatPage() {
   const { session } = useAuth();
-  const [localContacts, setLocalContacts] = useState(contacts);
-  const [selectedContact, setSelectedContact] = useState(localContacts[0]);
-  const [messages, setMessages] = useState(initialMessages);
+  const [localContacts, setLocalContacts] = useState<Contact[]>([]);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showMemberModal, setShowMemberModal] = useState(false);
+  const [studentsCanMessage, setStudentsCanMessage] = useState(false); 
+  const [showChatOnMobile, setShowChatOnMobile] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const isParent = session?.user?.role === "parent";
-
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
-    const newMsg = {
-      id: messages.length + 1,
-      sender: session?.user?.name || "User",
-      text: input,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isMe: true
-    };
-    setMessages([...messages, newMsg]);
-    setInput("");
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleNewGroup = () => {
-    const groupName = prompt("Enter new group name:");
-    if (groupName && groupName.trim()) {
-      const newGroup = {
-        id: localContacts.length + 1,
-        name: groupName.trim(),
-        type: "Group",
-        lastMsg: "Group created",
-        time: "Just now",
-        unread: 0
-      };
-      setLocalContacts([newGroup, ...localContacts]);
-      setSelectedContact(newGroup);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Load Conversations & Polling
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    async function loadConversations() {
+      if (!session?.accessToken) return;
+      try {
+        const contacts = await chatService.getConversations(session.accessToken);
+        setLocalContacts(contacts);
+        
+        // Update the selected contact object to stay in sync with latest metadata (unread, etc)
+        if (selectedContact) {
+          const updatedSelected = contacts.find(c => c.id === selectedContact.id);
+          if (updatedSelected) {
+            setSelectedContact(prev => ({
+              ...prev!,
+              online: updatedSelected.online,
+              unread: updatedSelected.unread, // This will likely be 0 if we just fetched history
+              lastMsg: updatedSelected.lastMsg,
+              time: updatedSelected.time
+            }));
+          }
+        }
+
+        if (contacts.length > 0 && !selectedContact && !showChatOnMobile) {
+          if (window.innerWidth > 768) {
+            setSelectedContact(contacts[0]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load contacts:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const newMsg = {
-        id: messages.length + 1,
-        sender: session?.user?.name || "User",
-        text: `📎 Attached file: ${file.name}`,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isMe: true
-      };
-      setMessages([...messages, newMsg]);
+    loadConversations();
+    interval = setInterval(loadConversations, 3000);
+
+    return () => clearInterval(interval);
+  }, [session?.accessToken, selectedContact?.id, showChatOnMobile]);
+
+  // Load Messages & Polling
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    async function loadMessages() {
+      if (!session?.accessToken || !selectedContact) return;
+      try {
+        const history = await chatService.getHistory(session.accessToken, selectedContact.id);
+        
+        // Only update if messages actually changed to prevent jitter
+        setMessages(prev => {
+          if (JSON.stringify(prev) !== JSON.stringify(history)) {
+            return history;
+          }
+          return prev;
+        });
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+      }
+    }
+
+    if (selectedContact) {
+      loadMessages();
+      interval = setInterval(loadMessages, 3000); // Poll every 3 seconds
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [selectedContact?.id, session?.accessToken]);
+
+  const isAdmin = session?.user?.role === "admin";
+  const isTeacher = session?.user?.role === "teacher" || isAdmin;
+  const isParent = session?.user?.role === "parent";
+  const isStudentSelected = selectedContact?.type === "Student";
+  const canStudentMessage = studentsCanMessage || !isStudentSelected;
+
+  const handleSendMessage = async () => {
+    if (!input.trim() || !selectedContact || !session?.accessToken) return;
+    
+    // Extra security check for student messaging
+    if (isStudentSelected && !isAdmin && !studentsCanMessage) return;
+
+    try {
+      const sentMsg = await chatService.sendMessage(session.accessToken, selectedContact.id, input);
+      setMessages(prev => [...prev, sentMsg]);
+      setInput("");
+      // Force immediate update of conversation list
+      const contacts = await chatService.getConversations(session.accessToken);
+      setLocalContacts(contacts);
+    } catch (error) {
+      console.error("Failed to send message:", error);
     }
   };
 
@@ -84,190 +140,237 @@ export function ChatPage() {
     contact.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-4 border-[#FF7F50] border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Loading Chats...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-[calc(100vh-90px)] w-full overflow-hidden bg-[#f0f2f5]">
+    <div className="flex flex-1 h-full min-h-0 w-full overflow-hidden bg-white relative">
       {/* Sidebar: Contacts */}
-      <div className="w-[30%] min-w-[300px] border-r border-slate-200 flex flex-col bg-white">
-        {/* Sidebar Header */}
-        <div className="h-[60px] bg-[#f0f2f5] px-4 flex items-center justify-between flex-shrink-0">
-          <div className="h-10 w-10 rounded-full bg-slate-300 overflow-hidden">
-            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${session?.user?.name || 'Admin'}`} alt="avatar" />
+      <div className={`${showChatOnMobile ? 'hidden md:flex' : 'flex'} w-full md:w-[350px] lg:w-[400px] border-r border-[#F1F5F9] flex flex-col bg-white shrink-0`}>
+        {/* Branded Chat Sidebar Header */}
+        <div className="h-[64px] bg-white px-6 flex items-center justify-between flex-shrink-0 border-b border-[#F1F5F9]">
+          <div className="flex items-center gap-2">
+            <ChatCircle size={24} weight="fill" className="text-[#FF7F50]" />
+            <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">Messages</span>
           </div>
-          <div className="flex items-center gap-6 text-slate-500">
-            {!isParent && (
-              <button title="New Group" onClick={handleNewGroup} className="hover:text-slate-700 transition-colors">
-                <UsersThree size={22} weight="bold" />
-              </button>
-            )}
-            <button title="Status" onClick={() => alert("Status updates coming soon!")} className="hover:text-slate-700 transition-colors">
-              <Circle size={22} weight="bold" />
-            </button>
-            <button title="New Chat" onClick={() => alert("Select a user to start chatting")} className="hover:text-slate-700 transition-colors">
-              <ChatCircleDots size={22} weight="bold" />
-            </button>
-            <button title="Menu" onClick={() => alert("Settings menu coming soon")} className="hover:text-slate-700 transition-colors">
-              <DotsThreeVertical size={22} weight="bold" />
-            </button>
+          <div className="flex items-center gap-3 text-slate-400">
+            <button title="Menu" className="p-2 hover:bg-slate-50 rounded-xl transition-all"><DotsThreeVertical size={20} weight="bold" /></button>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="p-2 bg-white flex-shrink-0">
-          <div className="relative">
-            <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <div className="p-4 border-b border-[#F1F5F9]">
+          <div className="relative flex items-center bg-slate-50 rounded-xl px-4 py-2 border border-slate-100 shadow-sm transition-all focus-within:ring-2 focus-within:ring-[#FF7F50]/20 focus-within:border-[#FF7F50]/50">
+            <MagnifyingGlass size={18} className="text-slate-400 mr-3" />
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search or start new chat" 
-              className="w-full bg-[#f0f2f5] rounded-lg pl-10 pr-4 py-1.5 text-sm outline-none placeholder:text-slate-500"
+              placeholder="Search conversations..." 
+              className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400 text-slate-600 font-medium"
             />
           </div>
         </div>
 
-        {/* Contacts List */}
-        <div className="flex-1 overflow-y-auto bg-white">
-          {filteredContacts.length > 0 ? filteredContacts.map((contact) => (
-            <button 
+        <div className="flex-1 overflow-y-auto hide-scrollbar">
+          {filteredContacts.map((contact) => (
+            <div 
               key={contact.id}
-              onClick={() => setSelectedContact(contact)}
-              className={`w-full flex items-center gap-3 px-4 py-3 transition-colors border-b border-slate-50 ${
-                selectedContact.id === contact.id ? "bg-[#f0f2f5]" : "hover:bg-[#f5f6f6]"
+              onClick={() => {
+                setSelectedContact(contact);
+                setShowChatOnMobile(true);
+              }}
+              className={`flex items-center gap-4 px-6 py-4 cursor-pointer transition-all border-b border-[#F1F5F9] relative ${
+                selectedContact?.id === contact.id ? "bg-orange-50/50" : "hover:bg-slate-50"
               }`}
             >
-              <div className="relative flex-shrink-0">
-                <div className="h-12 w-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 overflow-hidden">
-                  {contact.type === 'Group' ? <Users size={28} weight="duotone" /> : <UserCircle size={28} weight="duotone" />}
+              {selectedContact?.id === contact.id && (
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FF7F50]" />
+              )}
+              <div className="relative shrink-0">
+                <div className="h-12 w-12 rounded-2xl bg-slate-100 overflow-hidden shadow-sm border-2 border-white">
+                   <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${contact.name}`} alt={contact.name} />
                 </div>
+                {contact.online && (
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full shadow-sm"></div>
+                )}
               </div>
-              <div className="flex-1 min-w-0 py-1">
-                <div className="flex justify-between items-start">
-                  <div className="text-base font-normal text-slate-900 truncate">{contact.name}</div>
-                  <div className={`text-xs ${contact.unread > 0 ? "text-[#25d366] font-medium" : "text-slate-500"}`}>{contact.time}</div>
+              <div className="flex-1 min-w-0 pr-2">
+                <div className="flex justify-between items-center mb-1">
+                  <span className={`text-[15px] truncate font-bold ${selectedContact?.id === contact.id ? "text-[#FF7F50]" : "text-slate-900"}`}>{contact.name}</span>
+                  <span className={`text-[10px] uppercase font-bold tracking-tighter ${contact.unread > 0 ? "text-[#FF7F50]" : "text-slate-400"}`}>{contact.time}</span>
                 </div>
-                <div className="flex justify-between items-center mt-0.5">
-                  <div className="text-[13px] text-slate-500 truncate pr-2">{contact.lastMsg}</div>
+                <div className="flex justify-between items-center">
+                  <div className="text-[13px] text-slate-500 truncate flex items-center gap-1 font-medium">
+                    {contact.lastMsg || `${contact.type} • ${contact.role}`}
+                  </div>
                   {contact.unread > 0 && (
-                    <div className="h-5 w-5 rounded-full bg-[#25d366] text-white text-[11px] font-bold flex items-center justify-center">
+                    <div className="min-w-[18px] h-[18px] rounded-full bg-[#FF7F50] text-white text-[10px] font-black flex items-center justify-center shadow-sm">
                       {contact.unread}
                     </div>
                   )}
                 </div>
               </div>
-            </button>
-          )) : (
-             <div className="p-8 text-center text-sm text-slate-500">
-                No chats found for "{searchQuery}"
-             </div>
-          )}
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col relative">
-        {/* Chat Header */}
-        <div className="h-[60px] bg-[#f0f2f5] px-4 flex items-center justify-between border-l border-slate-200 flex-shrink-0 z-10">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 overflow-hidden">
-              {selectedContact.type === 'Group' ? <Users size={24} weight="duotone" /> : <UserCircle size={24} weight="duotone" />}
-            </div>
-            <div>
-              <div className="text-base font-normal text-slate-900">{selectedContact.name}</div>
-              <div className="text-[11px] text-slate-500">online</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-6 text-slate-500 pr-2">
-            <button onClick={() => alert("Search within chat coming soon")} className="hover:text-slate-700 transition-colors">
-               <MagnifyingGlass size={20} weight="bold" />
-            </button>
-            <button onClick={() => alert("Chat options coming soon")} className="hover:text-slate-700 transition-colors">
-               <DotsThreeVertical size={20} weight="bold" />
-            </button>
-          </div>
-        </div>
-
-        {/* Messages with WhatsApp background */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-1 whatsapp-bg relative">
-          {messages.map((msg, index) => {
-            const isFirstInSequence = index === 0 || messages[index - 1].isMe !== msg.isMe;
-            return (
-              <div key={msg.id} className={`flex w-full ${msg.isMe ? 'justify-end' : 'justify-start'} ${isFirstInSequence ? 'mt-3' : 'mt-0'}`}>
-                <div className={`relative max-w-[65%] px-3 py-1.5 shadow-sm ${
-                  msg.isMe 
-                    ? 'bg-[#dcf8c6] text-[#303030] rounded-lg rounded-tr-none' 
-                    : 'bg-white text-[#303030] rounded-lg rounded-tl-none'
-                }`}>
-                  {/* Bubble Tail */}
-                  {isFirstInSequence && (
-                    <div className={`absolute top-0 w-3 h-3 ${
-                      msg.isMe 
-                        ? 'right-[-8px] border-l-[10px] border-l-[#dcf8c6] border-b-[10px] border-b-transparent' 
-                        : 'left-[-8px] border-r-[10px] border-r-white border-b-[10px] border-b-transparent'
-                    }`} />
-                  )}
-                  
-                  {!msg.isMe && selectedContact.type === 'Group' && (
-                    <div className="text-[12px] font-bold text-[#FF7F50] mb-0.5">{msg.sender}</div>
-                  )}
-                  <div className="text-[14.5px] leading-relaxed break-words">
-                    {msg.text}
-                    <span className="inline-block w-12 h-1" /> {/* Spacer for time */}
-                  </div>
-                  <div className="absolute bottom-1 right-2 text-[10px] text-slate-500 flex items-center gap-1">
-                    {msg.time}
-                    {msg.isMe && (
-                      <span className="text-[#34b7f1]">
-                        <svg viewBox="0 0 16 15" width="16" height="15" fill="currentColor">
-                          <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879 5.517 6.43a.355.355 0 0 0-.503-.016l-.427.387a.368.368 0 0 0-.011.516l3.82 4.183a.368.368 0 0 0 .542.022l6.143-7.712a.365.365 0 0 0-.06-.516zm-5.045 0l-.478-.372a.365.365 0 0 0-.51.063L4.12 7.828l-.513-.561a.368.368 0 0 0-.542-.023l-3.003 3.77a.368.368 0 0 0 .063.518l.478.373a.365.365 0 0 0 .51-.063l2.766-3.473 1.134 1.242a.368.368 0 0 0 .542.022l4.981-6.262a.365.365 0 0 0-.063-.518z"></path>
-                        </svg>
-                      </span>
-                    )}
-                  </div>
+      <div className={`${showChatOnMobile ? 'flex' : 'hidden md:flex'} flex-1 flex flex-col relative bg-[#f8fafc] min-w-0`}>
+        {selectedContact ? (
+          <>
+            <div className="h-[64px] bg-white px-6 flex items-center justify-between border-b border-[#F1F5F9] shrink-0 z-10 shadow-sm shadow-slate-100/50">
+              <div className="flex items-center gap-4 cursor-pointer min-w-0">
+                <button 
+                  onClick={() => setShowChatOnMobile(false)}
+                  className="md:hidden p-2 -ml-2 text-slate-400 hover:bg-slate-50 rounded-xl transition-all"
+                >
+                  <CaretLeft size={20} weight="bold" />
+                </button>
+                <div className="h-11 w-11 rounded-2xl bg-slate-100 overflow-hidden border-2 border-slate-50 shrink-0 shadow-sm">
+                   <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${selectedContact.name}`} alt={selectedContact.name} />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[15px] font-bold text-slate-900 truncate leading-tight">{selectedContact.name}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">
+                    {isStudentSelected ? (studentsCanMessage ? "Messaging enabled" : "Read-only channel") : "online"}
+                  </span>
                 </div>
               </div>
-            );
-          })}
-        </div>
+              <div className="flex items-center gap-3 text-slate-400 shrink-0">
+                 {isAdmin && isStudentSelected && (
+                   <button 
+                    onClick={() => setStudentsCanMessage(!studentsCanMessage)}
+                    className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black transition-all border shadow-sm ${
+                      studentsCanMessage 
+                        ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
+                        : "bg-slate-50 border-slate-100 text-slate-400"
+                    }`}
+                    title="Toggle Student Messaging"
+                   >
+                     {studentsCanMessage ? <LockOpen size={14} weight="bold" /> : <Lock size={14} weight="bold" />}
+                     {studentsCanMessage ? "MESSAGING ON" : "MESSAGING OFF"}
+                   </button>
+                 )}
+                 <button title="Menu" className="p-2 hover:bg-slate-50 rounded-xl transition-all"><DotsThreeVertical size={20} weight="bold" /></button>
+              </div>
+            </div>
 
-        {/* Authentic WhatsApp Input Bar */}
-        <div className="bg-[#f0f2f5] px-4 py-2 flex items-center gap-4 flex-shrink-0">
-          <div className="flex items-center gap-4 text-slate-500">
-            <button onClick={() => alert("Emoji picker coming soon")} className="hover:text-slate-700 transition-colors">
-              <Smiley size={26} />
-            </button>
-            <label className="hover:text-slate-700 transition-colors cursor-pointer">
-              <Plus size={26} />
-              <input type="file" className="hidden" onChange={handleFileUpload} />
-            </label>
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 relative min-h-0 hide-scrollbar">
+              {/* Subtle Branded Background Pattern */}
+              <div className="absolute inset-0 bg-chat-pattern opacity-[0.04] pointer-events-none" />
+              
+              <div className="relative z-10 space-y-6">
+                {messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full py-20 text-slate-400 gap-4">
+                    <ChatCircle size={48} weight="duotone" className="opacity-20" />
+                    <p className="text-xs font-bold uppercase tracking-[0.2em]">No messages yet</p>
+                  </div>
+                ) : (
+                  messages.map((msg, index) => {
+                    const isMe = msg.senderId === session?.user?.id;
+                    const msgDate = new Date(msg.timestamp).toDateString();
+                    const prevMsgDate = index > 0 ? new Date(messages[index - 1].timestamp).toDateString() : null;
+                    const showDateHeader = msgDate !== prevMsgDate;
+
+                    return (
+                      <React.Fragment key={msg.id}>
+                        {showDateHeader && (
+                          <div className="flex justify-center my-8">
+                            <span className="px-4 py-1.5 rounded-xl bg-white shadow-sm border border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                              {msgDate === new Date().toDateString() ? 'Today' : 
+                               msgDate === new Date(Date.now() - 86400000).toDateString() ? 'Yesterday' : msgDate}
+                            </span>
+                          </div>
+                        )}
+                        <div className={`flex w-full ${isMe ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`relative max-w-[85%] md:max-w-[70%] min-w-[120px] px-4 pt-3 pb-5 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] rounded-2xl ${
+                            isMe ? 'bg-[#FF7F50] text-white rounded-tr-none' : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'
+                          }`}>
+                            <div className={`text-[14.5px] leading-relaxed break-words ${isMe ? 'font-medium' : 'font-normal'}`}>
+                              {msg.text}
+                            </div>
+                            <div className="absolute bottom-2 right-3 flex items-center gap-1.5">
+                              <span className={`text-[9px] font-bold uppercase tracking-tighter leading-none ${isMe ? 'text-white/70' : 'text-slate-400'}`}>
+                                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              {isMe && (
+                                <span className={msg.status === 'read' ? 'text-white' : 'text-white/50'}>
+                                   {msg.status === 'sent' ? <Check size={12} weight="bold" /> : <Checks size={14} weight="bold" />}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </React.Fragment>
+                    );
+                  })
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            </div>
+
+            <div className="bg-white px-6 py-5 flex items-center gap-4 shrink-0 border-t border-[#F1F5F9] shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.03)] z-20">
+               {!canStudentMessage && !isAdmin ? (
+                 <div className="flex-1 flex items-center justify-center py-3 bg-slate-50 rounded-2xl text-slate-400 text-xs font-black uppercase tracking-widest gap-3 text-center px-6 border border-slate-100">
+                    <Lock size={16} weight="bold" className="shrink-0" />
+                    <span className="truncate">Student messaging disabled by admin</span>
+                 </div>
+               ) : (
+                 <>
+                   <div className="hidden sm:flex items-center gap-1 text-slate-400">
+                      <button className="p-2.5 hover:bg-slate-50 hover:text-[#FF7F50] rounded-xl transition-all"><Smiley size={24} weight="bold" /></button>
+                      <button className="p-2.5 hover:bg-slate-50 hover:text-[#FF7F50] rounded-xl transition-all"><Paperclip size={24} weight="bold" /></button>
+                   </div>
+                   <div className="flex-1 flex items-center bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 shadow-inner focus-within:bg-white focus-within:ring-2 focus-within:ring-[#FF7F50]/10 transition-all min-w-0">
+                      <input 
+                        type="text" 
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                        placeholder={canStudentMessage ? "Write your message..." : "Admin override mode..."}
+                        className="w-full bg-transparent border-none outline-none text-[15px] text-slate-700 font-medium placeholder:text-slate-400"
+                      />
+                   </div>
+                   <div className="shrink-0">
+                     {input.trim() ? (
+                       <button onClick={handleSendMessage} className="w-12 h-12 bg-[#FF7F50] text-white rounded-2xl shadow-[0_8px_20px_-4px_rgba(255,127,80,0.4)] hover:bg-[#e66a3e] hover:shadow-[0_10px_25px_-5px_rgba(255,127,80,0.5)] transition-all transform active:scale-95 flex items-center justify-center"><PaperPlaneTilt size={22} weight="fill" /></button>
+                     ) : (
+                       <button className="p-2.5 bg-slate-50 text-slate-400 hover:text-[#FF7F50] hover:bg-slate-100 rounded-xl transition-all"><Microphone size={24} weight="bold" /></button>
+                     )}
+                   </div>
+                 </>
+               )}
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center bg-slate-50 p-10 relative overflow-hidden">
+            <div className="absolute inset-0 bg-chat-pattern opacity-[0.03]" />
+            <div className="relative z-10 flex flex-col items-center text-center max-w-sm">
+               <div className="w-20 h-20 rounded-3xl bg-white shadow-xl shadow-slate-200 flex items-center justify-center mb-6">
+                  <ChatCircle size={40} weight="fill" className="text-[#FF7F50]" />
+               </div>
+               <h3 className="text-xl font-black text-slate-900 mb-2">Select a Conversation</h3>
+               <p className="text-slate-400 text-sm font-medium">Choose a contact from the sidebar to start messaging in real-time.</p>
+            </div>
           </div>
-          <div className="flex-1 bg-white rounded-lg px-4 py-2.5">
-            <input 
-              type="text" 
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Type a message"
-              className="w-full bg-transparent border-none outline-none text-[15px] text-[#303030]"
-            />
-          </div>
-          <button 
-            onClick={handleSendMessage}
-            className="text-slate-500 hover:text-[#25d366] transition-colors"
-          >
-            <PaperPlaneTilt size={26} weight="fill" />
-          </button>
-        </div>
+        )}
       </div>
+
+      <style jsx>{`
+        .bg-chat-pattern {
+          background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+          background-repeat: repeat;
+        }
+      `}</style>
     </div>
   );
 }
-
-// Internal icon for sidebar (ChatCircleDots was used in header, need it here too)
-function ChatCircleDots({ size, weight }: { size: number, weight: "bold" | "duotone" | "fill" | "light" | "regular" | "thin" }) {
-  return (
-    <svg viewBox="0 0 256 256" width={size} height={size} fill="currentColor">
-       <path d="M128,24A104,104,0,0,0,36.82,178.07,10,10,0,0,1,34,185.39L25.43,215.4a18,18,0,0,0,22.17,22.17l30-8.57a10,10,0,0,1,7.32-2.82A104,104,0,1,0,128,24Zm0,192a87.87,87.87,0,0,1-44.06-11.81,26.1,26.1,0,0,0-19.16,7.37L43.43,217.4,56.59,171a26,26,0,0,0-7.37-19.16A88,88,0,1,1,128,216Z"></path>
-    </svg>
-  );
-}
-

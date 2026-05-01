@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell, User, BookOpen, ChartBar,
-  Bus, Gear, Images, CaretDown, SignOut, House, GraduationCap, ChatCircleDots
+  Bus, Gear, Images, CaretDown, SignOut, GraduationCap, ChatCircleDots
 } from "@phosphor-icons/react";
 import { MenuKey } from "../../app/parent-dashboard/page";
 import { DashboardTheme } from "../../types/theme";
@@ -44,11 +44,10 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
     {
       title: "MENU",
       items: [
-        { key: "dashboard",     label: "Dashboard",      icon: House },
         { key: "events",        label: "Events Gallery", icon: Images },
         { key: "diary",         label: "Diary & Homework", icon: BookOpen, badge: 3 },
         { key: "notifications", label: "Notifications",  icon: Bell },
-        { key: "chat",          label: "Messages",       icon: ChatCircleDots },
+        { key: "messages",      label: "Messages",       icon: ChatCircleDots },
       ]
     },
     {
@@ -128,8 +127,8 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
             }}>
               {activeStudent.avatar}
             </div>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 700, color: theme.text, lineHeight: 1.2 }}>{activeStudent.name}</p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: theme.text, lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{activeStudent.name}</p>
               <p style={{ fontSize: 10, color: theme.textMuted, fontWeight: 600 }}>Class {activeStudent.class}-{activeStudent.section}</p>
             </div>
           </button>
@@ -251,11 +250,14 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
                     textAlign: "left"
                   }}
                 >
-                  <Icon size={20} weight={isActive ? "bold" : "regular"} />
+                  <Icon size={20} weight={isActive ? "bold" : "regular"} style={{ flexShrink: 0 }} />
                   <span style={{ 
                     fontSize: 14.5, 
                     fontWeight: isActive ? 700 : 600,
-                    flex: 1
+                    flex: 1,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
                   }}>
                     {item.label}
                   </span>
