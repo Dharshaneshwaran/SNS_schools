@@ -9,9 +9,9 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
   const [language, setLanguage] = useState("English");
   const [saved, setSaved] = useState(false);
 
-  const handleSave = () => {
+  const handleSendApproval = () => {
     setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setTimeout(() => setSaved(false), 3500);
   };
 
   const cardStyle: React.CSSProperties = {
@@ -62,18 +62,32 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
           <PencilSimple size={18} color="#FF7F50" weight="duotone" />
           <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Edit Profile</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           {[
-            { label: "Full Name", placeholder: "Parent Name", type: "text" },
-            { label: "Email", placeholder: "parent@email.com", type: "email" },
-            { label: "Mobile", placeholder: "+91 XXXXXXXXXX", type: "tel" },
-            { label: "City", placeholder: "Coimbatore", type: "text" },
+            { label: "Father's Mobile", placeholder: "+91 XXXXXXXXXX", type: "tel" },
+            { label: "Mother's Mobile", placeholder: "+91 XXXXXXXXXX", type: "tel" },
+            { label: "Guardian Mobile (Optional)", placeholder: "+91 XXXXXXXXXX", type: "tel" },
           ].map((f, i) => (
             <div key={i}>
               <label style={labelStyle2}>{f.label}</label>
               <input type={f.type} placeholder={f.placeholder} style={inputStyle2} />
             </div>
           ))}
+          <div style={{ gridColumn: "span 2" }}>
+            <label style={labelStyle2}>Current Address</label>
+            <textarea 
+              placeholder="Enter your full address..." 
+              rows={3}
+              style={{ ...inputStyle2, resize: "none" } as React.CSSProperties} 
+            />
+          </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 32 }}>
+          <button onClick={handleSendApproval}
+            style={{ padding: "14px 40px", borderRadius: 14, background: saved ? "#10B981" : "linear-gradient(90deg,#FF7F50,#e66a3e)", color: "white", border: "none", cursor: "pointer", fontWeight: 700, fontSize: 15, transition: "background 0.3s", boxShadow: "0 6px 20px rgba(255,127,80,0.3)", fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>
+            {saved ? "✓ Approval Sent to Admin" : "Send Approval to Admin"}
+          </button>
         </div>
       </div>
 
@@ -129,13 +143,6 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
         </div>
       </div>
 
-      {/* Save Button */}
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
-        <button onClick={handleSave}
-          style={{ padding: "13px 32px", borderRadius: 12, background: saved ? "#10B981" : "linear-gradient(90deg,#FF7F50,#e66a3e)", color: "white", border: "none", cursor: "pointer", fontWeight: 600, fontSize: 15, transition: "background 0.3s", boxShadow: "0 4px 14px rgba(255,127,80,0.3)", fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>
-          {saved ? "✓ Saved!" : "Save Changes"}
-        </button>
-      </div>
     </div>
   );
 }
@@ -146,7 +153,6 @@ const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
       width: 46, height: 26, borderRadius: 13, padding: 3, border: "none",
       background: on ? "#FF7F50" : "#ddd", cursor: "pointer",
       transition: "background 0.3s", display: "flex", alignItems: "center",
-      justifyContent: on ? "flex-end" : "flex-start",
     }}>
     <motion.div animate={{ x: on ? 20 : 0 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} style={{ width: 20, height: 20, borderRadius: "50%", background: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }} />
   </button>

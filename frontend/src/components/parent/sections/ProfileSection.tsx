@@ -5,15 +5,34 @@ import { User, Phone, Envelope, MapPin, GraduationCap, PencilSimple } from "@pho
 
 import { DashboardTheme } from "../../../types/theme";
 
-type Student = { id: number; name: string; class: string; section: string; avatar: string };
+import { Student } from "../../../types/dashboard";
 
 export default function ProfileSection({ student, theme }: { student: Student; theme: DashboardTheme }) {
-  const details = [
+  const studentInfo = [
     { label: "Full Name", value: student.name, icon: <User size={18} /> },
     { label: "Class", value: `Class ${student.class} – Section ${student.section}`, icon: <GraduationCap size={18} /> },
     { label: "School", value: "SNS Academy, Coimbatore", icon: <MapPin size={18} /> },
-    { label: "Parent Email", value: "parent@snsacademy.org", icon: <Envelope size={18} /> },
-    { label: "Mobile", value: "+91 98765 43210", icon: <Phone size={18} /> },
+    { label: "Guardian Mobile", value: student.guardianNumber || "Not Provided", icon: <Phone size={18} /> },
+  ];
+
+  const parentDetails = [
+    { 
+      type: "Father", 
+      name: "Mr. Sharma", // Mock name
+      mobile: student.fatherNumber, 
+      email: student.fatherEmail || "father@snsacademy.org" 
+    },
+    { 
+      type: "Mother", 
+      name: "Mrs. Sharma", // Mock name
+      mobile: student.motherNumber, 
+      email: student.motherEmail || "mother@snsacademy.org" 
+    },
+  ];
+
+  const teacherDetails = [
+    { label: "Class Teacher", value: student.classTeacher, icon: <User size={18} /> },
+    { label: "Teacher Email", value: student.teacherEmail, icon: <Envelope size={18} /> },
   ];
 
   return (
@@ -36,17 +55,12 @@ export default function ProfileSection({ student, theme }: { student: Student; t
         }}>{student.avatar}</div>
         
         <h2 style={{ fontSize: 24, fontWeight: 900, color: theme.text, marginBottom: 8, letterSpacing: "-0.02em" }}>{student.name}</h2>
-        <p style={{ color: "#FF7F50", fontSize: 14, fontWeight: 800, marginBottom: 32, letterSpacing: "0.05em", textTransform: "uppercase" }}>Class {student.class}-{student.section}</p>
+        <p style={{ color: "#FF7F50", fontSize: 14, fontWeight: 800, marginBottom: 24, letterSpacing: "0.05em", textTransform: "uppercase" }}>Class {student.class}-{student.section}</p>
         
-        <button style={{
-          width: "100%", padding: "16px 0", borderRadius: 16,
-          background: theme.isDark ? "rgba(255,255,255,0.1)" : "#1e293b",
-          color: "white", border: "none", cursor: "pointer",
-          fontSize: 14, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-          transition: "all 0.3s"
-        }}>
-          <PencilSimple size={20} weight="bold" /> Edit Details
-        </button>
+        <div style={{ padding: "16px", borderRadius: 16, background: theme.isDark ? "rgba(255,255,255,0.03)" : "#F8FAFC", border: `1px solid ${theme.border}`, textAlign: "left" }}>
+          <p style={{ fontSize: 11, fontWeight: 800, color: theme.textMuted, textTransform: "uppercase", marginBottom: 8 }}>Permanent Address</p>
+          <p style={{ fontSize: 13, fontWeight: 600, color: theme.text, lineHeight: 1.5 }}>{student.address}</p>
+        </div>
       </motion.div>
 
       {/* Details Card */}
@@ -56,33 +70,81 @@ export default function ProfileSection({ student, theme }: { student: Student; t
         className="premium-card"
         style={{ padding: "40px" }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }}>
-          <h3 style={{ fontSize: 20, fontWeight: 800, color: theme.text, letterSpacing: "-0.01em" }}>Personal Information</h3>
-        </div>
-        
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-          {details.map((d, i) => (
-            <div key={i}
-              style={{ 
-                display: "flex", alignItems: "center", gap: 20, padding: "24px", 
-                borderRadius: 20, background: theme.isDark ? "rgba(255,255,255,0.02)" : "#F8FAFC", 
-                border: `1px solid ${theme.border}`,
-                transition: "all 0.3s"
-              }}
-            >
-              <div style={{ 
-                width: 52, height: 52, borderRadius: 14, 
-                background: theme.isDark ? "rgba(255,255,255,0.05)" : "#fff", 
-                display: "flex", alignItems: "center", justifyContent: "center", 
-                color: "#FF7F50", flexShrink: 0,
-                boxShadow: "0 4px 10px rgba(0,0,0,0.03)"
-              }}>{d.icon}</div>
-              <div>
-                <p style={{ fontSize: 12, color: theme.textMuted, fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: 4 }}>{d.label}</p>
-                <p style={{ fontSize: 16, fontWeight: 700, color: theme.text }}>{d.value}</p>
-              </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+          {/* Student Info Group */}
+          <div>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: theme.text, letterSpacing: "-0.01em", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FF7F50" }} /> Student Information
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {studentInfo.map((d, i) => (
+                <div key={i} style={{ 
+                  display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", 
+                  borderRadius: 14, background: theme.isDark ? "rgba(255,255,255,0.02)" : "#F8FAFC", 
+                  border: `1px solid ${theme.border}`,
+                }}>
+                  <div style={{ color: "#FF7F50", flexShrink: 0 }}>{d.icon}</div>
+                  <div>
+                    <p style={{ fontSize: 9, color: theme.textMuted, fontWeight: 800, textTransform: "uppercase", marginBottom: 2 }}>{d.label}</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: theme.text }}>{d.value}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* Combined Parent Details Group */}
+          <div>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: theme.text, letterSpacing: "-0.01em", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FF7F50" }} /> Parent Information
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              {parentDetails.map((p, i) => (
+                <div key={i} style={{ 
+                  padding: "20px", borderRadius: 16, 
+                  background: theme.isDark ? "rgba(255,255,255,0.03)" : "#FFFFFF", 
+                  border: `1px solid ${theme.border}`,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
+                }}>
+                  <p style={{ fontSize: 11, fontWeight: 900, color: theme.primary, textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                    <User size={14} weight="bold" /> {p.type}'s Details
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <Phone size={14} color={theme.textMuted} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: theme.text }}>{p.mobile}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <Envelope size={14} color={theme.textMuted} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: theme.text }}>{p.email}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Academic Contact Group */}
+          <div>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: theme.text, letterSpacing: "-0.01em", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FF7F50" }} /> Academic Contact
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {teacherDetails.map((d, i) => (
+                <div key={i} style={{ 
+                  display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", 
+                  borderRadius: 14, background: theme.isDark ? "rgba(255,255,255,0.02)" : "#F8FAFC", 
+                  border: `1px solid ${theme.border}`,
+                }}>
+                  <div style={{ color: "#FF7F50", flexShrink: 0 }}>{d.icon}</div>
+                  <div>
+                    <p style={{ fontSize: 9, color: theme.textMuted, fontWeight: 800, textTransform: "uppercase", marginBottom: 2 }}>{d.label}</p>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: theme.text }}>{d.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>

@@ -9,19 +9,48 @@ import AcademicSection from "../../components/parent/sections/AcademicSection";
 import TransportSection from "../../components/parent/sections/TransportSection";
 import SettingsSection from "../../components/parent/sections/SettingsSection";
 import DashboardHome from "../../components/parent/sections/DashboardHome";
-import { Bell, MagnifyingGlass, Sun, Moon, ChatCircleDots } from "@phosphor-icons/react";
+import { Bell, MagnifyingGlass, Sun, Moon } from "@phosphor-icons/react";
 
 import { DashboardTheme } from "../../types/theme";
+import { MenuKey, Student, AcademicTab } from "../../types/dashboard";
 
-export type MenuKey = "events" | "profile" | "diary" | "notifications" | "academic" | "transport" | "settings";
-
-const students = [
-  { id: 1, name: "Arjun Sharma", class: "8", section: "A", avatar: "AS" },
-  { id: 2, name: "Priya Sharma", class: "5", section: "B", avatar: "PS" },
+const students: Student[] = [
+  { 
+    id: 1, 
+    name: "Arjun Sharma", 
+    class: "8", 
+    section: "A", 
+    avatar: "AS",
+    fatherNumber: "+91 00000 00000",
+    fatherEmail: "father@email.com",
+    motherNumber: "+91 00000 00000",
+    motherEmail: "mother@email.com",
+    guardianNumber: "+91 00000 00000",
+    address: "Dummy Address, Street Name, City, State - Pincode",
+    parentMobile: "+91 00000 00000",
+    classTeacher: "Mrs. Sarah Jenkins",
+    teacherEmail: "sarah.j@snsacademy.org"
+  },
+  { 
+    id: 2, 
+    name: "Priya Sharma", 
+    class: "5", 
+    section: "B", 
+    avatar: "PS",
+    fatherNumber: "+91 00000 00000",
+    fatherEmail: "father@email.com",
+    motherNumber: "+91 00000 00000",
+    motherEmail: "mother@email.com",
+    address: "Dummy Address, Street Name, City, State - Pincode",
+    parentMobile: "+91 00000 00000",
+    classTeacher: "Mr. Robert Wilson",
+    teacherEmail: "robert.w@snsacademy.org"
+  },
 ];
 
 export default function ParentDashboard() {
-  const [activeMenu, setActiveMenu] = useState<MenuKey>("events");
+  const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
+  const [academicTab, setAcademicTab] = useState<AcademicTab>("calendar");
   const [activeStudent, setActiveStudent] = useState(students[0]);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -41,11 +70,12 @@ export default function ParentDashboard() {
 
   const renderContent = () => {
     switch (activeMenu) {
+      case "dashboard":     return <DashboardHome theme={theme} onNavigate={(tab) => { setAcademicTab(tab); setActiveMenu("academic"); }} />;
       case "events":        return <EventsGallery theme={theme} />;
       case "profile":       return <ProfileSection student={activeStudent} theme={theme} />;
       case "diary":         return <DiarySection student={activeStudent} theme={theme} />;
       case "notifications": return <DiarySection student={activeStudent} theme={theme} showOnlyNotifications={true} />; 
-      case "academic":      return <AcademicSection student={activeStudent} theme={theme} />;
+      case "academic":      return <AcademicSection student={activeStudent} theme={theme} initialTab={academicTab} />;
       case "transport":     return <TransportSection theme={theme} />;
       case "settings":      return <SettingsSection theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
       default:              return <EventsGallery theme={theme} />;
@@ -71,11 +101,11 @@ export default function ParentDashboard() {
       <main style={{ flex: 1, height: "100vh", overflowY: "auto", minWidth: 0, display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }} className="hide-scrollbar">
         {/* Top Bar - Clean & Modern */}
         <header style={{ 
-          height: 90, 
+          height: 70, 
           background: theme.isDark ? "rgba(18,18,18,0.7)" : "rgba(255,255,255,0.7)", 
           backdropFilter: "blur(12px)",
           borderBottom: `1px solid ${theme.border}`,
-          padding: "0 40px",
+          padding: "0 32px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -121,12 +151,12 @@ export default function ParentDashboard() {
           </div>
         </header>
 
-        <div style={{ padding: "40px 60px", flex: 1, position: "relative", zIndex: 2 }}>
-          <div style={{ marginBottom: 40 }}>
-             <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
+        <div style={{ padding: "24px 40px", flex: 1, position: "relative", zIndex: 2 }}>
+          <div style={{ marginBottom: 24 }}>
+             <h2 style={{ fontSize: 24, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
                 {activeStudent.name}
              </h2>
-             <p style={{ color: theme.textMuted, fontWeight: 600, fontSize: 16 }}>Class {activeStudent.class}-{activeStudent.section} Student</p>
+             <p style={{ color: theme.textMuted, fontWeight: 600, fontSize: 14 }}>Class {activeStudent.class}-{activeStudent.section} Student</p>
           </div>
           {renderContent()}
         </div>
