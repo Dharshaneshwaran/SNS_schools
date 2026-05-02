@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell, User, BookOpen, ChartBar,
-  Bus, Gear, Images, CaretDown, SignOut, House
+  Bus, Gear, Images, CaretDown, SignOut, GraduationCap, ChatCircleDots, House
 } from "@phosphor-icons/react";
 import { MenuKey, Student } from "../../types/dashboard";
 import { DashboardTheme } from "../../types/theme";
@@ -18,9 +18,10 @@ interface Props {
   activeMenu: MenuKey;
   setActiveMenu: (m: MenuKey) => void;
   theme: DashboardTheme;
+  onMenuClick?: () => void;
 }
 
-export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, theme }: Props) {
+export default function ParentSidebar({ students, activeStudent, setActiveStudent, activeMenu, setActiveMenu, theme, onMenuClick }: Props) {
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
   const router = useRouter();
 
@@ -35,15 +36,17 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
       key: MenuKey;
       label: string;
       icon: any;
+      badge?: number;
     }[];
   }[] = [
     {
       title: "MENU",
       items: [
-        { key: "events",        label: "Events Gallery", icon: Images },
         { key: "dashboard",     label: "Dashboard",      icon: House },
-        { key: "diary",         label: "Diary & Homework", icon: BookOpen },
+        { key: "events",        label: "Events Gallery", icon: Images },
+        { key: "diary",         label: "Diary & Homework", icon: BookOpen, badge: 3 },
         { key: "notifications", label: "Notifications",  icon: Bell },
+        { key: "messages",      label: "Messages",       icon: ChatCircleDots },
       ]
     },
     {
@@ -75,13 +78,12 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
           <div style={{ 
             width: 40, height: 40, 
             display: "flex", alignItems: "center", justifyContent: "center",
-            background: "#fff",
+            background: theme.accent,
             borderRadius: 12,
-            boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+            boxShadow: `0 8px 20px ${theme.accent}44`,
             padding: 6,
-            border: "1px solid rgba(0,0,0,0.04)"
           }}>
-            <img src="/images/logo.png" alt="Logo" style={{ width: "100%", height: "auto", objectFit: "contain" }} />
+            <GraduationCap size={24} weight="fill" color="white" />
           </div>
           <div>
             <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 800, fontSize: 16, color: theme.text, lineHeight: 1.1 }}>SNS Academy</p>
@@ -124,8 +126,8 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
             }}>
               {activeStudent.avatar}
             </div>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 700, color: theme.text, lineHeight: 1.2 }}>{activeStudent.name}</p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: theme.text, lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{activeStudent.name}</p>
               <p style={{ fontSize: 10, color: theme.textMuted, fontWeight: 600 }}>Class {activeStudent.class}-{activeStudent.section}</p>
             </div>
           </button>
@@ -173,6 +175,7 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
                   onClick={() => {
                     setActiveStudent(student);
                     setShowStudentDropdown(false);
+                    onMenuClick?.();
                   }}
                   style={{
                     width: "100%",
@@ -227,7 +230,7 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
               return (
                 <motion.button
                   key={item.key}
-                  onClick={() => setActiveMenu(item.key)}
+                  onClick={() => { setActiveMenu(item.key); onMenuClick?.(); }}
                   whileTap={{ scale: 0.98 }}
                   style={{
                     width: "100%",
@@ -237,20 +240,36 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
                     padding: "12px 16px",
                     borderRadius: 12,
                     border: "none",
-                    background: isActive ? "rgba(255, 127, 80, 0.08)" : "transparent",
-                    color: isActive ? "#FF7F50" : theme.textMuted,
+                    background: isActive ? "linear-gradient(90deg,#FF7F50,#e66a3e)" : "transparent",
+                    color: isActive ? "white" : theme.textMuted,
                     cursor: "pointer",
                     marginBottom: 4,
                     transition: "all 0.2s",
+                    boxShadow: isActive ? "0 4px 16px rgba(255,127,80,0.3)" : "none",
+                    textAlign: "left"
                   }}
                 >
-                  <Icon size={20} weight={isActive ? "bold" : "regular"} />
+                  <Icon size={20} weight={isActive ? "bold" : "regular"} style={{ flexShrink: 0 }} />
                   <span style={{ 
                     fontSize: 14.5, 
                     fontWeight: isActive ? 700 : 600,
+                    flex: 1,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
                   }}>
                     {item.label}
                   </span>
+                  {item.badge && !isActive && (
+                    <span style={{ 
+                      width: 18, height: 18, borderRadius: "50%", 
+                      background: theme.accent, color: "white", 
+                      fontSize: 10, fontWeight: 700, 
+                      display: "flex", alignItems: "center", justifyContent: "center" 
+                    }}>
+                      {item.badge}
+                    </span>
+                  )}
                 </motion.button>
               );
             })}

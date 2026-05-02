@@ -8,8 +8,9 @@ import DiarySection from "../../components/parent/sections/DiarySection";
 import AcademicSection from "../../components/parent/sections/AcademicSection";
 import TransportSection from "../../components/parent/sections/TransportSection";
 import SettingsSection from "../../components/parent/sections/SettingsSection";
+import MessagesSection from "../../components/parent/sections/MessagesSection";
 import DashboardHome from "../../components/parent/sections/DashboardHome";
-import { Bell, MagnifyingGlass, Sun, Moon } from "@phosphor-icons/react";
+import { List, Bell, MagnifyingGlass, Sun, Moon } from "@phosphor-icons/react";
 
 import { DashboardTheme } from "../../types/theme";
 import { MenuKey, Student, AcademicTab } from "../../types/dashboard";
@@ -52,6 +53,7 @@ export default function ParentDashboard() {
   const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
   const [academicTab, setAcademicTab] = useState<AcademicTab>("calendar");
   const [activeStudent, setActiveStudent] = useState(students[0]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const theme: DashboardTheme = {
@@ -78,86 +80,78 @@ export default function ParentDashboard() {
       case "academic":      return <AcademicSection student={activeStudent} theme={theme} initialTab={academicTab} />;
       case "transport":     return <TransportSection theme={theme} />;
       case "settings":      return <SettingsSection theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
+      case "messages":      return <MessagesSection theme={theme} />;
       default:              return <EventsGallery theme={theme} />;
     }
   };
 
   return (
-    <div className={`mesh-bg${isDarkMode ? " dark-mode" : ""}`} style={{ display: "flex", height: "100vh", background: theme.bg, transition: "background 0.3s ease", position: "relative", overflow: "hidden" }}>
+    <div className={`mesh-bg${isDarkMode ? " dark-mode" : ""} flex min-h-screen font-sans relative overflow-hidden`} style={{ background: theme.bg, transition: "background 0.3s ease" }}>
       {/* Background Decorative Elements */}
       <div className="bg-glow" style={{ top: "-10%", left: "-10%", width: 700, height: 700, background: "radial-gradient(circle, rgba(255, 127, 80, 0.12), transparent 70%)", position: "absolute", zIndex: 0 }} />
       <div className="bg-glow" style={{ bottom: "-10%", right: "-10%", width: 600, height: 600, background: "radial-gradient(circle, rgba(79, 70, 229, 0.1), transparent 70%)", animationDelay: "-5s", position: "absolute", zIndex: 0 }} />
-      <div className="bg-glow" style={{ top: "20%", right: "10%", width: 450, height: 450, background: "radial-gradient(circle, rgba(255, 127, 80, 0.08), transparent 70%)", animationDuration: "20s", position: "absolute", zIndex: 0 }} />
-      <div className="bg-glow" style={{ bottom: "20%", left: "30%", width: 300, height: 300, background: "radial-gradient(circle, rgba(79, 70, 229, 0.05), transparent 70%)", animationDelay: "-8s", animationDuration: "12s", position: "absolute", zIndex: 0 }} />
+      
+      {/* Sidebar Overlay for mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[60] lg:hidden backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
-      <ParentSidebar
-        students={students}
-        activeStudent={activeStudent}
-        setActiveStudent={setActiveStudent}
-        activeMenu={activeMenu}
-        setActiveMenu={setActiveMenu}
-        theme={theme}
-      />
-      <main style={{ flex: 1, height: "100vh", overflowY: "auto", minWidth: 0, display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }} className="hide-scrollbar">
-        {/* Top Bar - Clean & Modern */}
-        <header style={{ 
-          height: 70, 
-          background: theme.isDark ? "rgba(18,18,18,0.7)" : "rgba(255,255,255,0.7)", 
-          backdropFilter: "blur(12px)",
-          borderBottom: `1px solid ${theme.border}`,
-          padding: "0 32px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "sticky",
-          top: 0,
-          zIndex: 40
-        }}>
-          {/* Search Bar */}
-          <div style={{ flex: 1, maxWidth: 400 }}>
-            <div style={{ position: "relative" }}>
-              <MagnifyingGlass size={20} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: theme.textMuted }} />
-              <input 
-                type="text" 
-                placeholder="Search everything..." 
-                style={{
-                  width: "100%",
-                  padding: "12px 16px 12px 48px",
-                  borderRadius: 14,
-                  border: `1px solid ${theme.border}`,
-                  background: theme.isDark ? "rgba(255,255,255,0.03)" : "#F8FAFC",
-                  fontSize: 14,
-                  outline: "none",
-                  color: theme.text,
-                  transition: "all 0.2s"
-                }}
-              />
-            </div>
-          </div>
+      {/* Sidebar Wrapper */}
+      <div 
+        className={`fixed lg:relative inset-y-0 left-0 z-[70] transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} transition-transform duration-300 ease-in-out`}
+        style={{ background: theme.sidebarBg }}
+      >
+        <ParentSidebar
+          students={students}
+          activeStudent={activeStudent}
+          setActiveStudent={(s) => { setActiveStudent(s); setIsSidebarOpen(false); }}
+          activeMenu={activeMenu}
+          setActiveMenu={(m) => { setActiveMenu(m); setIsSidebarOpen(false); }}
+          theme={theme}
+        />
+      </div>
+
+      <main className="flex-1 h-screen lg:h-screen w-full min-w-0 relative z-10 flex flex-col overflow-hidden">
+        {/* Global Dashboard Header */}
+        <div 
+          className="flex items-center px-5 py-3 shrink-0 z-30 shadow-[0_2px_12px_rgba(0,0,0,0.03)]"
+          style={{ background: theme.isDark ? "rgba(18,18,18,0.7)" : "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${theme.border}` }}
+        >
+          <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-1.5 -ml-1.5 mr-3 text-[#FF7F50] rounded-xl hover:bg-orange-50 active:scale-95 transition-all"
+            title={isSidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
+          >
+            <List size={28} weight="bold" />
+          </button>
           
-          <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <button style={{ background: "none", border: "none", color: theme.textMuted, cursor: "pointer" }} onClick={() => setIsDarkMode(!isDarkMode)}>
-                {isDarkMode ? <Sun size={24} weight="bold" /> : <Moon size={24} weight="bold" />}
-              </button>
-              <button
-                onClick={() => setActiveMenu("notifications")}
-                style={{ background: "none", border: "none", color: activeMenu === "notifications" ? "#FF7F50" : theme.textMuted, cursor: "pointer", position: "relative" }}
-              >
-                <Bell size={24} weight={activeMenu === "notifications" ? "fill" : "regular"} />
-                <span style={{ position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: "50%", background: "#FF7F50", border: `2px solid ${theme.bg}` }}></span>
-              </button>
-            </div>
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <span className="font-extrabold text-[15px] tracking-tight font-poppins leading-none" style={{ color: theme.text }}>
+              {activeStudent.name}
+            </span>
+            <span className="text-[11px] font-semibold tracking-wide mt-0.5" style={{ color: theme.textMuted }}>
+              Class {activeStudent.class}-{activeStudent.section}
+            </span>
           </div>
-        </header>
 
-        <div style={{ padding: "24px 40px", flex: 1, position: "relative", zIndex: 2 }}>
-          <div style={{ marginBottom: 24 }}>
-             <h2 style={{ fontSize: 24, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
-                {activeStudent.name}
-             </h2>
-             <p style={{ color: theme.textMuted, fontWeight: 600, fontSize: 14 }}>Class {activeStudent.class}-{activeStudent.section} Student</p>
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF7F50] to-[#e66a3e] text-white flex items-center justify-center font-bold text-xs shadow-[0_2px_8px_rgba(255,127,80,0.3)] ring-2 ring-white">
+            {activeStudent.avatar}
           </div>
+        </div>
+
+        {/* Content Area */}
+        <div className={`flex-1 min-h-0 overflow-hidden flex flex-col ${activeMenu === 'messages' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
+          {activeMenu !== 'messages' && activeMenu !== 'dashboard' && (
+            <div className="mb-8 md:mb-10 shrink-0">
+              <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
+                {activeStudent.name}
+              </h2>
+              <p style={{ color: theme.textMuted, fontWeight: 600, fontSize: 16 }}>Class {activeStudent.class}-{activeStudent.section} Student</p>
+            </div>
+          )}
           {renderContent()}
         </div>
       </main>

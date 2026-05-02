@@ -32,4 +32,40 @@ class AuthStorageService {
   Future<void> clearSession() {
     return _storage.delete(key: _sessionKey);
   }
+
+  Future<void> setBiometricsEnabled(bool enabled) async {
+    await _storage.write(key: 'biometrics_enabled', value: enabled.toString());
+  }
+
+  Future<bool> getBiometricsEnabled() async {
+    final value = await _storage.read(key: 'biometrics_enabled');
+    return value == 'true';
+  }
+
+  Future<void> setDarkModeEnabled(bool enabled) async {
+    await _storage.write(key: 'dark_mode_enabled', value: enabled.toString());
+  }
+
+  Future<bool> getDarkModeEnabled() async {
+    final value = await _storage.read(key: 'dark_mode_enabled');
+    return value == 'true';
+  }
+
+  Future<void> setLanguage(String language) async {
+    await _storage.write(key: 'preferred_language', value: language);
+  }
+
+  Future<String> getLanguage() async {
+    final value = await _storage.read(key: 'preferred_language');
+    return value ?? 'English';
+  }
+  Future<void> setSplashEnabled(bool enabled) async {
+    await _storage.write(key: 'splash_enabled', value: enabled.toString());
+  }
+
+  Future<bool> getSplashEnabled() async {
+    final value = await _storage.read(key: 'splash_enabled');
+    // Default to true (show splash) if never set
+    return value != 'false';
+  }
 }

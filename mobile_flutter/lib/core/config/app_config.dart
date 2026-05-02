@@ -9,7 +9,8 @@ class AppConfig {
     if (kIsWeb) {
       return 'http://localhost:5000';
     } else {
-      // Physical device: use your computer's LAN IP
+      // Physical device: use your computer's current LAN IP (192.168.23.127)
+      // Note: On college WiFi, client isolation might block this. Use a mobile hotspot if it fails.
       return 'http://192.168.23.127:5000';
     }
   }
@@ -20,8 +21,11 @@ class AppConfig {
     defaultValue: 'teacher@sns-erp.local',
   );
 
-  static const defaultPassword = String.fromEnvironment(
-    'DEMO_USER_PASSWORD',
-    defaultValue: 'ChangeMe123!',
-  );
+  static String get defaultPassword {
+    const envPass = String.fromEnvironment('DEMO_USER_PASSWORD');
+    if (envPass.isNotEmpty) return envPass;
+    
+    // Use 12345678 for local dev as requested, ChangeMe123! for live
+    return kDebugMode ? '12345678' : 'ChangeMe123!';
+  }
 }

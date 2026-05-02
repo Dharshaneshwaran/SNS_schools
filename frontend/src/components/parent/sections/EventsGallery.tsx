@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Heart, 
@@ -9,12 +10,16 @@ import {
   DotsThreeOutlineVertical,
   CalendarBlank,
   MapPin,
-  CheckCircle
+  CheckCircle,
+  ShareNetwork,
+  Trophy,
+  Flask,
+  MaskHappy,
+  Handshake,
+  Microphone,
+  Barbell,
 } from "@phosphor-icons/react";
-import { useState } from "react";
 import { DashboardTheme } from "../../../types/theme";
-
-
 
 const events = [
   { 
@@ -23,10 +28,13 @@ const events = [
     date: "Apr 20, 2026", 
     location: "Main Stadium",
     category: "Sports", 
+    color: "#FF7F50",
+    icon: <Trophy size={16} weight="fill" />,
     image: "/events/sports-day.png",
     likes: 1248,
     comments: 48,
-    description: "What an incredible display of talent and sportsmanship! 🏆 Our students showcased outstanding athletic abilities across track, field, and team sports. Proud of every participant who gave their best! #SportsDay2026 #SNSAcademy #Champions",
+    description: "What an incredible display of talent and sportsmanship! 🏆 Our students showcased outstanding athletic abilities across track, field, and team sports. Proud of every participant who gave their best!",
+    hashtags: ["#SportsDay2026", "#SNSAcademy", "#Champions"],
     postedTime: "2 hours ago"
   },
   { 
@@ -35,10 +43,13 @@ const events = [
     date: "Apr 14, 2026", 
     location: "Block A Hall",
     category: "Academic", 
+    color: "#6C63FF",
+    icon: <Flask size={16} weight="fill" />,
     image: "/events/science-exhibition.png",
     likes: 856,
     comments: 32,
-    description: "Exploring the future! 🔬 Our young scientists blew everyone away at this year's Science Exhibition. From renewable energy models to AI-powered robots — the future is bright! #ScienceFair #Innovation #FutureScientists",
+    description: "Exploring the future! 🔬 Our young scientists blew everyone away at this year's Science Exhibition. From renewable energy models to AI-powered robots — the future is bright!",
+    hashtags: ["#ScienceFair", "#Innovation", "#FutureScientists"],
     postedTime: "1 day ago"
   },
   { 
@@ -47,10 +58,13 @@ const events = [
     date: "Apr 10, 2026", 
     location: "Open Air Theatre",
     category: "Cultural", 
+    color: "#10B981",
+    icon: <MaskHappy size={16} weight="fill" />,
     image: "/events/cultural-fest.png",
     likes: 2432,
     comments: 156,
-    description: "A night filled with music, dance, and vibrant performances! 🎭 From classical performances to modern fusion — our students proved that art knows no boundaries. #CulturalFest #ArtAndCulture #SNSPride",
+    description: "A night filled with music, dance, and vibrant performances! 🎭 From classical performances to modern fusion — our students proved that art knows no boundaries.",
+    hashtags: ["#CulturalFest", "#ArtAndCulture", "#SNSPride"],
     postedTime: "3 days ago"
   },
   { 
@@ -59,32 +73,78 @@ const events = [
     date: "Apr 5, 2026", 
     location: "Conference Room",
     category: "Meeting", 
+    color: "#F59E0B",
+    icon: <Handshake size={16} weight="fill" />,
     image: "/events/parent-teacher-meet.png",
     likes: 432,
     comments: 12,
-    description: "A productive Parent-Teacher Meet discussing student progress and future goals. 🤝 Together, we build a better future for our students! #PTM #ParentTeacher #Education",
+    description: "A productive Parent-Teacher Meet discussing student progress and future goals. 🤝 Together, we build a better future for our students!",
+    hashtags: ["#PTM", "#ParentTeacher", "#Education"],
     postedTime: "1 week ago"
+  },
+  {
+    id: 5,
+    title: "Inter-School Debate",
+    date: "Mar 28, 2026",
+    location: "Auditorium",
+    category: "Academic",
+    color: "#8B5CF6",
+    icon: <Microphone size={16} weight="fill" />,
+    image: "/events/debate-competition.png",
+    likes: 176,
+    comments: 21,
+    description: "Our debate team represented SNS Academy brilliantly at the Inter-School Debate Championship! 🎙️ Articulate, confident, and well-prepared — these students are natural leaders.",
+    hashtags: ["#DebateChampionship", "#PublicSpeaking", "#Leaders"],
+    postedTime: "1 month ago"
+  },
+  {
+    id: 6,
+    title: "Yoga & Wellness Day",
+    date: "Mar 21, 2026",
+    location: "Wellness Center",
+    category: "Health",
+    color: "#10B981",
+    icon: <Barbell size={16} weight="fill" />,
+    image: "/events/yoga-wellness.png",
+    likes: 203,
+    comments: 15,
+    description: "Mind, body, and soul — all aligned on Yoga & Wellness Day! 🧘 Students and teachers came together for a rejuvenating session of yoga, meditation, and mindfulness.",
+    hashtags: ["#YogaDay", "#Wellness", "#MindfulSchool"],
+    postedTime: "1 month ago"
   },
 ];
 
 export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
-
-  const [likedEvents, setLikedEvents] = useState<number[]>([]);
-  const [expandedCaptions, setExpandedCaptions] = useState<number[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
+  const [savedPosts, setSavedPosts] = useState<Set<number>>(new Set());
+  const [expandedCaptions, setExpandedCaptions] = useState<Set<number>>(new Set());
 
   const toggleLike = (id: number) => {
-    setLikedEvents(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
+    setLikedPosts(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSave = (id: number) => {
+    setSavedPosts(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const toggleCaption = (id: number) => {
-    setExpandedCaptions(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
+    setExpandedCaptions(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
-
-
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
@@ -96,7 +156,7 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
         paddingBottom: 10,
         paddingLeft: 4
       }} className="hide-scrollbar">
-        {events.map((event, i) => (
+        {events.map((event) => (
           <div key={event.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -128,27 +188,41 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
         ))}
       </div>
 
+      {/* Category Pills */}
+      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }} className="hide-scrollbar">
+        {["All", "Sports", "Academic", "Cultural", "Meeting", "Health"].map(cat => (
+          <button
+            key={cat}
+            style={{
+              padding: "7px 18px", borderRadius: 20,
+              background: cat === "All" ? "linear-gradient(90deg,#FF7F50,#e66a3e)" : theme.cardBg,
+              color: cat === "All" ? "white" : theme.textMuted,
+              border: cat === "All" ? "none" : `1px solid ${theme.border}`,
+              fontSize: 13, fontWeight: 600, cursor: "pointer",
+              whiteSpace: "nowrap", transition: "all 0.2s",
+              fontFamily: "var(--font-inter,'Inter',sans-serif)",
+            }}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
 
-
-      <div style={{ 
-        maxWidth: "500px", 
-        margin: "0 auto", 
-        width: "100%",
-        display: "flex", 
-        flexDirection: "column", 
-        gap: 24,
+      {/* Feed - Instagram/LinkedIn Style Post Cards */}
+      <div style={{
+        display: "flex", flexDirection: "column", gap: 32,
+        maxWidth: 640, margin: "0 auto", width: "100%",
         paddingBottom: 60 
       }}>
         <AnimatePresence mode="popLayout">
-          {events.map((event, i) => {
-            const isLiked = likedEvents.includes(event.id);
-            const isExpanded = expandedCaptions.includes(event.id);
-            const captionParts = event.description.split(" #");
-            const text = captionParts[0];
-            const hashtags = captionParts.length > 1 ? captionParts.slice(1).map(h => "#" + h) : [];
+          {events.map((event) => {
+            const isLiked = likedPosts.has(event.id);
+            const isSaved = savedPosts.has(event.id);
+            const isExpanded = expandedCaptions.has(event.id);
+            const text = event.description;
 
             return (
-              <motion.div
+              <motion.article
                 key={event.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -163,9 +237,9 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                   boxShadow: theme.isDark ? "0 10px 40px rgba(0,0,0,0.3)" : "0 10px 40px rgba(0,0,0,0.05)"
                 }}
               >
-                {/* Header - Stolen from Mobile UI Stagger */}
+                {/* Header */}
                 <div style={{ 
-                  padding: "12px 16px", 
+                  padding: "16px 20px", 
                   display: "flex", 
                   alignItems: "center", 
                   justifyContent: "space-between" 
@@ -207,7 +281,7 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                 <div 
                   style={{ 
                     width: "100%", 
-                    aspectRatio: "16/10", 
+                    aspectRatio: "4/5", 
                     background: theme.isDark ? "#121212" : "#f0f0f0",
                     position: "relative",
                     overflow: "hidden",
@@ -235,36 +309,46 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                     fontSize: 11,
                     fontWeight: 800,
                     textTransform: "uppercase",
-                    letterSpacing: "0.05em"
+                    letterSpacing: "0.05em",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6
                   }}>
+                    {event.icon}
                     {event.category}
                   </div>
                 </div>
 
                 {/* Interaction & Details */}
-                <div style={{ padding: "14px 20px" }}>
+                <div style={{ padding: "20px 24px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
                       <motion.button 
                         whileTap={{ scale: 0.7 }}
                         onClick={() => toggleLike(event.id)}
                         style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
                       >
                         <Heart 
-                          size={24} 
+                          size={30} 
                           weight={isLiked ? "fill" : "bold"} 
                           color={isLiked ? "#ef4444" : theme.text} 
                         />
                       </motion.button>
-                      <ChatCircle size={24} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
-                      <PaperPlaneTilt size={24} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
+                      <ChatCircle size={30} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
+                      <ShareNetwork size={30} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
                     </div>
-                    <BookmarkSimple size={24} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
+                    <motion.button
+                      whileTap={{ scale: 0.8 }}
+                      onClick={() => toggleSave(event.id)}
+                      style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                    >
+                      <BookmarkSimple size={30} weight={isSaved ? "fill" : "bold"} color={isSaved ? "#FF7F50" : theme.text} />
+                    </motion.button>
                   </div>
 
                   {/* Likes and Caption */}
                   <div style={{ color: theme.text, fontWeight: 800, fontSize: 15, marginBottom: 10 }}>
-                    {isLiked ? (event.likes + 1).toLocaleString() : event.likes.toLocaleString()} likes
+                    {(isLiked ? event.likes + 1 : event.likes).toLocaleString()} likes
                   </div>
                   
                   <div style={{ fontSize: 15, lineHeight: "1.6", color: theme.text }}>
@@ -289,10 +373,10 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                     )}
                   </div>
 
-                  {/* Staggered Hashtags Row */}
+                  {/* Hashtags */}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
-                    {hashtags.map((h, hi) => (
-                      <span key={hi} style={{ color: "#4f46e5", fontWeight: 700, fontSize: 14 }}>{h}</span>
+                    {event.hashtags.map((h, hi) => (
+                      <span key={hi} style={{ color: event.color, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{h}</span>
                     ))}
                   </div>
 
@@ -318,7 +402,7 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </motion.article>
             );
           })}
         </AnimatePresence>
