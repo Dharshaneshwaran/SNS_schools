@@ -155,5 +155,6 @@ export default function ParentDashboard() {
           {renderContent()}
         </div>
       </main>
+    </div>
   );
 }
