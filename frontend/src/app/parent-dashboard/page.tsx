@@ -144,14 +144,6 @@ export default function ParentDashboard() {
 
         {/* Content Area */}
         <div className={`flex-1 min-h-0 overflow-y-auto flex flex-col ${activeMenu === 'messages' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
-          {activeMenu !== 'messages' && activeMenu !== 'dashboard' && (
-            <div className="mb-8 md:mb-10 shrink-0">
-              <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
-                {activeStudent.name}
-              </h2>
-              <p style={{ color: theme.textMuted, fontWeight: 600, fontSize: 16 }}>Class {activeStudent.class}-{activeStudent.section} Student</p>
-            </div>
-          )}
           {renderContent()}
         </div>
       </main>

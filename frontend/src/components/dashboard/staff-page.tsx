@@ -13,6 +13,7 @@ import {
   Plus
 } from "@phosphor-icons/react";
 import { PageSection } from "./page-section";
+import { createTeacher } from "../../services/users-service";
 
 type Step = 1 | 2 | 3;
 
@@ -31,12 +32,23 @@ export function StaffPage() {
   const nextStep = () => setStep((prev) => (prev + 1) as Step);
   const prevStep = () => setStep((prev) => (prev - 1) as Step);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
+    try {
+      await createTeacher({
+        name: formData.fullName,
+        email: formData.email,
+        department: formData.department,
+        employeeId: `STAFF-${Math.floor(Math.random() * 10000)}`, // Temporary mock ID or add field
+        designation: "Faculty",
+        specialization: formData.department,
+      });
       setStep(3);
-    }, 2000);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to create staff member");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const togglePermission = (p: string) => {

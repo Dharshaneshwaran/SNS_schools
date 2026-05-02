@@ -10,27 +10,27 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  login(@Body() payload: LoginDto) {
-    return this.authService.login(payload);
+  async login(@Body() payload: LoginDto) {
+    return await this.authService.login(payload);
   }
 
   @Public()
   @Post('refresh')
-  refresh(@Body() payload: RefreshTokenDto) {
-    return this.authService.refresh(payload.refreshToken);
+  async refresh(@Body() payload: RefreshTokenDto) {
+    return await this.authService.refresh(payload.refreshToken);
   }
 
   @Get('me')
-  me(@Req() request: AuthenticatedRequest) {
-    return this.authService.getProfile(request.user.sub);
+  async me(@Req() request: AuthenticatedRequest) {
+    return await this.authService.getProfile(request.user.sub);
   }
 
   @Post('change-password')
-  changePassword(
+  async changePassword(
     @Req() request: AuthenticatedRequest,
     @Body() body: { currentPassword: string; newPassword: string },
   ) {
-    return this.authService.changePassword(
+    return await this.authService.changePassword(
       request.user.sub,
       body.currentPassword,
       body.newPassword,
@@ -38,10 +38,10 @@ export class AuthController {
   }
 
   @Patch('profile')
-  updateProfile(
+  async updateProfile(
     @Req() request: AuthenticatedRequest,
     @Body() body: { name?: string; email?: string },
   ) {
-    return this.authService.updateProfile(request.user.sub, body);
+    return await this.authService.updateProfile(request.user.sub, body);
   }
 }

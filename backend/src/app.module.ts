@@ -15,8 +15,11 @@ import { UsersModule } from './users/users.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { NotificationsModule } from './notifications/notifications.module';
 
+import { DatabaseModule } from './database/database.module';
+
 @Module({
   imports: [
+    DatabaseModule,
     HealthModule,
     UsersModule,
     AuthModule,

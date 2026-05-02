@@ -188,26 +188,6 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
         ))}
       </div>
 
-      {/* Category Pills */}
-      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }} className="hide-scrollbar">
-        {["All", "Sports", "Academic", "Cultural", "Meeting", "Health"].map(cat => (
-          <button
-            key={cat}
-            style={{
-              padding: "7px 18px", borderRadius: 20,
-              background: cat === "All" ? "linear-gradient(90deg,#FF7F50,#e66a3e)" : theme.cardBg,
-              color: cat === "All" ? "white" : theme.textMuted,
-              border: cat === "All" ? "none" : `1px solid ${theme.border}`,
-              fontSize: 13, fontWeight: 600, cursor: "pointer",
-              whiteSpace: "nowrap", transition: "all 0.2s",
-              fontFamily: "var(--font-inter,'Inter',sans-serif)",
-            }}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
       {/* Feed - Instagram/LinkedIn Style Post Cards */}
       <div style={{
         display: "flex", flexDirection: "column", gap: 32,
