@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 import 'teacher_dashboard_home.dart';
 
 class TeacherMainScreen extends StatefulWidget {
