@@ -9,19 +9,49 @@ import AcademicSection from "../../components/parent/sections/AcademicSection";
 import TransportSection from "../../components/parent/sections/TransportSection";
 import SettingsSection from "../../components/parent/sections/SettingsSection";
 import MessagesSection from "../../components/parent/sections/MessagesSection";
-import { List } from "@phosphor-icons/react";
+import DashboardHome from "../../components/parent/sections/DashboardHome";
+import { List, Bell, MagnifyingGlass, Sun, Moon } from "@phosphor-icons/react";
 
 import { DashboardTheme } from "../../types/theme";
+import { MenuKey, Student, AcademicTab } from "../../types/dashboard";
 
-export type MenuKey = "events" | "profile" | "diary" | "notifications" | "academic" | "transport" | "settings" | "messages";
-
-const students = [
-  { id: 1, name: "Arjun Sharma", class: "8", section: "A", avatar: "AS" },
-  { id: 2, name: "Priya Sharma", class: "5", section: "B", avatar: "PS" },
+const students: Student[] = [
+  { 
+    id: 1, 
+    name: "Arjun Sharma", 
+    class: "8", 
+    section: "A", 
+    avatar: "AS",
+    fatherNumber: "+91 00000 00000",
+    fatherEmail: "father@email.com",
+    motherNumber: "+91 00000 00000",
+    motherEmail: "mother@email.com",
+    guardianNumber: "+91 00000 00000",
+    address: "Dummy Address, Street Name, City, State - Pincode",
+    parentMobile: "+91 00000 00000",
+    classTeacher: "Mrs. Sarah Jenkins",
+    teacherEmail: "sarah.j@snsacademy.org"
+  },
+  { 
+    id: 2, 
+    name: "Priya Sharma", 
+    class: "5", 
+    section: "B", 
+    avatar: "PS",
+    fatherNumber: "+91 00000 00000",
+    fatherEmail: "father@email.com",
+    motherNumber: "+91 00000 00000",
+    motherEmail: "mother@email.com",
+    address: "Dummy Address, Street Name, City, State - Pincode",
+    parentMobile: "+91 00000 00000",
+    classTeacher: "Mr. Robert Wilson",
+    teacherEmail: "robert.w@snsacademy.org"
+  },
 ];
 
 export default function ParentDashboard() {
-  const [activeMenu, setActiveMenu] = useState<MenuKey>("events");
+  const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
+  const [academicTab, setAcademicTab] = useState<AcademicTab>("calendar");
   const [activeStudent, setActiveStudent] = useState(students[0]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -42,11 +72,12 @@ export default function ParentDashboard() {
 
   const renderContent = () => {
     switch (activeMenu) {
+      case "dashboard":     return <DashboardHome theme={theme} onNavigate={(tab) => { setAcademicTab(tab); setActiveMenu("academic"); }} />;
       case "events":        return <EventsGallery theme={theme} />;
       case "profile":       return <ProfileSection student={activeStudent} theme={theme} />;
       case "diary":         return <DiarySection student={activeStudent} theme={theme} />;
       case "notifications": return <DiarySection student={activeStudent} theme={theme} showOnlyNotifications={true} />; 
-      case "academic":      return <AcademicSection student={activeStudent} theme={theme} />;
+      case "academic":      return <AcademicSection student={activeStudent} theme={theme} initialTab={academicTab} />;
       case "transport":     return <TransportSection theme={theme} />;
       case "settings":      return <SettingsSection theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
       case "messages":      return <MessagesSection theme={theme} />;
@@ -87,7 +118,7 @@ export default function ParentDashboard() {
         {/* Global Dashboard Header */}
         <div 
           className="flex items-center px-5 py-3 shrink-0 z-30 shadow-[0_2px_12px_rgba(0,0,0,0.03)]"
-          style={{ background: theme.sidebarBg, borderBottom: `1px solid ${theme.border}` }}
+          style={{ background: theme.isDark ? "rgba(18,18,18,0.7)" : "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${theme.border}` }}
         >
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -113,7 +144,7 @@ export default function ParentDashboard() {
 
         {/* Content Area */}
         <div className={`flex-1 min-h-0 overflow-hidden flex flex-col ${activeMenu === 'messages' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
-          {activeMenu !== 'messages' && (
+          {activeMenu !== 'messages' && activeMenu !== 'dashboard' && (
             <div className="mb-8 md:mb-10 shrink-0">
               <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
                 {activeStudent.name}
@@ -124,8 +155,5 @@ export default function ParentDashboard() {
           {renderContent()}
         </div>
       </main>
-
-
-    </div>
   );
 }

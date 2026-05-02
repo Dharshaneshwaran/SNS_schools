@@ -5,13 +5,11 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell, User, BookOpen, ChartBar,
-  Bus, Gear, Images, CaretDown, SignOut, GraduationCap, ChatCircleDots
+  Bus, Gear, Images, CaretDown, SignOut, GraduationCap, ChatCircleDots, House
 } from "@phosphor-icons/react";
-import { MenuKey } from "../../app/parent-dashboard/page";
+import { MenuKey, Student } from "../../types/dashboard";
 import { DashboardTheme } from "../../types/theme";
 import { clearSession } from "../../lib/session-storage";
-
-type Student = { id: number; name: string; class: string; section: string; avatar: string };
 
 interface Props {
   students: Student[];
@@ -44,6 +42,7 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
     {
       title: "MENU",
       items: [
+        { key: "dashboard",     label: "Dashboard",      icon: House },
         { key: "events",        label: "Events Gallery", icon: Images },
         { key: "diary",         label: "Diary & Homework", icon: BookOpen, badge: 3 },
         { key: "notifications", label: "Notifications",  icon: Bell },

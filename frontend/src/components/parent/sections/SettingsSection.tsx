@@ -29,7 +29,11 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
     fullName: "Parent Name",
     email: "parent@email.com",
     mobile: "+91 9876543210",
-    city: "Coimbatore"
+    city: "Coimbatore",
+    fatherMobile: "",
+    motherMobile: "",
+    guardianMobile: "",
+    address: ""
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -38,9 +42,16 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
     confirm: ""
   });
 
+  const [saved, setSaved] = useState(false);
+
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleSendApproval = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3500);
   };
 
   const handleSaveProfile = async () => {
@@ -212,6 +223,9 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
             { label: "Email", key: "email", type: "email" },
             { label: "Mobile", key: "mobile", type: "tel" },
             { label: "City", key: "city", type: "text" },
+            { label: "Father's Mobile", key: "fatherMobile", type: "tel" },
+            { label: "Mother's Mobile", key: "motherMobile", type: "tel" },
+            { label: "Guardian Mobile (Optional)", key: "guardianMobile", type: "tel" },
           ].map((f, i) => (
             <div key={i}>
               <label style={labelStyle2}>{f.label}</label>
@@ -223,6 +237,23 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
               />
             </div>
           ))}
+          <div style={{ gridColumn: "span 2" }}>
+            <label style={labelStyle2}>Current Address</label>
+            <textarea 
+              value={profileData.address}
+              onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
+              placeholder="Enter your full address..." 
+              rows={3}
+              style={{ ...inputStyle2, resize: "none" } as React.CSSProperties} 
+            />
+          </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 32 }}>
+          <button onClick={handleSendApproval}
+            style={{ padding: "14px 40px", borderRadius: 14, background: saved ? "#10B981" : "linear-gradient(90deg,#FF7F50,#e66a3e)", color: "white", border: "none", cursor: "pointer", fontWeight: 700, fontSize: 15, transition: "background 0.3s", boxShadow: "0 6px 20px rgba(255,127,80,0.3)", fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}>
+            {saved ? "✓ Approval Sent to Admin" : "Send Approval to Admin"}
+          </button>
         </div>
       </div>
 
@@ -316,7 +347,6 @@ const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
       width: 46, height: 26, borderRadius: 13, padding: 3, border: "none",
       background: on ? "#FF7F50" : "#ddd", cursor: "pointer",
       transition: "background 0.3s", display: "flex", alignItems: "center",
-      justifyContent: on ? "flex-end" : "flex-start",
     }}>
     <motion.div animate={{ x: on ? 20 : 0 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} style={{ width: 20, height: 20, borderRadius: "50%", background: "white", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" }} />
   </button>

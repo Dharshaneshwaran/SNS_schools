@@ -13,6 +13,10 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "SNS Academy ERP | Smart School Management",
   description: "Simplifying communication between parents, teachers, and administration through innovation and design thinking.",
+  icons: {
+    icon: "/images/logo.png",
+    apple: "/images/logo.png",
+  }
 };
 
 export default function RootLayout({
@@ -21,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className={`${inter.variable} ${poppins.variable} min-h-full font-sans`}>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <body className={`${inter.variable} ${poppins.variable} min-h-full font-sans`} suppressHydrationWarning>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

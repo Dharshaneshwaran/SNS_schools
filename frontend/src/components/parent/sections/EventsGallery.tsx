@@ -146,7 +146,6 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
       return next;
     });
   };
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       {/* Stories - Inspired by Instagram */}
@@ -157,7 +156,11 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
         paddingBottom: 10,
         paddingLeft: 4
       }} className="hide-scrollbar">
+<<<<<<< HEAD
         {events.map((event) => (
+=======
+        {events.map((event, i) => (
+>>>>>>> origin/Yukesh
           <div key={event.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -186,6 +189,7 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
               {event.title.split(" ")[0]}
             </span>
           </div>
+<<<<<<< HEAD
         ))}
       </div>
 
@@ -213,10 +217,25 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
       <div style={{
         display: "flex", flexDirection: "column", gap: 32,
         maxWidth: 640, margin: "0 auto", width: "100%",
+=======
+        ))}
+      </div>
+
+
+
+      <div style={{ 
+        maxWidth: "500px", 
+        margin: "0 auto", 
+        width: "100%",
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 24,
+>>>>>>> origin/Yukesh
         paddingBottom: 60 
       }}>
         <AnimatePresence mode="popLayout">
           {events.map((event, i) => {
+<<<<<<< HEAD
             const isLiked = likedPosts.has(event.id);
             const isSaved = savedPosts.has(event.id);
             const isExpanded = expandedCaptions.has(event.id);
@@ -224,6 +243,16 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
 
             return (
               <motion.article
+=======
+            const isLiked = likedEvents.includes(event.id);
+            const isExpanded = expandedCaptions.includes(event.id);
+            const captionParts = event.description.split(" #");
+            const text = captionParts[0];
+            const hashtags = captionParts.length > 1 ? captionParts.slice(1).map(h => "#" + h) : [];
+
+            return (
+              <motion.div
+>>>>>>> origin/Yukesh
                 key={event.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -238,9 +267,15 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                   boxShadow: theme.isDark ? "0 10px 40px rgba(0,0,0,0.3)" : "0 10px 40px rgba(0,0,0,0.05)"
                 }}
               >
+<<<<<<< HEAD
                 {/* Header */}
                 <div style={{ 
                   padding: "16px 20px", 
+=======
+                {/* Header - Stolen from Mobile UI Stagger */}
+                <div style={{ 
+                  padding: "12px 16px", 
+>>>>>>> origin/Yukesh
                   display: "flex", 
                   alignItems: "center", 
                   justifyContent: "space-between" 
@@ -282,7 +317,11 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                 <div 
                   style={{ 
                     width: "100%", 
+<<<<<<< HEAD
                     aspectRatio: "4/5", 
+=======
+                    aspectRatio: "16/10", 
+>>>>>>> origin/Yukesh
                     background: theme.isDark ? "#121212" : "#f0f0f0",
                     position: "relative",
                     overflow: "hidden",
@@ -310,31 +349,47 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                     fontSize: 11,
                     fontWeight: 800,
                     textTransform: "uppercase",
+<<<<<<< HEAD
                     letterSpacing: "0.05em",
                     display: "flex",
                     alignItems: "center",
                     gap: 6
                   }}>
                     {event.icon}
+=======
+                    letterSpacing: "0.05em"
+                  }}>
+>>>>>>> origin/Yukesh
                     {event.category}
                   </div>
                 </div>
 
                 {/* Interaction & Details */}
+<<<<<<< HEAD
                 <div style={{ padding: "20px 24px" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+=======
+                <div style={{ padding: "14px 20px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+>>>>>>> origin/Yukesh
                       <motion.button 
                         whileTap={{ scale: 0.7 }}
                         onClick={() => toggleLike(event.id)}
                         style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
                       >
                         <Heart 
+<<<<<<< HEAD
                           size={30} 
+=======
+                          size={24} 
+>>>>>>> origin/Yukesh
                           weight={isLiked ? "fill" : "bold"} 
                           color={isLiked ? "#ef4444" : theme.text} 
                         />
                       </motion.button>
+<<<<<<< HEAD
                       <ChatCircle size={30} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
                       <ShareNetwork size={30} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
                     </div>
@@ -345,11 +400,21 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                     >
                       <BookmarkSimple size={30} weight={isSaved ? "fill" : "bold"} color={isSaved ? "#FF7F50" : theme.text} />
                     </motion.button>
+=======
+                      <ChatCircle size={24} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
+                      <PaperPlaneTilt size={24} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
+                    </div>
+                    <BookmarkSimple size={24} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
+>>>>>>> origin/Yukesh
                   </div>
 
                   {/* Likes and Caption */}
                   <div style={{ color: theme.text, fontWeight: 800, fontSize: 15, marginBottom: 10 }}>
+<<<<<<< HEAD
                     {(isLiked ? event.likes + 1 : event.likes).toLocaleString()} likes
+=======
+                    {isLiked ? (event.likes + 1).toLocaleString() : event.likes.toLocaleString()} likes
+>>>>>>> origin/Yukesh
                   </div>
                   
                   <div style={{ fontSize: 15, lineHeight: "1.6", color: theme.text }}>
@@ -374,10 +439,17 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                     )}
                   </div>
 
+<<<<<<< HEAD
                   {/* Hashtags */}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
                     {event.hashtags.map((h, hi) => (
                       <span key={hi} style={{ color: event.color, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{h}</span>
+=======
+                  {/* Staggered Hashtags Row */}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
+                    {hashtags.map((h, hi) => (
+                      <span key={hi} style={{ color: "#4f46e5", fontWeight: 700, fontSize: 14 }}>{h}</span>
+>>>>>>> origin/Yukesh
                     ))}
                   </div>
 
@@ -403,7 +475,11 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                     </div>
                   </div>
                 </div>
+<<<<<<< HEAD
               </motion.article>
+=======
+              </motion.div>
+>>>>>>> origin/Yukesh
             );
           })}
         </AnimatePresence>
