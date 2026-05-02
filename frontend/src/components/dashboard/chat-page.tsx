@@ -3,8 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { 
   PaperPlaneTilt, 
-  Users, 
-  UserCircle,
   MagnifyingGlass,
   DotsThreeVertical,
   UsersThree,
@@ -53,9 +51,9 @@ const initialMessages: Message[] = [
 
 export function ChatPage() {
   const { session } = useAuth();
-  const [localContacts, setLocalContacts] = useState(contacts);
-  const [selectedContact, setSelectedContact] = useState(localContacts[0]);
-  const [messages, setMessages] = useState(initialMessages);
+  const [localContacts, setLocalContacts] = useState<Contact[]>([]);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
@@ -112,7 +110,6 @@ export function ChatPage() {
       setLocalContacts([newGroup, ...localContacts]);
       setSelectedContact(newGroup);
     }
-  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -361,6 +358,13 @@ export function ChatPage() {
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        .bg-chat-pattern {
+          background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+          background-repeat: repeat;
+        }
+      `}</style>
     </div>
   );
 }

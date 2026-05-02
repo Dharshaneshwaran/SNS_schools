@@ -12,6 +12,8 @@ import { SubstitutionsModule } from './substitutions/substitutions.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { TimetableModule } from './timetable/timetable.module';
 import { UsersModule } from './users/users.module';
+import { MessagingModule } from './messaging/messaging.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { UsersModule } from './users/users.module';
     SubstitutionsModule,
     ReportsModule,
     SettingsModule,
+    MessagingModule,
+    NotificationsModule,
   ],
   providers: [
     {

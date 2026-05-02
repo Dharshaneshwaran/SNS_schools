@@ -5,6 +5,10 @@ import type { AppRole } from '../common/constants/roles';
 @Injectable()
 export class UsersService {
   private readonly users: AuthUser[] = this.buildSeedUsers();
+  
+  findAll() {
+    return this.users;
+  }
 
   findByEmail(email: string) {
     return (
@@ -77,6 +81,28 @@ export class UsersService {
         'parent',
         'Parent Portal',
         sharedPassword,
+      ),
+      // Mock Students (Parent role for login, but represented as students in UI)
+      ...Array.from({ length: 10 }).map((_, i) => 
+        this.createSeedUser(
+          `student-${i + 1}`,
+          `Student ${String.fromCharCode(65 + i)}`,
+          `student${i + 1}@sns.edu`,
+          'parent',
+          'Academic',
+          sharedPassword,
+        )
+      ),
+      // Mock Teachers (Additional accounts for the teachers already in TeachersService)
+      ...Array.from({ length: 10 }).map((_, i) => 
+        this.createSeedUser(
+          `teacher-mock-${i + 1}`,
+          `Teacher ${i + 1}`,
+          `teacher${i + 1}@sns.edu`,
+          'teacher',
+          'Education',
+          sharedPassword,
+        )
       ),
     ];
   }

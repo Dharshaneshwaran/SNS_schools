@@ -40,18 +40,20 @@ export function SidebarNav() {
         { label: "Calendar", href: "/dashboard/calendar", icon: <CalendarCheck size={18} weight="duotone" /> },
       ]
     },
-    {
+    // Only show MANAGEMENT to Admins
+    ...(isAdmin ? [{
       title: "MANAGEMENT",
       items: [
         { label: "Users", href: "/dashboard/users", icon: <Users size={18} weight="duotone" /> },
         { label: "Staff", href: "/dashboard/staff", icon: <ChalkboardTeacher size={18} weight="duotone" /> },
         { label: "Admission", href: "/dashboard/admission", icon: <UserPlus size={18} weight="duotone" /> },
-        { label: "Students", href: "/dashboard/students", icon: <Student size={18} weight="duotone" /> },
       ]
-    },
+    }] : []),
     {
       title: "TOOLS",
       items: [
+        // Both can see Students, but it might be in different contexts
+        { label: "Students", href: "/dashboard/students", icon: <Student size={18} weight="duotone" /> },
         { label: "Results", href: "/dashboard/results", icon: <GraduationCap size={18} weight="duotone" /> },
         { label: "Transport", href: "/dashboard/transport", icon: <Bus size={18} weight="duotone" /> },
         { label: "Reports", href: "/dashboard/reports", icon: <FileText size={18} weight="duotone" /> },

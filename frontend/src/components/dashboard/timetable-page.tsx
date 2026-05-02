@@ -3,7 +3,6 @@
 import { useCallback } from "react";
 import { useAuthResource } from "../../hooks/use-auth-resource";
 import { getTimetable } from "../../services/mock-data-service";
-import { InfoListCard } from "./info-list-card";
 import { PageSection } from "./page-section";
 import { ResourceError, ResourceLoading } from "./resource-states";
 
@@ -14,56 +13,93 @@ export function TimetablePage() {
   );
   const { data, error, isLoading } = useAuthResource(loadTimetable);
 
+  // Define headers for the periods
+  const periodHeaders = ["I", "II", "III", "LUNCH", "IV", "V", "VI", "VII"];
+
+  const getDaySchedule = (dayName: string) => {
+    return data?.schedule.find(s => s.day === dayName);
+  };
+
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
   return (
     <PageSection
-      eyebrow="Timetable"
-      title="Weekly timetable"
-      description="This working mock page shows the current week draft, period allocations, and conflict cues your team can replace with real validation later."
+      eyebrow="Academic Schedule"
+      title="Master Timetable"
+      description="Weekly academic period allocations and lab sessions."
     >
       {isLoading ? <ResourceLoading label="timetable" /> : null}
       {error ? <ResourceError label="timetable" message={error} /> : null}
       {data ? (
-        <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-          <section className="rounded-[1.6rem] border border-[var(--border)] bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-strong)]">
-              {data.weekLabel}
-            </p>
-            <div className="mt-5 space-y-4">
-              {data.schedule.map((day) => (
-                <div
-                  key={day.day}
-                  className="rounded-[1.4rem] border border-[var(--border)] bg-[#fcfcfb] p-5"
-                >
-                  <h2 className="text-lg font-semibold text-slate-900">{day.day}</h2>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    {day.periods.map((period) => (
-                      <div
-                        key={`${day.day}-${period.slot}`}
-                        className="rounded-[1.1rem] border border-[var(--border)] bg-white p-4"
-                      >
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent-strong)]">
-                          {period.slot}
-                        </p>
-                        <p className="mt-2 text-sm font-semibold text-slate-900">
-                          {period.subject}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-600">{period.teacher}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-          <InfoListCard
-            title="Conflict alerts"
-            items={data.conflicts.map((conflict) => ({
-              title: "Schedule review",
-              description: conflict,
-            }))}
-          />
+        <div className="w-full overflow-x-auto rounded-[2rem] border border-slate-200 bg-white shadow-xl shadow-slate-200/50">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="p-5 text-left font-extrabold text-slate-500 uppercase tracking-widest border-r border-slate-200 min-w-[140px]">Day/Period</th>
+                {periodHeaders.map((header, i) => (
+                  <th key={i} className="p-5 text-center font-extrabold text-slate-900 uppercase tracking-widest border-r border-slate-200 last:border-r-0">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {days.map((day) => {
+                const schedule = getDaySchedule(day);
+                return (
+                  <tr key={day} className="border-b border-slate-100 last:border-b-0 group hover:bg-slate-50/50 transition-colors">
+                    <td className="p-5 font-black text-slate-900 border-r border-slate-200 bg-slate-50/30">{day}</td>
+                    
+                    {/* Period I-III */}
+                    {day === "Tuesday" || day === "Friday" ? (
+                      <td colSpan={3} className="p-5 text-center bg-slate-100/50 font-bold text-slate-600 uppercase tracking-[0.3em]">LAB</td>
+                    ) : (
+                      <>
+                        <td className="p-5 text-center border-r border-slate-100 font-bold text-slate-700">{schedule?.periods[0]?.subject.split(' ')[0] || '-'}</td>
+                        <td className="p-5 text-center border-r border-slate-100 font-bold text-slate-700">{schedule?.periods[1]?.subject.split(' ')[0] || '-'}</td>
+                        <td className="p-5 text-center border-r border-slate-100 font-bold text-slate-700">{schedule?.periods[2]?.subject.split(' ')[0] || '-'}</td>
+                      </>
+                    )}
+
+                    {/* LUNCH - Vertically merged in spirit across rows */}
+                    <td className="p-5 text-center border-r border-slate-200 font-black text-slate-400 bg-slate-50/30 uppercase tracking-[0.2em] [writing-mode:vertical-lr] rotate-180 md:[writing-mode:horizontal-tb] md:rotate-0">
+                      LUNCH
+                    </td>
+
+                    {/* Period IV-VII */}
+                    {day === "Monday" || day === "Thursday" ? (
+                      <td colSpan={3} className="p-5 text-center border-r border-slate-100 bg-slate-100/50 font-bold text-slate-600 uppercase tracking-[0.3em]">LAB</td>
+                    ) : day === "Saturday" ? (
+                      <td colSpan={3} className="p-5 text-center border-r border-slate-100 bg-slate-100/50 font-bold text-slate-600 uppercase tracking-[0.3em]">SEMINAR</td>
+                    ) : day === "Wednesday" ? (
+                      <>
+                        <td className="p-5 text-center border-r border-slate-100 font-bold text-slate-700">{schedule?.periods[3]?.subject.split(' ')[0] || 'Che'}</td>
+                        <td colSpan={2} className="p-5 text-center border-r border-slate-100 bg-slate-100/50 font-bold text-slate-600 uppercase tracking-[0.3em]">LIBRARY</td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="p-5 text-center border-r border-slate-100 font-bold text-slate-700">{schedule?.periods[3]?.subject.split(' ')[0] || 'Eng'}</td>
+                        <td className="p-5 text-center border-r border-slate-100 font-bold text-slate-700">{schedule?.periods[4]?.subject.split(' ')[0] || 'Che'}</td>
+                        <td className="p-5 text-center border-r border-slate-100 font-bold text-slate-700">{schedule?.periods[5]?.subject.split(' ')[0] || 'Mat'}</td>
+                      </>
+                    )}
+
+                    {/* Last Period - Sports check */}
+                    <td className="p-5 text-center font-bold text-slate-700 last:border-r-0">
+                      {day === "Tuesday" || day === "Saturday" ? (
+                        <span className="bg-slate-100 px-3 py-1 rounded-lg text-slate-500 text-[10px] uppercase tracking-widest font-black">SPORTS</span>
+                      ) : (
+                        schedule?.periods[6]?.subject.split(' ')[0] || 'Phy'
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       ) : null}
     </PageSection>
   );
 }
+
