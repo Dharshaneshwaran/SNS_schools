@@ -42,8 +42,8 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
     {
       title: "MENU",
       items: [
-        { key: "dashboard",     label: "Dashboard",      icon: House },
         { key: "events",        label: "Events Gallery", icon: Images },
+        { key: "dashboard",     label: "Dashboard",      icon: House },
         { key: "diary",         label: "Diary & Homework", icon: BookOpen, badge: 3 },
         { key: "notifications", label: "Notifications",  icon: Bell },
         { key: "messages",      label: "Messages",       icon: ChatCircleDots },

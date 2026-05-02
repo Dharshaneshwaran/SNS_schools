@@ -6,7 +6,7 @@ import 'core/constants/app_roles.dart';
 import 'core/models/auth_session.dart';
 import 'features/auth/data/auth_api_service.dart';
 import 'features/auth/data/auth_storage_service.dart';
-import 'features/auth/presentation/login_screen.dart';
+import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/parent_dashboard/presentation/parent_dashboard_screen.dart';
 import 'features/splash/presentation/splash_screen.dart';
