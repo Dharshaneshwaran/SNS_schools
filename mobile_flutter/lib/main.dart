@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/models/user_model.dart';
@@ -9,8 +10,12 @@ import 'features/parent/presentation/screens/parent_main_screen.dart';
 
 import 'features/auth/presentation/screens/splash_screen.dart';
 
+import 'features/teacher/presentation/screens/teacher_main_screen.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // Disable runtime fetching to prevent 'Failed to fetch' errors if offline/blocked
+  GoogleFonts.config.allowRuntimeFetching = false;
   runApp(const ProviderScope(child: SNSErpApp()));
 }
 
@@ -51,6 +56,8 @@ class _SNSErpAppState extends ConsumerState<SNSErpApp> {
     if (authState.status == AuthStatus.authenticated) {
       if (authState.user?.role == UserRole.admin) {
         return const AdminMainScreen();
+      } else if (authState.user?.role == UserRole.staff) {
+        return const TeacherMainScreen();
       } else {
         return const ParentMainScreen();
       }

@@ -16,7 +16,10 @@ class AuthService {
         'password': password,
       });
 
-      final String token = response.data['access_token'];
+      final String? token = response.data['accessToken'];
+      if (token == null) {
+        throw Exception('Login failed: Access token missing from response');
+      }
       await _storage.write(key: 'jwt_token', value: token);
       
       final user = UserModel.fromJson(response.data['user']);

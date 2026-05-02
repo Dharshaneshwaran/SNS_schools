@@ -20,12 +20,12 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
-      email: json['email'],
-      name: json['name'],
-      role: _parseRole(json['role']),
-      status: _parseStatus(json['status']),
-      photoUrl: json['photoUrl'],
+      id: json['id'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      role: _parseRole(json['role'] as String?),
+      status: _parseStatus(json['status'] as String?),
+      photoUrl: json['photoUrl'] as String?,
     );
   }
 
@@ -40,7 +40,8 @@ class UserModel {
     };
   }
 
-  static UserRole _parseRole(String role) {
+  static UserRole _parseRole(String? role) {
+    if (role == null) return UserRole.parent;
     switch (role.toLowerCase()) {
       case 'admin':
         return UserRole.admin;
@@ -54,7 +55,8 @@ class UserModel {
     }
   }
 
-  static AccountStatus _parseStatus(String status) {
+  static AccountStatus _parseStatus(String? status) {
+    if (status == null) return AccountStatus.pending_approval;
     switch (status.toLowerCase()) {
       case 'pending_approval':
         return AccountStatus.pending_approval;

@@ -20,7 +20,40 @@ const stats = [
 
 export default function DashboardOverview() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Ongoing Class Hero */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden p-8 rounded-[40px] bg-gradient-to-br from-[#FF6A00] to-[#FF9E22] text-white shadow-2xl shadow-orange-500/20"
+      >
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider">
+                Ongoing Now
+              </span>
+              <span className="text-white/60 text-xs font-medium italic">• Ends in 25 mins</span>
+            </div>
+            <h2 className="text-4xl font-black italic uppercase tracking-tighter mb-2">
+              Mathematics <span className="text-white/80">—</span> Grade 10A
+            </h2>
+            <p className="text-white/80 font-medium tracking-wide">Chapter 4: Quadratic Equations & Applications</p>
+          </div>
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 rounded-2xl bg-white text-[#FF6A00] font-black uppercase text-sm shadow-xl hover:shadow-2xl transition-all"
+          >
+            Mark Attendance
+          </motion.button>
+        </div>
+        
+        {/* Decorative elements */}
+        <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -left-10 -bottom-10 w-48 h-48 bg-black/10 rounded-full blur-2xl" />
+      </motion.div>
+
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {stats.map((stat, i) => (

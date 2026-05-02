@@ -24,12 +24,9 @@ interface SidebarProps {
 
 const menuItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "classes", label: "Classes", icon: Users },
-  { id: "schedule", label: "Schedule", icon: Calendar },
+  { id: "classes", label: "My Classes", icon: Users },
   { id: "tasks", label: "Assignments", icon: FileText },
   { id: "communication", label: "Messages", icon: MessageCircle },
-  { id: "resources", label: "Resources", icon: FolderOpen },
-  { id: "tools", label: "Tools", icon: Settings },
 ];
 
 export default function TeacherSidebar({ activeTab, setActiveTab, theme, toggleTheme }: SidebarProps) {

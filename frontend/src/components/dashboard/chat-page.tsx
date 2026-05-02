@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   PaperPlaneTilt, 
   Users, 
@@ -10,20 +10,48 @@ import {
   Circle,
   Smiley,
   Plus,
-  UsersThree
+  UsersThree,
+  Microphone,
+  ArrowBendUpLeft,
+  X,
+  Check,
+  Checks
 } from "@phosphor-icons/react";
 import { useAuth } from "../../hooks/use-auth";
 
-const contacts = [
-  { id: 1, name: "Grade 10-A Parents", type: "Group", lastMsg: "When is the next meeting?", time: "10:30 AM", unread: 2 },
-  { id: 2, name: "Staff Lounge", type: "Group", lastMsg: "Lunch is ready!", time: "12:15 PM", unread: 0 },
-  { id: 3, name: "Dr. Sarah Connor", type: "Staff", lastMsg: "Syllabus updated.", time: "Yesterday", unread: 0 },
-  { id: 4, name: "Finance Office", type: "Staff", lastMsg: "Fee reports generated.", time: "2 days ago", unread: 0 },
+type MessageStatus = 'sent' | 'delivered' | 'read';
+
+interface Message {
+  id: number;
+  sender: string;
+  text: string;
+  time: string;
+  isMe: boolean;
+  status?: MessageStatus;
+  replyTo?: { id: number; text: string; sender: string };
+}
+
+interface Contact {
+  id: number;
+  name: string;
+  type: string;
+  lastMsg: string;
+  time: string;
+  unread: number;
+  online: boolean;
+  lastSeen?: string;
+}
+
+const contacts: Contact[] = [
+  { id: 1, name: "Grade 10-A Parents", type: "Group", lastMsg: "When is the next meeting?", time: "10:30 AM", unread: 2, online: true },
+  { id: 2, name: "Staff Lounge", type: "Group", lastMsg: "Lunch is ready!", time: "12:15 PM", unread: 0, online: true },
+  { id: 3, name: "Dr. Sarah Connor", type: "Staff", lastMsg: "Syllabus updated.", time: "Yesterday", unread: 0, online: true, lastSeen: "online" },
+  { id: 4, name: "Finance Office", type: "Staff", lastMsg: "Fee reports generated.", time: "2 days ago", unread: 0, online: false, lastSeen: "last seen today at 3:45 PM" },
 ];
 
-const initialMessages = [
+const initialMessages: Message[] = [
   { id: 1, sender: "Dr. Sarah Connor", text: "Hello Admin, have you reviewed the Grade 10 results?", time: "10:15 AM", isMe: false },
-  { id: 2, sender: "Admin", text: "Yes Sarah, they look good. I'll publish them by 2 PM today.", time: "10:20 AM", isMe: true },
+  { id: 2, sender: "Admin", text: "Yes Sarah, they look good. I'll publish them by 2 PM today.", time: "10:20 AM", isMe: true, status: 'read' },
   { id: 3, sender: "Dr. Sarah Connor", text: "Perfect. Thank you!", time: "10:21 AM", isMe: false },
 ];
 
@@ -34,32 +62,84 @@ export function ChatPage() {
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const isParent = session?.user?.role === "parent";
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (input.length > 0) {
+      setIsTyping(true);
+      const timer = setTimeout(() => setIsTyping(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [input]);
+
   const handleSendMessage = () => {
     if (!input.trim()) return;
-    const newMsg = {
+    const newMsg: Message = {
       id: messages.length + 1,
       sender: session?.user?.name || "User",
       text: input,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isMe: true
+      isMe: true,
+      status: 'sent',
+      replyTo: replyingTo ? { id: replyingTo.id, text: replyingTo.text, sender: replyingTo.sender } : undefined
     };
     setMessages([...messages, newMsg]);
     setInput("");
+    setReplyingTo(null);
+
+    // Simulate message delivery and read status
+    setTimeout(() => {
+      setMessages(prev => prev.map(m => m.id === newMsg.id ? { ...m, status: 'delivered' } : m));
+    }, 1000);
+    setTimeout(() => {
+      setMessages(prev => prev.map(m => m.id === newMsg.id ? { ...m, status: 'read' } : m));
+    }, 2000);
+  };
+
+  const handleReply = (msg: Message) => {
+    setReplyingTo(msg);
+    inputRef.current?.focus();
+  };
+
+  const handleVoiceRecord = () => {
+    setIsRecording(!isRecording);
+    if (!isRecording) {
+      setTimeout(() => {
+        const newMsg: Message = {
+          id: messages.length + 1,
+          sender: session?.user?.name || "User",
+          text: "🎤 Voice message (0:05)",
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isMe: true,
+          status: 'sent'
+        };
+        setMessages([...messages, newMsg]);
+        setIsRecording(false);
+      }, 2000);
+    }
   };
 
   const handleNewGroup = () => {
     const groupName = prompt("Enter new group name:");
     if (groupName && groupName.trim()) {
-      const newGroup = {
+      const newGroup: Contact = {
         id: localContacts.length + 1,
         name: groupName.trim(),
         type: "Group",
         lastMsg: "Group created",
         time: "Just now",
-        unread: 0
+        unread: 0,
+        online: true
       };
       setLocalContacts([newGroup, ...localContacts]);
       setSelectedContact(newGroup);
@@ -69,12 +149,13 @@ export function ChatPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const newMsg = {
+      const newMsg: Message = {
         id: messages.length + 1,
         sender: session?.user?.name || "User",
-        text: `📎 Attached file: ${file.name}`,
+        text: `📎 ${file.name}`,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isMe: true
+        isMe: true,
+        status: 'sent'
       };
       setMessages([...messages, newMsg]);
     }
@@ -83,6 +164,13 @@ export function ChatPage() {
   const filteredContacts = localContacts.filter(contact => 
     contact.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const MessageStatusIcon = ({ status }: { status?: MessageStatus }) => {
+    if (!status) return null;
+    if (status === 'sent') return <Check size={16} weight="bold" className="text-slate-400" />;
+    if (status === 'delivered') return <Checks size={16} weight="bold" className="text-slate-400" />;
+    return <Checks size={16} weight="bold" className="text-[#34b7f1]" />;
+  };
 
   return (
     <div className="flex h-[calc(100vh-90px)] w-full overflow-hidden bg-[#f0f2f5]">
@@ -139,6 +227,9 @@ export function ChatPage() {
                 <div className="h-12 w-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 overflow-hidden">
                   {contact.type === 'Group' ? <Users size={28} weight="duotone" /> : <UserCircle size={28} weight="duotone" />}
                 </div>
+                {contact.online && contact.type !== 'Group' && (
+                  <div className="absolute bottom-0 right-0 h-3 w-3 bg-[#25d366] rounded-full border-2 border-white"></div>
+                )}
               </div>
               <div className="flex-1 min-w-0 py-1">
                 <div className="flex justify-between items-start">
@@ -148,7 +239,7 @@ export function ChatPage() {
                 <div className="flex justify-between items-center mt-0.5">
                   <div className="text-[13px] text-slate-500 truncate pr-2">{contact.lastMsg}</div>
                   {contact.unread > 0 && (
-                    <div className="h-5 w-5 rounded-full bg-[#25d366] text-white text-[11px] font-bold flex items-center justify-center">
+                    <div className="h-5 w-5 rounded-full bg-[#25d366] text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">
                       {contact.unread}
                     </div>
                   )}
@@ -168,12 +259,21 @@ export function ChatPage() {
         {/* Chat Header */}
         <div className="h-[60px] bg-[#f0f2f5] px-4 flex items-center justify-between border-l border-slate-200 flex-shrink-0 z-10">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 overflow-hidden">
+            <div className="relative h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 overflow-hidden">
               {selectedContact.type === 'Group' ? <Users size={24} weight="duotone" /> : <UserCircle size={24} weight="duotone" />}
+              {selectedContact.online && selectedContact.type !== 'Group' && (
+                <div className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-[#25d366] rounded-full border-2 border-[#f0f2f5]"></div>
+              )}
             </div>
             <div>
               <div className="text-base font-normal text-slate-900">{selectedContact.name}</div>
-              <div className="text-[11px] text-slate-500">online</div>
+              <div className="text-[11px] text-slate-500">
+                {isTyping ? (
+                  <span className="text-[#25d366]">typing...</span>
+                ) : (
+                  selectedContact.lastSeen || 'click here for contact info'
+                )}
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-6 text-slate-500 pr-2">
@@ -191,12 +291,27 @@ export function ChatPage() {
           {messages.map((msg, index) => {
             const isFirstInSequence = index === 0 || messages[index - 1].isMe !== msg.isMe;
             return (
-              <div key={msg.id} className={`flex w-full ${msg.isMe ? 'justify-end' : 'justify-start'} ${isFirstInSequence ? 'mt-3' : 'mt-0'}`}>
-                <div className={`relative max-w-[65%] px-3 py-1.5 shadow-sm ${
-                  msg.isMe 
-                    ? 'bg-[#dcf8c6] text-[#303030] rounded-lg rounded-tr-none' 
-                    : 'bg-white text-[#303030] rounded-lg rounded-tl-none'
-                }`}>
+              <div key={msg.id} className={`flex w-full ${msg.isMe ? 'justify-end' : 'justify-start'} ${isFirstInSequence ? 'mt-3' : 'mt-0'} group`}>
+                <div 
+                  className={`relative max-w-[65%] px-3 py-1.5 shadow-sm transition-all hover:shadow-md ${
+                    msg.isMe 
+                      ? 'bg-[#dcf8c6] text-[#303030] rounded-lg rounded-tr-none' 
+                      : 'bg-white text-[#303030] rounded-lg rounded-tl-none'
+                  }`}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    handleReply(msg);
+                  }}
+                >
+                  {/* Reply button on hover */}
+                  <button 
+                    onClick={() => handleReply(msg)}
+                    className="absolute -top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 hover:bg-slate-200 rounded-full p-1 shadow-md"
+                    title="Reply"
+                  >
+                    <ArrowBendUpLeft size={14} weight="bold" />
+                  </button>
+
                   {/* Bubble Tail */}
                   {isFirstInSequence && (
                     <div className={`absolute top-0 w-3 h-3 ${
@@ -206,28 +321,47 @@ export function ChatPage() {
                     }`} />
                   )}
                   
+                  {/* Reply Preview */}
+                  {msg.replyTo && (
+                    <div className={`mb-1 pl-2 py-1 border-l-4 ${msg.isMe ? 'border-[#25d366] bg-[#d1f4cc]' : 'border-[#34b7f1] bg-slate-50'} rounded text-xs`}>
+                      <div className="font-semibold text-[#25d366]">{msg.replyTo.sender}</div>
+                      <div className="text-slate-600 truncate">{msg.replyTo.text}</div>
+                    </div>
+                  )}
+
                   {!msg.isMe && selectedContact.type === 'Group' && (
                     <div className="text-[12px] font-bold text-[#FF7F50] mb-0.5">{msg.sender}</div>
                   )}
                   <div className="text-[14.5px] leading-relaxed break-words">
                     {msg.text}
-                    <span className="inline-block w-12 h-1" /> {/* Spacer for time */}
+                    <span className="inline-block w-16 h-1" /> {/* Spacer for time */}
                   </div>
                   <div className="absolute bottom-1 right-2 text-[10px] text-slate-500 flex items-center gap-1">
                     {msg.time}
-                    {msg.isMe && (
-                      <span className="text-[#34b7f1]">
-                        <svg viewBox="0 0 16 15" width="16" height="15" fill="currentColor">
-                          <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879 5.517 6.43a.355.355 0 0 0-.503-.016l-.427.387a.368.368 0 0 0-.011.516l3.82 4.183a.368.368 0 0 0 .542.022l6.143-7.712a.365.365 0 0 0-.06-.516zm-5.045 0l-.478-.372a.365.365 0 0 0-.51.063L4.12 7.828l-.513-.561a.368.368 0 0 0-.542-.023l-3.003 3.77a.368.368 0 0 0 .063.518l.478.373a.365.365 0 0 0 .51-.063l2.766-3.473 1.134 1.242a.368.368 0 0 0 .542.022l4.981-6.262a.365.365 0 0 0-.063-.518z"></path>
-                        </svg>
-                      </span>
-                    )}
+                    {msg.isMe && <MessageStatusIcon status={msg.status} />}
                   </div>
                 </div>
               </div>
             );
           })}
+          <div ref={messagesEndRef} />
         </div>
+
+        {/* Reply Bar */}
+        {replyingTo && (
+          <div className="bg-[#f0f2f5] px-4 py-2 flex items-center justify-between border-t border-slate-200">
+            <div className="flex-1 flex items-center gap-2">
+              <ArrowBendUpLeft size={18} className="text-[#25d366]" />
+              <div className="flex-1">
+                <div className="text-xs font-semibold text-[#25d366]">{replyingTo.sender}</div>
+                <div className="text-xs text-slate-600 truncate">{replyingTo.text}</div>
+              </div>
+            </div>
+            <button onClick={() => setReplyingTo(null)} className="text-slate-500 hover:text-slate-700">
+              <X size={20} weight="bold" />
+            </button>
+          </div>
+        )}
 
         {/* Authentic WhatsApp Input Bar */}
         <div className="bg-[#f0f2f5] px-4 py-2 flex items-center gap-4 flex-shrink-0">
@@ -242,6 +376,7 @@ export function ChatPage() {
           </div>
           <div className="flex-1 bg-white rounded-lg px-4 py-2.5">
             <input 
+              ref={inputRef}
               type="text" 
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -250,12 +385,21 @@ export function ChatPage() {
               className="w-full bg-transparent border-none outline-none text-[15px] text-[#303030]"
             />
           </div>
-          <button 
-            onClick={handleSendMessage}
-            className="text-slate-500 hover:text-[#25d366] transition-colors"
-          >
-            <PaperPlaneTilt size={26} weight="fill" />
-          </button>
+          {input.trim() ? (
+            <button 
+              onClick={handleSendMessage}
+              className="text-slate-500 hover:text-[#25d366] transition-colors"
+            >
+              <PaperPlaneTilt size={26} weight="fill" />
+            </button>
+          ) : (
+            <button 
+              onClick={handleVoiceRecord}
+              className={`transition-colors ${isRecording ? 'text-red-500 animate-pulse' : 'text-slate-500 hover:text-[#25d366]'}`}
+            >
+              <Microphone size={26} weight={isRecording ? "fill" : "regular"} />
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -270,4 +414,3 @@ function ChatCircleDots({ size, weight }: { size: number, weight: "bold" | "duot
     </svg>
   );
 }
-
