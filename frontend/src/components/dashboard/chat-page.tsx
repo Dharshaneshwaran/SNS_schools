@@ -9,7 +9,8 @@ import {
   Paperclip,
   ArrowBendUpLeft,
   X,
-  Checks
+  Checks,
+  ChatCircle
 } from "@phosphor-icons/react";
 import { useAuth } from "../../hooks/use-auth";
 
@@ -188,12 +189,12 @@ export function ChatPage() {
               key={contact.id}
               onClick={() => setSelectedContact(contact)}
               className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
-                selectedContact.id === contact.id ? "bg-blue-50 border-l-4 border-blue-500" : "hover:bg-slate-50"
+                selectedContact?.id === contact.id ? "bg-blue-50 border-l-4 border-blue-500" : "hover:bg-slate-50"
               }`}
             >
               <div className="relative flex-shrink-0">
                 <div className="h-11 w-11 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
-                  {contact.type === 'Group' ? <Users size={24} weight="duotone" /> : <UserCircle size={24} weight="duotone" />}
+                  {contact.type === 'Group' ? <UsersThree size={24} weight="duotone" /> : <Checks size={24} weight="duotone" />}
                 </div>
                 {contact.online && contact.type !== 'Group' && (
                   <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-white"></div>
@@ -224,31 +225,33 @@ export function ChatPage() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-white">
-        {/* Chat Header */}
-        <div className="h-16 bg-white px-6 flex items-center justify-between border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
-              {selectedContact.type === 'Group' ? <Users size={22} weight="duotone" /> : <UserCircle size={22} weight="duotone" />}
-              {selectedContact.online && selectedContact.type !== 'Group' && (
-                <div className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-white"></div>
-              )}
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-slate-900">{selectedContact.name}</div>
-              <div className="text-xs text-slate-500">
-                {selectedContact.type === 'Group' ? `${Math.floor(Math.random() * 20) + 5} members` : selectedContact.online ? 'Online' : 'Offline'}
+        {selectedContact ? (
+          <>
+            {/* Chat Header */}
+            <div className="h-16 bg-white px-6 flex items-center justify-between border-b border-slate-200">
+              <div className="flex items-center gap-3">
+                <div className="relative h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+                  {selectedContact.type === 'Group' ? <UsersThree size={22} weight="duotone" /> : <Checks size={22} weight="duotone" />}
+                  {selectedContact.online && selectedContact.type !== 'Group' && (
+                    <div className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-white"></div>
+                  )}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-slate-900">{selectedContact.name}</div>
+                  <div className="text-xs text-slate-500">
+                    {selectedContact.type === 'Group' ? `${Math.floor(Math.random() * 20) + 5} members` : selectedContact.online ? 'Online' : 'Offline'}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => alert("Search in conversation")} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+                  <MagnifyingGlass size={18} weight="bold" className="text-slate-600" />
+                </button>
+                <button onClick={() => alert("Conversation info")} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+                  <DotsThreeVertical size={18} weight="bold" className="text-slate-600" />
+                </button>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => alert("Search in conversation")} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-               <MagnifyingGlass size={18} weight="bold" className="text-slate-600" />
-            </button>
-            <button onClick={() => alert("Conversation info")} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-               <DotsThreeVertical size={18} weight="bold" className="text-slate-600" />
-            </button>
-          </div>
-        </div>
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
@@ -358,6 +361,18 @@ export function ChatPage() {
             <PaperPlaneTilt size={20} weight="fill" className="text-white" />
           </button>
         </div>
+      </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-500 bg-slate-50/50">
+            <div className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-4">
+               <ChatCircle size={40} weight="duotone" className="text-blue-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-slate-800">Your Messages</h3>
+            <p className="text-sm text-slate-500 max-w-[280px] text-center mt-2">
+              Select a conversation from the sidebar to start messaging your teachers or groups.
+            </p>
+          </div>
+        )}
       </div>
 
       <style jsx>{`

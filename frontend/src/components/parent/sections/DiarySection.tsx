@@ -8,7 +8,6 @@ import {
   CalendarCheck, 
   Bell, 
   CalendarBlank,
-  Filter,
   Funnel,
   CheckCircle,
   FileText,
