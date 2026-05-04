@@ -40,6 +40,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState(status: AuthStatus.loading);
     try {
       final user = await _authService.login(email, password);
+      if (user.role == UserRole.admin) {
+        state = AuthState(
+          status: AuthStatus.error,
+          errorMessage: 'Admin accounts must use the web dashboard. Please use a teacher or parent login.',
+        );
+        return;
+      }
       state = AuthState(status: AuthStatus.authenticated, user: user);
     } catch (e) {
       state = AuthState(status: AuthStatus.error, errorMessage: e.toString());
