@@ -1,15 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { 
-  Users, 
   UserCircle, 
   PencilSimple, 
   Trash, 
   DownloadSimple,
   MagnifyingGlass,
-  Funnel,
   CheckCircle,
   XCircle,
   ToggleLeft,

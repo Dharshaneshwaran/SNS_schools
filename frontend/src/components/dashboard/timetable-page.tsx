@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { 
   Calendar, 
   PencilSimple, 
   Plus, 
   Clock, 
-  UserCircle,
   CheckCircle,
   X
 } from "@phosphor-icons/react";
@@ -30,16 +29,11 @@ const initialSchedule = [
 
 export function TimetablePage() {
   const [isEditing, setIsEditing] = useState(false);
-  const [schedule, setSchedule] = useState(initialSchedule);
+  const [schedule] = useState(initialSchedule);
   const { data, isLoading, error } = useAuthResource("timetable", getTimetable);
 
   // Define headers for the periods
-  const periodHeaders = ["I", "II", "III", "LUNCH", "IV", "V", "VI", "VII"];
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-  const getDaySchedule = (dayName: string) => {
-    return data?.schedule?.find((s: any) => s.day === dayName);
-  };
 
   return (
     <PageSection
