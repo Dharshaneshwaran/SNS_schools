@@ -110,85 +110,89 @@ export default function StudentsSection() {
       {/* Student Details Modal */}
       <AnimatePresence>
         {selectedStudent && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedStudent(null)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/80 backdrop-blur-[2px]" // Reduced blur to keep foreground sharp
             />
             
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-full max-w-4xl bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[48px] shadow-2xl relative overflow-hidden flex flex-col md:flex-row"
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-5xl bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[40px] shadow-[0_0_50px_rgba(0,0,0,0.3)] relative overflow-hidden flex flex-col lg:flex-row z-10"
               onClick={e => e.stopPropagation()}
             >
               {/* Profile Sidebar */}
-              <div className="w-full md:w-80 bg-[var(--bg-primary)] p-10 border-r border-[var(--border)] flex flex-col items-center text-center">
-                <div className="w-32 h-32 rounded-[40px] bg-zinc-800 flex items-center justify-center text-5xl font-black italic text-white shadow-xl mb-6">
+              <div className="w-full lg:w-96 bg-[var(--bg-primary)] p-8 lg:p-12 border-r border-[var(--border)] flex flex-col items-center text-center">
+                <div className="w-40 h-40 rounded-[48px] bg-zinc-800 flex items-center justify-center text-6xl font-black italic text-white shadow-2xl mb-8">
                   {selectedStudent.name.charAt(0)}
                 </div>
-                <h3 className="text-2xl font-black text-[var(--text-primary)] leading-tight mb-2">{selectedStudent.name}</h3>
-                <p className="text-[var(--accent)] text-xs font-black uppercase tracking-widest mb-8">Roll No: {selectedStudent.roll}</p>
+                <h3 className="text-3xl font-black text-[var(--text-primary)] leading-tight mb-3 italic uppercase tracking-tighter">{selectedStudent.name}</h3>
+                <p className="text-[var(--accent)] text-sm font-black uppercase tracking-[0.2em] mb-10">Roll ID: {selectedStudent.roll}</p>
                 
                 <div className="w-full space-y-4">
-                  <div className="p-4 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)]">
-                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Performance</p>
-                    <p className="text-sm font-bold text-[var(--text-primary)]">{selectedStudent.performance}</p>
+                  <div className="p-5 rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)]">
+                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-1.5">Academic Standing</p>
+                    <p className="text-lg font-black text-[var(--text-primary)] italic uppercase">{selectedStudent.performance}</p>
                   </div>
-                  <div className="p-4 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)]">
-                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">Attendance</p>
-                    <p className="text-sm font-bold text-green-500">94.5%</p>
+                  <div className="p-5 rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)]">
+                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-1.5">Class Attendance</p>
+                    <p className="text-2xl font-black text-green-500">94.5%</p>
                   </div>
                 </div>
               </div>
 
               {/* Details Content */}
-              <div className="flex-1 p-10 relative">
+              <div className="flex-1 p-8 lg:p-12 relative overflow-y-auto">
                 <button 
                   onClick={() => setSelectedStudent(null)}
-                  className="absolute top-8 right-8 p-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-red-500 transition-all"
+                  className="absolute top-8 right-8 p-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-red-500 hover:border-red-500/30 transition-all z-20"
                 >
                   <X size={20} strokeWidth={3} />
                 </button>
 
-                <h4 className="text-sm font-black uppercase tracking-[0.2em] text-[var(--text-secondary)] mb-8">Detailed Information</h4>
+                <div className="mb-10">
+                  <h4 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--accent)] mb-2">Student Profile</h4>
+                  <h2 className="text-2xl font-black text-[var(--text-primary)] italic uppercase">Complete Dossier</h2>
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   {[
-                    { label: "Parent Name", value: selectedStudent.parent, icon: User },
-                    { label: "Phone Number", value: selectedStudent.phone, icon: Phone },
-                    { label: "Email Address", value: selectedStudent.email, icon: Mail },
-                    { label: "Date of Birth", value: "12th Oct 2011", icon: Calendar },
-                    { label: "Gender / Blood", value: `${selectedStudent.gender} / ${selectedStudent.blood}`, icon: User },
-                    { label: "Address", value: selectedStudent.address, icon: MapPin },
+                    { label: "Parent / Guardian", value: selectedStudent.parent, icon: User },
+                    { label: "Emergency Contact", value: selectedStudent.phone, icon: Phone },
+                    { label: "Communication Email", value: selectedStudent.email, icon: Mail },
+                    { label: "Date of Birth", value: "12th October 2011", icon: Calendar },
+                    { label: "Gender & Blood Group", value: `${selectedStudent.gender} / ${selectedStudent.blood}`, icon: User },
+                    { label: "Residential Address", value: selectedStudent.address, icon: MapPin },
                   ].map((info, i) => (
-                    <div key={i} className="flex gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-[var(--bg-primary)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0">
-                        <info.icon size={18} />
+                    <div key={i} className="flex gap-5 group">
+                      <div className="w-12 h-12 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0 group-hover:border-[var(--accent)] transition-all">
+                        <info.icon size={22} strokeWidth={2.5} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">{info.label}</p>
-                        <p className="text-sm font-bold text-[var(--text-primary)] mt-0.5">{info.value}</p>
+                        <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">{info.label}</p>
+                        <p className="text-base font-bold text-[var(--text-primary)]">{info.value}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-[var(--border)] flex gap-4">
-                  <button className="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-primary)] font-black uppercase tracking-widest text-xs hover:border-[var(--accent)] transition-all">
-                    <FileText size={16} /> View Reports
+                <div className="mt-16 pt-10 border-t border-[var(--border)] flex flex-wrap gap-4">
+                  <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-primary)] font-black uppercase tracking-[0.2em] text-[10px] hover:border-[var(--accent)] transition-all">
+                    <FileText size={18} /> Detailed Reports
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-xs hover:shadow-xl hover:shadow-[var(--accent-glow)] transition-all">
-                    <Award size={16} /> Certificates
+                  <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-[var(--accent)] text-white font-black uppercase tracking-[0.2em] text-[10px] hover:shadow-2xl hover:shadow-[var(--accent-glow)] transition-all">
+                    <Award size={18} /> View Certificates
                   </button>
                 </div>
               </div>
 
-              <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-[var(--accent-glow)] rounded-full blur-3xl opacity-20 pointer-events-none" />
+              {/* Decorative background glow */}
+              <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-[var(--accent-glow)] rounded-full blur-[100px] opacity-10 pointer-events-none" />
             </motion.div>
           </div>
         )}

@@ -6,10 +6,6 @@ import {
   Calendar as CalendarIcon, 
   ChevronLeft, 
   ChevronRight, 
-  Star,
-  CheckCircle2,
-  Clock,
-  AlertCircle
 } from "lucide-react";
 
 const academicEvents = [
@@ -37,22 +33,22 @@ export default function CalendarSection() {
   const year = currentDate.getFullYear();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 max-h-[calc(100vh-140px)] overflow-y-auto pr-2 scrollbar-hide">
       {/* Compact Header */}
-      <div className="flex items-center justify-between bg-[var(--bg-secondary)] p-3 px-6 rounded-[24px] border border-[var(--border)]">
-        <div className="flex items-center gap-4">
-          <div className="p-2 rounded-xl bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent-glow)]">
-            <CalendarIcon size={18} />
+      <div className="flex items-center justify-between bg-[var(--bg-secondary)] p-2 px-4 rounded-[20px] border border-[var(--border)] sticky top-0 z-20 backdrop-blur-md bg-opacity-80">
+        <div className="flex items-center gap-3">
+          <div className="p-1.5 rounded-lg bg-[var(--accent)] text-white shadow-md">
+            <CalendarIcon size={14} />
           </div>
-          <h2 className="text-lg font-black italic uppercase tracking-tight text-[var(--text-primary)]">
-            {activeTab === 'academic' ? 'Academic' : 'Attendance'} <span className="text-[var(--accent)]">Schedule</span>
+          <h2 className="text-sm font-black italic uppercase tracking-tight text-[var(--text-primary)]">
+            {activeTab === 'academic' ? 'Academic' : 'Attendance'} <span className="text-[var(--accent)]">Hub</span>
           </h2>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-[var(--bg-primary)] p-1 rounded-xl border border-[var(--border)]">
+        <div className="flex items-center gap-1 bg-[var(--bg-primary)] p-0.5 rounded-lg border border-[var(--border)]">
           <button 
             onClick={() => setActiveTab("academic")}
-            className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${
               activeTab === "academic" ? "bg-[var(--accent)] text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
           >
@@ -60,39 +56,39 @@ export default function CalendarSection() {
           </button>
           <button 
             onClick={() => setActiveTab("attendance")}
-            className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${
               activeTab === "attendance" ? "bg-[var(--accent)] text-white" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             }`}
           >
-            My Attendance
+            Attendance
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Calendar Grid */}
-        <div className="lg:col-span-2 p-8 rounded-[40px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--card-shadow)]">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight italic">
+        <div className="lg:col-span-3 p-5 rounded-[32px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--card-shadow)]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight italic">
               {monthName} <span className="text-[var(--accent)]">{year}</span>
             </h3>
-            <div className="flex gap-2">
-              <button className="p-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] transition-all">
-                <ChevronLeft size={18} />
+            <div className="flex gap-1.5">
+              <button className="p-1.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] transition-all">
+                <ChevronLeft size={14} />
               </button>
-              <button className="p-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] transition-all">
-                <ChevronRight size={18} />
+              <button className="p-1.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] transition-all">
+                <ChevronRight size={14} />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-2 mb-2 text-center">
-            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
-              <div key={d} className="text-[10px] font-black text-[var(--text-secondary)] uppercase p-2">{d}</div>
+          <div className="grid grid-cols-7 gap-1.5 mb-1 text-center">
+            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+              <div key={`${d}-${i}`} className="text-[9px] font-black text-[var(--text-secondary)] uppercase p-1">{d}</div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-1.5">
             {[...Array(firstDayOfMonth)].map((_, i) => (
               <div key={`empty-${i}`} className="aspect-square" />
             ))}
@@ -105,21 +101,20 @@ export default function CalendarSection() {
               return (
                 <motion.div
                   key={day}
-                  whileHover={{ scale: 1.05 }}
-                  className={`aspect-square rounded-2xl border-2 flex flex-col items-center justify-center relative cursor-pointer transition-all ${
+                  className={`aspect-square rounded-xl border flex flex-col items-center justify-center relative cursor-pointer transition-all ${
                     day === 4 
-                      ? "bg-[var(--accent)] border-[var(--accent)] text-white shadow-lg shadow-[var(--accent-glow)]" 
+                      ? "bg-[var(--accent)] border-[var(--accent)] text-white shadow-md shadow-[var(--accent-glow)]" 
                       : "bg-[var(--bg-primary)] border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--accent)]"
                   }`}
                 >
-                  <span className="text-sm font-bold">{day}</span>
+                  <span className="text-xs font-bold">{day}</span>
                   
                   {activeTab === 'academic' && event && (
-                    <div className="absolute bottom-1.5 w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    <div className="absolute bottom-1 w-1 h-1 rounded-full bg-orange-500" />
                   )}
 
                   {activeTab === 'attendance' && attendanceStatus && (
-                    <div className={`absolute bottom-1.5 w-1.5 h-1.5 rounded-full ${
+                    <div className={`absolute bottom-1 w-1 h-1 rounded-full ${
                       attendanceStatus === 'present' ? 'bg-green-500' : 'bg-blue-500'
                     }`} />
                   )}
@@ -130,67 +125,49 @@ export default function CalendarSection() {
         </div>
 
         {/* Legend & Details */}
-        <div className="space-y-6">
-          <div className="p-8 rounded-[40px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--card-shadow)]">
-            <h4 className="text-sm font-black uppercase tracking-widest text-[var(--text-primary)] mb-6">Legend</h4>
-            <div className="space-y-4">
+        <div className="space-y-4">
+          <div className="p-5 rounded-[32px] bg-[var(--bg-secondary)] border border-[var(--border)]">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)] mb-4">Legend</h4>
+            <div className="space-y-3">
               {activeTab === 'academic' ? (
                 <>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-orange-500" />
-                    <span className="text-sm font-bold text-[var(--text-secondary)]">Examinations</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-orange-500" />
+                    <span className="text-[11px] font-bold text-[var(--text-secondary)]">Exams</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-blue-500" />
-                    <span className="text-sm font-bold text-[var(--text-secondary)]">Public Holidays</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                    <span className="text-[11px] font-bold text-[var(--text-secondary)]">Holidays</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-green-500" />
-                    <span className="text-sm font-bold text-[var(--text-secondary)]">School Events</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    <span className="text-[11px] font-bold text-[var(--text-secondary)]">Events</span>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-green-500" />
-                    <span className="text-sm font-bold text-[var(--text-secondary)]">Present</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    <span className="text-[11px] font-bold text-[var(--text-secondary)]">Present</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-red-500" />
-                    <span className="text-sm font-bold text-[var(--text-secondary)]">Absent</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                    <span className="text-[11px] font-bold text-[var(--text-secondary)]">Absent</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-blue-500" />
-                    <span className="text-sm font-bold text-[var(--text-secondary)]">Leave Approved</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                    <span className="text-[11px] font-bold text-[var(--text-secondary)]">Leave</span>
                   </div>
                 </>
               )}
             </div>
           </div>
 
-          <div className="p-8 rounded-[40px] bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] border border-[var(--border)] shadow-[var(--card-shadow)] relative overflow-hidden">
-            <div className="relative z-10">
-              <h4 className="text-sm font-black uppercase tracking-widest text-[var(--text-primary)] mb-4">Quick Insights</h4>
-              {activeTab === 'academic' ? (
-                <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)]">
-                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">Next Event</p>
-                    <p className="text-sm font-bold text-[var(--text-primary)]">Mid-Term Exams</p>
-                    <p className="text-xs text-[var(--accent)] font-bold mt-1 italic">Starts in 11 days</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)]">
-                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">Monthly %</p>
-                    <p className="text-lg font-black text-green-500">98%</p>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)]">
-                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase mb-1">Late Days</p>
-                    <p className="text-lg font-black text-orange-500">01</p>
-                  </div>
-                </div>
-              )}
+          <div className="p-5 rounded-[32px] bg-[var(--bg-primary)] border border-[var(--border)]">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)] mb-3">Next Event</h4>
+            <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)]">
+              <p className="text-[11px] font-bold text-[var(--text-primary)]">Mid-Term Exams</p>
+              <p className="text-[9px] text-[var(--accent)] font-black mt-0.5 uppercase">15 May 2026</p>
             </div>
           </div>
         </div>

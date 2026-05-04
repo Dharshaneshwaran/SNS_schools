@@ -103,16 +103,6 @@ export default function TeacherDashboard() {
         <TeacherHeader theme={theme} toggleTheme={toggleTheme} />
         
         <div className="p-6 lg:p-10 flex-1 max-w-[1600px] mx-auto w-full">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-baseline gap-4">
-              <h1 className="text-2xl lg:text-3xl font-black italic tracking-tight uppercase leading-none">
-                {activeTab} <span className="text-[var(--accent)]">Dashboard</span>
-              </h1>
-              <div className="h-1 w-1 rounded-full bg-[var(--border)]" />
-              <p className="text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-widest leading-none">AY 2026-27</p>
-            </div>
-          </div>
-
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
