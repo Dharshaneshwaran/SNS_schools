@@ -9,10 +9,8 @@ import {
   Clock, 
   ShieldCheck, 
   UserPlus, 
-  IdentificationCard,
   FileText,
   ListChecks,
-  ChartBar,
   DotsThreeVertical,
   MagnifyingGlass,
   Funnel,
@@ -31,16 +29,24 @@ import { EventsGallery } from "./events-gallery";
 import { getAllUsers } from "../../services/users-service";
 import Link from "next/link";
 
+interface DashboardUser {
+  name: string;
+  email: string;
+  department: string;
+  status: string;
+  role: string;
+}
+
 export function AdminDashboard() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<DashboardUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const data = await getAllUsers();
+        const data = await getAllUsers() as DashboardUser[];
         // Filter for students (parents in current role mapping)
-        const students = data.filter((u: any) => u.role === "parent");
+        const students = data.filter((u: DashboardUser) => u.role === "parent");
         setUsers(students);
       } catch (err) {
         console.error("Failed to fetch users", err);
@@ -62,7 +68,7 @@ export function AdminDashboard() {
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Admin Command Center</h1>
         </div>
         <p className="text-slate-500 text-sm max-w-2xl">
-          Welcome back, Admin. Here's a real-time snapshot of SNS Academy's operations across staff, students, and academic compliance.
+          Welcome back, Admin. Here&apos;s a real-time snapshot of SNS Academy&apos;s operations across staff, students, and academic compliance.
         </p>
       </section>
 
@@ -223,7 +229,7 @@ export function AdminDashboard() {
                     </tr>
                   ) : users.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-10 text-center text-slate-400 font-medium">No students found. Use "Admission" to add one.</td>
+                      <td colSpan={5} className="py-10 text-center text-slate-400 font-medium">No students found. Use &quot;Admission&quot; to add one.</td>
                     </tr>
                   ) : users.map((student, i) => (
                     <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group">

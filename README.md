@@ -35,7 +35,7 @@ All test configurations leverage the shared core password: `ChangeMe123!`
 | Role Scope | Targeted Email Account |
 |---|---|
 | **Superadmin** | `superadmin@sns-erp.local` |
-| **Admin** | `admin@sns-erp.local` |
+| **Admin** | `admin@sns-erp.local` |check thee flu
 | **Leader** | `leader@sns-erp.local` |
 | **Teacher** | `teacher@sns-erp.local` |
 | **Parent** | `1234567890` |
