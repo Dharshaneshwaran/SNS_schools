@@ -132,7 +132,7 @@ export function CalendarPage() {
       title="School Calendar"
       description="Manage the official school timeline, schedule events, and broadcast academic dates to the community."
     >
-      <div className="flex flex-col gap-6 -mt-6">
+      <div className="flex flex-col gap-6">
         {/* Unified Calendar Card */}
         <div className="w-full rounded-[2.5rem] border border-slate-200 bg-white shadow-2xl shadow-slate-200/40 overflow-hidden flex flex-col">
           {/* Unified Top Header: Title + Month Controls */}
@@ -190,7 +190,7 @@ export function CalendarPage() {
                 return (
                   <div 
                     key={idx} 
-                    className={`min-h-[120px] flex-1 p-1 border-r border-b border-slate-100 relative transition-colors flex flex-col ${day ? 'bg-white hover:bg-slate-50/30' : 'bg-slate-50/20'}`}
+                    className={`min-h-[100px] flex-1 p-1 border-r border-b border-slate-100 relative transition-colors flex flex-col ${day ? 'bg-white hover:bg-slate-50/30' : 'bg-slate-50/20'}`}
                   >
                     {day && (
                       <>

@@ -41,9 +41,11 @@ export type TimetableData = {
   schedule: {
     day: string;
     periods: {
-      slot: string;
+      time: string;
       subject: string;
       teacher: string;
+      grade: string;
+      room: string;
     }[];
   }[];
 };
@@ -65,6 +67,21 @@ export type AttendanceData = {
     expected: string;
     actual: string;
   }[];
+  classWiseAttendance: {
+    class: string;
+    total: number;
+    present: number;
+    absent: number;
+    percentage: string;
+  }[];
+  studentsAttendance: {
+    [className: string]: {
+      rollNo: string;
+      name: string;
+      status: string;
+      photo: string;
+    }[];
+  };
 };
 
 export type SubstitutionsData = {
