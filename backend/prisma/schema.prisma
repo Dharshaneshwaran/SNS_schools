@@ -34,12 +34,41 @@ model TeacherProfile {
 }
 
 model StudentProfile {
-  id        String @id @default(uuid())
-  userId    String @unique
-  studentId String @unique
-  class     String
-  section   String
-  user      User   @relation(fields: [userId], references: [id])
+  id                   String @id @default(uuid())
+  userId               String @unique
+  studentId            String @unique
+  class                String
+  section              String
+  admissionNo          String?
+  applicationNo        String?
+  gender               String?
+  dob                  String?
+  birthCertNo          String?
+  nationality          String?
+  religion             String?
+  community            String?
+  bloodGroup           String?
+  presentSchool        String?
+  previousGrade        String?
+  boardOfEducation     String?
+  motherTongue         String?
+  fatherName           String?
+  fatherContact        String?
+  fatherEmail          String?
+  fatherEducation      String?
+  fatherOccupation     String?
+  fatherOrganization   String?
+  fatherDesignation    String?
+  fatherOfficeAddress  String?
+  motherName           String?
+  motherContact        String?
+  motherEmail          String?
+  motherEducation      String?
+  motherOccupation     String?
+  motherOrganization   String?
+  motherDesignation    String?
+  motherOfficeAddress  String?
+  user                 User   @relation(fields: [userId], references: [id])
 }
 
 model Group {

@@ -20,15 +20,7 @@ export function createTeacher(data: {
   });
 }
 
-export function createStudent(data: {
-  name: string;
-  email: string;
-  department: string;
-  studentId: string;
-  class: string;
-  section: string;
-  password?: string;
-}) {
+export function createStudent(data: any) {
   const session = readSession();
   return apiRequest("/users/student", {
     method: "POST",

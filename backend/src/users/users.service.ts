@@ -130,15 +130,7 @@ export class UsersService implements OnModuleInit {
     });
   }
 
-  async createStudent(data: {
-    name: string;
-    email: string;
-    department: string;
-    studentId: string;
-    class: string;
-    section: string;
-    password?: string;
-  }) {
+  async createStudent(data: any) {
     return this.prisma.user.create({
       data: {
         name: data.name,
@@ -152,6 +144,35 @@ export class UsersService implements OnModuleInit {
             studentId: data.studentId,
             class: data.class,
             section: data.section,
+            admissionNo: data.admissionNo,
+            applicationNo: data.applicationNo,
+            gender: data.gender,
+            dob: data.dob,
+            birthCertNo: data.birthCertNo,
+            nationality: data.nationality,
+            religion: data.religion,
+            community: data.community,
+            bloodGroup: data.bloodGroup,
+            presentSchool: data.presentSchool,
+            previousGrade: data.previousGrade,
+            boardOfEducation: data.boardOfEducation,
+            motherTongue: data.motherTongue,
+            fatherName: data.fatherName,
+            fatherContact: data.fatherContact,
+            fatherEmail: data.fatherEmail,
+            fatherEducation: data.fatherEducation,
+            fatherOccupation: data.fatherOccupation,
+            fatherOrganization: data.fatherOrganization,
+            fatherDesignation: data.fatherDesignation,
+            fatherOfficeAddress: data.fatherOfficeAddress,
+            motherName: data.motherName,
+            motherContact: data.motherContact,
+            motherEmail: data.motherEmail,
+            motherEducation: data.motherEducation,
+            motherOccupation: data.motherOccupation,
+            motherOrganization: data.motherOrganization,
+            motherDesignation: data.motherDesignation,
+            motherOfficeAddress: data.motherOfficeAddress,
           },
         },
       },

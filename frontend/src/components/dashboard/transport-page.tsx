@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Bus, 
   MapPin, 
@@ -10,9 +10,12 @@ import {
   NavigationArrow,
   CheckCircle,
   Warning,
-  MagnifyingGlass
+  MagnifyingGlass,
+  XCircle,
+  UserCircle
 } from "@phosphor-icons/react";
 import { PageSection } from "./page-section";
+import { getAllUsers } from "../../services/users-service";
 
 const routes = [
   { id: "R-101", name: "North Zone Circuit", driver: "Somnath P.", status: "On Route", students: 42, color: "#FF7F50" },
@@ -23,6 +26,32 @@ const routes = [
 
 export function TransportPage() {
   const [selectedRoute, setSelectedRoute] = useState(routes[0]);
+  const [showManifestModal, setShowManifestModal] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+  const openManifestModal = async () => {
+    setShowManifestModal(true);
+    setIsLoadingUsers(true);
+    try {
+      const data = await getAllUsers() as any[];
+      // Filter for active students who have the transport feature toggled on
+      const mapped = data.map(u => ({
+        id: u.studentProfile?.studentId || u.teacherProfile?.employeeId || u.id.slice(0, 8),
+        dbId: u.id,
+        name: u.name,
+        role: u.role === 'parent' ? 'Student' : u.role.charAt(0).toUpperCase() + u.role.slice(1),
+        status: u.status === 'active' ? 'Active' : 'Inactive',
+        features: ["Transport", "Attendance"].filter(() => Math.random() > 0.3), // Mock features
+        busAssigned: null
+      })).filter(u => u.role === 'Student' && u.features.includes("Transport"));
+      setUsers(mapped);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
 
   return (
     <PageSection
@@ -30,6 +59,108 @@ export function TransportPage() {
       title="Transport Management"
       description="Monitor school bus fleet, manage student assignments, and track routes in real-time."
     >
+      <AnimatePresence>
+        {showManifestModal && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowManifestModal(false)}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" 
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-4xl max-h-[90vh] bg-white border border-slate-100 rounded-[2.5rem] shadow-[0_20px_60px_rgba(15,23,42,0.1)] relative overflow-hidden flex flex-col z-10"
+              onClick={e => e.stopPropagation()}
+            >
+               <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                  <div className="flex items-center gap-4">
+                     <div className="p-3 bg-[#FF7F50]/10 text-[#FF7F50] rounded-2xl"><Users size={28} weight="fill" /></div>
+                     <div>
+                        <h2 className="text-2xl font-black text-slate-900">Route Manifest</h2>
+                        <p className="text-sm font-bold text-slate-500 mt-1">Assign transport-enrolled students to buses</p>
+                     </div>
+                  </div>
+                  <button 
+                    onClick={() => setShowManifestModal(false)}
+                    className="p-3 rounded-full bg-white text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all shadow-sm"
+                  >
+                    <XCircle size={24} weight="fill" />
+                  </button>
+               </div>
+               
+               <div className="p-8 overflow-y-auto flex-1 bg-white">
+                 {isLoadingUsers ? (
+                   <div className="py-20 flex flex-col items-center gap-4">
+                     <div className="w-8 h-8 border-4 border-[#FF7F50] border-t-transparent rounded-full animate-spin" />
+                     <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Syncing Database...</p>
+                   </div>
+                 ) : (
+                   <div className="space-y-4">
+                     {users.map(user => (
+                       <div key={user.dbId} className="flex items-center justify-between p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:border-slate-200 transition-colors">
+                          <div className="flex items-center gap-4">
+                             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-300 shadow-sm border border-slate-100">
+                                <UserCircle size={24} weight="duotone" />
+                             </div>
+                             <div>
+                                <p className="text-sm font-bold text-slate-900">{user.name}</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user.id}</p>
+                             </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                             <select
+                               value={user.busAssigned || ""}
+                               onChange={(e) => {
+                                 setUsers(users.map(u => u.dbId === user.dbId ? { ...u, busAssigned: e.target.value } : u));
+                               }}
+                               className={`px-4 py-2 rounded-xl text-xs font-bold outline-none cursor-pointer border transition-all ${
+                                 user.busAssigned 
+                                   ? "border-[#FF7F50] bg-[#FF7F50]/10 text-[#FF7F50]" 
+                                   : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
+                               }`}
+                             >
+                               <option value="">Unassigned</option>
+                               {routes.map(r => (
+                                 <option key={r.id} value={r.id}>{r.id} - {r.name}</option>
+                               ))}
+                             </select>
+                          </div>
+                       </div>
+                     ))}
+                     {users.length === 0 && (
+                        <div className="py-20 text-center space-y-4 flex flex-col items-center">
+                           <div className="p-4 rounded-full bg-slate-50 text-slate-300">
+                             <Users size={40} weight="duotone" />
+                           </div>
+                           <div>
+                             <h4 className="text-lg font-bold text-slate-900">No Students Found</h4>
+                             <p className="text-slate-400 font-medium text-sm mt-1">No active students have the Transport feature enabled.</p>
+                           </div>
+                        </div>
+                     )}
+                   </div>
+                 )}
+               </div>
+               
+               {/* Modal Action Footer */}
+               <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+                 <button 
+                   onClick={() => setShowManifestModal(false)}
+                   className="px-8 py-4 bg-[#FF7F50] hover:bg-[#FF6A00] text-white font-black uppercase tracking-widest text-xs rounded-2xl shadow-xl shadow-[#FF7F50]/20 transition-all"
+                 >
+                   Save & Close
+                 </button>
+               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         
         {/* Left: Route List */}
@@ -145,7 +276,7 @@ export function TransportPage() {
 
            {/* Quick Actions Bar */}
            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button className="p-6 rounded-3xl bg-white border border-slate-100 shadow-lg hover:shadow-xl hover:border-[#FF7F50]/30 transition-all text-center group">
+              <button onClick={openManifestModal} className="p-6 rounded-3xl bg-white border border-slate-100 shadow-lg hover:shadow-xl hover:border-[#FF7F50]/30 transition-all text-center group">
                  <Users size={32} className="text-slate-300 group-hover:text-[#FF7F50] mx-auto mb-3" weight="duotone" />
                  <div className="font-bold text-slate-900">Assign Students</div>
                  <p className="text-[10px] text-slate-400 uppercase tracking-tighter">Manage route manifest</p>
