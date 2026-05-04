@@ -17,7 +17,8 @@ import {
   Bell,
   Lock,
   ShieldCheck,
-  SignOut
+  SignOut,
+  User
 } from "@phosphor-icons/react";
 import { useAuth } from "../../hooks/use-auth";
 
@@ -142,7 +143,7 @@ export function ChatPage() {
     setFetchError(null);
     try {
       const { getAllUsers } = await import("../../services/users-service");
-      const users = await getAllUsers();
+      const users = (await getAllUsers()) as any[];
       setAllUsers(users);
     } catch (err) {
       console.error("Failed to fetch users", err);

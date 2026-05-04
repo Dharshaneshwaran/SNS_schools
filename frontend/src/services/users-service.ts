@@ -8,6 +8,7 @@ export function createTeacher(data: {
   employeeId: string;
   designation: string;
   specialization: string;
+  password?: string;
 }) {
   const session = readSession();
   return apiRequest("/users/teacher", {
@@ -26,6 +27,7 @@ export function createStudent(data: {
   studentId: string;
   class: string;
   section: string;
+  password?: string;
 }) {
   const session = readSession();
   return apiRequest("/users/student", {

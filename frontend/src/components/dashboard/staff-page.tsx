@@ -24,6 +24,8 @@ export function StaffPage() {
     email: "",
     phone: "",
     department: "",
+    employeeId: "",
+    password: "",
     role: "teacher",
     permissions: ["view_attendance", "view_reports"]
   });
@@ -39,9 +41,10 @@ export function StaffPage() {
         name: formData.fullName,
         email: formData.email,
         department: formData.department,
-        employeeId: `STAFF-${Math.floor(Math.random() * 10000)}`, // Temporary mock ID or add field
+        employeeId: formData.employeeId || `STAFF-${Math.floor(Math.random() * 10000)}`,
         designation: "Faculty",
         specialization: formData.department,
+        password: formData.password,
       });
       setStep(3);
     } catch (error) {
@@ -75,7 +78,7 @@ export function StaffPage() {
              </div>
              <div className="flex gap-2">
                 {[1, 2, 3].map((s) => (
-                  <div key={s} className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step >= s ? "bg-[#FF7F50]" : "bg-slate-200"}`} />
+                   <div key={s} className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step >= s ? "bg-[#FF7F50]" : "bg-slate-200"}`} />
                 ))}
              </div>
           </div>
@@ -84,11 +87,11 @@ export function StaffPage() {
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <motion.div 
-                  key="step1"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="space-y-8"
+                   key="step1"
+                   initial={{ opacity: 0, y: 10 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, y: -10 }}
+                   className="space-y-8"
                 >
                   <div className="flex items-center gap-3 text-[#FF7F50] mb-2">
                      <IdentificationCard size={24} weight="duotone" />
@@ -107,6 +110,19 @@ export function StaffPage() {
                       placeholder="sarah.c@sns-academy.edu" 
                       value={formData.email}
                       onChange={(val) => setFormData({...formData, email: val})}
+                    />
+                    <InputField 
+                      label="Employee ID" 
+                      placeholder="e.g. SNS-T-2024" 
+                      value={formData.employeeId}
+                      onChange={(val) => setFormData({...formData, employeeId: val})}
+                    />
+                    <InputField 
+                      label="Account Password" 
+                      placeholder="••••••••" 
+                      type="password"
+                      value={formData.password}
+                      onChange={(val) => setFormData({...formData, password: val})}
                     />
                     <InputField 
                       label="Phone Number" 
@@ -133,7 +149,7 @@ export function StaffPage() {
                   <div className="flex justify-end pt-4">
                     <button 
                       onClick={nextStep}
-                      disabled={!formData.fullName || !formData.email}
+                      disabled={!formData.fullName || !formData.email || !formData.employeeId || !formData.password}
                       className="flex items-center gap-2 px-10 py-4 bg-[#FF7F50] text-white rounded-2xl font-bold shadow-lg shadow-[#FF7F50]/30 hover:bg-[#e66a3e] transition-all disabled:opacity-50"
                     >
                       Set Permissions <CaretRight size={20} />

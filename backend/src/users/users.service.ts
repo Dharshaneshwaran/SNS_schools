@@ -88,12 +88,13 @@ export class UsersService implements OnModuleInit {
     employeeId: string;
     designation: string;
     specialization: string;
+    password?: string;
   }) {
     return this.prisma.user.create({
       data: {
         name: data.name,
         email: data.email.toLowerCase(),
-        password: process.env.DEMO_USER_PASSWORD ?? 'ChangeMe123!',
+        password: data.password || process.env.DEMO_USER_PASSWORD || 'ChangeMe123!',
         role: 'teacher',
         department: data.department,
         status: 'active',
@@ -115,12 +116,13 @@ export class UsersService implements OnModuleInit {
     studentId: string;
     class: string;
     section: string;
+    password?: string;
   }) {
     return this.prisma.user.create({
       data: {
         name: data.name,
         email: data.email.toLowerCase(),
-        password: process.env.DEMO_USER_PASSWORD ?? 'ChangeMe123!',
+        password: data.password || process.env.DEMO_USER_PASSWORD || 'ChangeMe123!',
         role: 'parent',
         department: data.department,
         status: 'active',

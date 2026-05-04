@@ -3,9 +3,75 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  password       String
+  role           Role            @default(parent)
+  department     String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  status         UserStatus      @default(active)
+  groups         GroupMember[]
+  sentMessages   Message[]       @relation("SentMessages")
+  studentProfile StudentProfile?
+  teacherProfile TeacherProfile?
+}
+
+model TeacherProfile {
+  id             String @id @default(uuid())
+  userId         String @unique
+  employeeId     String @unique
+  designation    String
+  specialization String
+  user           User   @relation(fields: [userId], references: [id])
+}
+
+model StudentProfile {
+  id        String @id @default(uuid())
+  userId    String @unique
+  studentId String @unique
+  class     String
+  section   String
+  user      User   @relation(fields: [userId], references: [id])
+}
+
+model Group {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  members     GroupMember[]
+  messages    Message[]
+}
+
+model GroupMember {
+  id        String   @id @default(uuid())
+  userId    String
+  groupId   String
+  role      String   @default("member")
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, groupId])
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  text      String
+  senderId  String
+  groupId   String
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id])
+  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
 }
 
 enum Role {
@@ -19,75 +85,4 @@ enum Role {
 enum UserStatus {
   active
   away
-}
-
-model User {
-  id         String     @id @default(uuid())
-  name       String
-  email      String     @unique
-  password   String
-  role       Role       @default(parent)
-  department String
-  status     UserStatus @default(active)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-
-  teacherProfile TeacherProfile?
-  studentProfile StudentProfile?
-  
-  groups         GroupMember[]
-  sentMessages   Message[]    @relation("SentMessages")
-}
-
-model TeacherProfile {
-  id           String @id @default(uuid())
-  userId       String @unique
-  user         User   @relation(fields: [userId], references: [id])
-  employeeId   String @unique
-  designation  String
-  specialization String
-}
-
-model StudentProfile {
-  id           String @id @default(uuid())
-  userId       String @unique
-  user         User   @relation(fields: [userId], references: [id])
-  studentId    String @unique
-  class        String
-  section      String
-}
-
-model Group {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  members     GroupMember[]
-  messages    Message[]
-}
-
-model GroupMember {
-  id        String   @id @default(uuid())
-  userId    String
-  groupId   String
-  role      String   @default("member") // member, admin
-  createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id])
-  group     Group    @relation(fields: [groupId], references: [id])
-
-  @@unique([userId, groupId])
-}
-
-model Message {
-  id        String   @id @default(uuid())
-  text      String
-  senderId  String
-  groupId   String
-  createdAt DateTime @default(now())
-
-  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
-  group     Group    @relation(fields: [groupId], references: [id])
 }

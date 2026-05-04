@@ -30,7 +30,7 @@ const initialSchedule = [
 export function TimetablePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [schedule] = useState(initialSchedule);
-  const { data, isLoading, error } = useAuthResource("timetable", getTimetable);
+  const { data, isLoading, error } = useAuthResource(getTimetable);
 
   // Define headers for the periods
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
