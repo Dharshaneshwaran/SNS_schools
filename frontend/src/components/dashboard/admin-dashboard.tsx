@@ -9,10 +9,8 @@ import {
   Clock, 
   ShieldCheck, 
   UserPlus, 
-  IdentificationCard,
   FileText,
   ListChecks,
-  ChartBar,
   DotsThreeVertical,
   MagnifyingGlass,
   Funnel,
@@ -25,13 +23,43 @@ import {
   Student,
   ChatCircleDots
 } from "@phosphor-icons/react";
+import { useState, useEffect } from "react";
 import { AdminStatCard } from "./admin-stat-card";
 import { EventsGallery } from "./events-gallery";
+import { getAllUsers } from "../../services/users-service";
+import Link from "next/link";
+
+interface DashboardUser {
+  name: string;
+  email: string;
+  department: string;
+  status: string;
+  role: string;
+}
 
 export function AdminDashboard() {
+  const [users, setUsers] = useState<DashboardUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const data = await getAllUsers() as DashboardUser[];
+        // Filter for students (parents in current role mapping)
+        const students = data.filter((u: DashboardUser) => u.role === "parent");
+        setUsers(students);
+      } catch (err) {
+        console.error("Failed to fetch users", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchUsers();
+  }, []);
+
   return (
     <div className="flex flex-col gap-8 pb-12">
-      {/* ── Header Section ── */}
+      {/* ... (rest of header/stats) */}
       <section className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF7F50]/10 border border-[#FF7F50]/20">
@@ -40,15 +68,15 @@ export function AdminDashboard() {
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Admin Command Center</h1>
         </div>
         <p className="text-slate-500 text-sm max-w-2xl">
-          Welcome back, Admin. Here's a real-time snapshot of SNS Academy's operations across staff, students, and academic compliance.
+          Welcome back, Admin. Here&apos;s a real-time snapshot of SNS Academy&apos;s operations across staff, students, and academic compliance.
         </p>
       </section>
 
-      {/* ── Stats Grid ── */}
+      {/* Stats Grid */}
       <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <AdminStatCard 
           label="Total Students" 
-          value="1,284" 
+          value={isLoading ? "..." : users.length.toLocaleString()} 
           change="+12" 
           trend="up" 
           icon={<Users size={24} />} 
@@ -76,14 +104,14 @@ export function AdminDashboard() {
         />
       </section>
 
-      {/* ── Main Dashboard Layout ── */}
+      {/* Main Dashboard Layout */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         
         {/* Left Column: Management & Analytics */}
         <div className="lg:col-span-8 flex flex-col gap-8">
           
           {/* Quick Actions Hub */}
-          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 p-8 shadow-[0_24px_70px_rgba(15,23,42,0.05)] sm:p-10">
+          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 p-8 shadow-[0_24px_70_rgba(15,23,42,0.05)] sm:p-10">
             <h3 className="text-lg font-semibold text-slate-900 mb-8 flex items-center gap-2">
               <ListChecks size={20} className="text-[#FF7F50]" />
               System Modules
@@ -93,67 +121,79 @@ export function AdminDashboard() {
                 icon={<Bell size={28} weight="duotone" />} 
                 label="Notifications" 
                 description="Broadcast messages"
+                href="/dashboard/notifications"
               />
               <ManagementAction 
                 icon={<UserList size={28} weight="duotone" />} 
                 label="Attendance" 
                 description="Track presence"
+                href="/dashboard/attendance"
               />
               <ManagementAction 
                 icon={<Users size={28} weight="duotone" />} 
                 label="Users" 
                 description="Manage students/staff"
+                href="/dashboard/users"
               />
               <ManagementAction 
                 icon={<GraduationCap size={28} weight="duotone" />} 
                 label="Results" 
                 description="Publish marks"
+                href="/dashboard/results"
               />
               <ManagementAction 
                 icon={<Bus size={28} weight="duotone" />} 
                 label="Transport" 
                 description="Track bus routes"
+                href="/dashboard/transport"
               />
               <ManagementAction 
                 icon={<Calendar size={28} weight="duotone" />} 
                 label="Timetable" 
                 description="Set schedules"
+                href="/dashboard/timetable"
               />
               <ManagementAction 
                 icon={<CalendarCheck size={28} weight="duotone" />} 
                 label="Calendar" 
                 description="Add school events"
+                href="/dashboard/calendar"
               />
               <ManagementAction 
                 icon={<UserPlus size={28} weight="duotone" />} 
                 label="Admission" 
                 description="New enrollment"
+                href="/dashboard/admission"
               />
               <ManagementAction 
                 icon={<ChalkboardTeacher size={28} weight="duotone" />} 
                 label="Staff" 
                 description="Faculty management"
+                href="/dashboard/staff"
               />
               <ManagementAction 
                 icon={<Student size={28} weight="duotone" />} 
                 label="Alumni" 
                 description="Past students"
+                href="/dashboard/alumni"
               />
               <ManagementAction 
                 icon={<FileText size={28} weight="duotone" />} 
                 label="Reports" 
                 description="Generate data"
+                href="/dashboard/reports"
               />
               <ManagementAction 
                 icon={<ChatCircleDots size={28} weight="duotone" />} 
                 label="Chat" 
                 description="Direct messaging"
+                href="/dashboard/chat"
               />
             </div>
           </div>
 
           {/* Student Roster Section */}
-          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 p-8 shadow-[0_24px_70px_rgba(15,23,42,0.05)]">
+          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 p-8 shadow-[0_24px_70_rgba(15,23,42,0.05)]">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-lg font-semibold text-slate-900">Student Roster</h3>
               <div className="flex gap-3">
@@ -176,26 +216,29 @@ export function AdminDashboard() {
                 <thead>
                   <tr className="text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">
                     <th className="pb-4 font-bold">Student Name</th>
-                    <th className="pb-4 font-bold">ID</th>
-                    <th className="pb-4 font-bold">Class</th>
+                    <th className="pb-4 font-bold">Email</th>
+                    <th className="pb-4 font-bold">Department</th>
                     <th className="pb-4 font-bold">Status</th>
                     <th className="pb-4 font-bold text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
-                  {[
-                    { name: "Arjun Sharma", id: "SNS-2024-001", class: "Class 8 - Sec A", status: "Active" },
-                    { name: "Priya Patel", id: "SNS-2024-012", class: "Class 10 - Sec B", status: "Active" },
-                    { name: "Rohan Gupta", id: "SNS-2024-045", class: "Class 9 - Sec C", status: "On Leave" },
-                    { name: "Meera Reddy", id: "SNS-2024-089", class: "Class 7 - Sec A", status: "Active" },
-                  ].map((student, i) => (
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={5} className="py-10 text-center text-slate-400 font-medium">Loading records from database...</td>
+                    </tr>
+                  ) : users.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-10 text-center text-slate-400 font-medium">No students found. Use &quot;Admission&quot; to add one.</td>
+                    </tr>
+                  ) : users.map((student, i) => (
                     <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group">
                       <td className="py-4 font-semibold text-slate-900">{student.name}</td>
-                      <td className="py-4 text-slate-500">{student.id}</td>
-                      <td className="py-4 text-slate-500">{student.class}</td>
+                      <td className="py-4 text-slate-500">{student.email}</td>
+                      <td className="py-4 text-slate-500">{student.department}</td>
                       <td className="py-4">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          student.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                          student.status?.toLowerCase() === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
                         }`}>
                           {student.status}
                         </span>
@@ -213,7 +256,7 @@ export function AdminDashboard() {
           <EventsGallery />
 
           {/* Activity Log / Trends Mockup */}
-          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 p-8 shadow-[0_24px_70px_rgba(15,23,42,0.05)]">
+          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 p-8 shadow-[0_24px_70_rgba(15,23,42,0.05)]">
              <div className="flex items-center justify-between mb-8">
                <h3 className="text-lg font-semibold text-slate-900">Attendance Trends</h3>
                <div className="flex gap-2">
@@ -251,7 +294,7 @@ export function AdminDashboard() {
         <div className="lg:col-span-4 flex flex-col gap-8">
           
           {/* Approval Queue */}
-          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 p-8 shadow-[0_24px_70px_rgba(15,23,42,0.05)] flex flex-col gap-6">
+          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 p-8 shadow-[0_24px_70_rgba(15,23,42,0.05)] flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-slate-900">Pending Approvals</h3>
               <span className="text-[10px] bg-[#FF7F50]/10 text-[#FF7F50] px-2 py-1 rounded-full font-bold uppercase tracking-wider">28 NEW</span>
@@ -281,7 +324,7 @@ export function AdminDashboard() {
           </div>
 
           {/* System Health */}
-          <div className="rounded-[2rem] bg-gradient-to-br from-[#FF7F50]/5 to-white border border-[#FF7F50]/20 p-8 shadow-[0_24px_70px_rgba(255,127,80,0.05)]">
+          <div className="rounded-[2rem] bg-gradient-to-br from-[#FF7F50]/5 to-white border border-[#FF7F50]/20 p-8 shadow-[0_24px_70_rgba(255,127,80,0.05)]">
              <div className="flex items-center gap-3 mb-6">
                 <TrendUp size={24} className="text-[#FF7F50]" />
                 <h3 className="text-lg font-semibold text-slate-900">System Pulse</h3>
@@ -299,20 +342,22 @@ export function AdminDashboard() {
   );
 }
 
-function ManagementAction({ icon, label, description }: { icon: React.ReactNode, label: string, description: string }) {
+function ManagementAction({ icon, label, description, href }: { icon: React.ReactNode, label: string, description: string, href: string }) {
   return (
-    <motion.button 
-      whileHover={{ y: -5 }}
-      className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-[#FF7F50]/30 hover:bg-white hover:shadow-xl transition-all text-center group"
-    >
-      <div className="text-slate-400 group-hover:text-[#FF7F50] transition-colors">
-        {icon}
-      </div>
-      <div>
-        <div className="text-sm font-bold text-slate-900 mb-0.5">{label}</div>
-        <div className="text-[10px] text-slate-500 uppercase tracking-tighter">{description}</div>
-      </div>
-    </motion.button>
+    <Link href={href}>
+      <motion.div 
+        whileHover={{ y: -5 }}
+        className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-[#FF7F50]/30 hover:bg-white hover:shadow-xl transition-all text-center group h-full cursor-pointer"
+      >
+        <div className="text-slate-400 group-hover:text-[#FF7F50] transition-colors">
+          {icon}
+        </div>
+        <div>
+          <div className="text-sm font-bold text-slate-900 mb-0.5">{label}</div>
+          <div className="text-[10px] text-slate-500 uppercase tracking-tighter">{description}</div>
+        </div>
+      </motion.div>
+    </Link>
   );
 }
 

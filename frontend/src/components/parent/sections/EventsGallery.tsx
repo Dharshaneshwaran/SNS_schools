@@ -209,7 +209,7 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
         ))}
       </div>
 
-      {/* Grid Feed */}
+      {/* Feed - Instagram/LinkedIn Style Post Grid */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",

@@ -7,21 +7,41 @@ import { AuthGuard } from '../common/guards/auth.guard';
 export class MessagingController {
   constructor(private readonly messagingService: MessagingService) {}
 
-  @Get('conversations')
-  getConversations(@Req() req: any) {
-    const userId = req.user.sub;
-    return this.messagingService.getConversations(userId);
+  @Get('groups')
+  async getGroups(@Req() req: any) {
+    return this.messagingService.getGroups(req.user.sub);
   }
 
-  @Get('history/:recipientId')
-  getHistory(@Req() req: any, @Param('recipientId') recipientId: string) {
-    const userId = req.user.sub;
-    return this.messagingService.getMessagesBetweenUsers(userId, recipientId);
+  @Get('messages/:groupId')
+  async getMessages(@Param('groupId') groupId: string) {
+    return this.messagingService.getMessages(groupId);
+  }
+
+  @Post('groups')
+  async createGroup(
+    @Req() req: any,
+    @Body() body: { name: string; description: string },
+  ) {
+    return this.messagingService.createGroup(
+      body.name,
+      body.description,
+      req.user.sub,
+    );
+  }
+
+  @Post('groups/:groupId/members')
+  async addMember(
+    @Param('groupId') groupId: string,
+    @Body() body: { userId: string },
+  ) {
+    return this.messagingService.addMember(groupId, body.userId);
   }
 
   @Post('send')
-  sendMessage(@Req() req: any, @Body() body: { recipientId: string; text: string }) {
-    const userId = req.user.sub;
-    return this.messagingService.sendMessage(userId, body.recipientId, body.text);
+  async sendMessage(
+    @Req() req: any,
+    @Body() body: { groupId: string; text: string },
+  ) {
+    return this.messagingService.sendMessage(req.user.sub, body.groupId, body.text);
   }
 }

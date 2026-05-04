@@ -1,128 +1,150 @@
-import { Injectable } from '@nestjs/common';
-import type { AuthUser } from '../auth/auth.types';
-import type { AppRole } from '../common/constants/roles';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import { AuthUser } from '../auth/auth.types';
 
 @Injectable()
-export class UsersService {
-  private readonly users: AuthUser[] = this.buildSeedUsers();
-  
-  findAll() {
-    return this.users;
+export class UsersService implements OnModuleInit {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async onModuleInit() {
+    await this.seedAdmin();
   }
 
-  findByEmail(email: string) {
-    return (
-      this.users.find((user) => user.email === email.toLowerCase()) ?? null
-    );
+  private async seedAdmin() {
+    const adminEmail = process.env.DEMO_USER_EMAIL ?? 'admin@sns-erp.local';
+    const existing = await this.prisma.user.findUnique({
+      where: { email: adminEmail.toLowerCase() },
+    });
+
+    if (!existing) {
+      await this.prisma.user.create({
+        data: {
+          email: adminEmail.toLowerCase(),
+          password: process.env.DEMO_USER_PASSWORD ?? 'ChangeMe123!',
+          name: process.env.DEMO_USER_NAME ?? 'SNS ERP Admin',
+          role: 'admin',
+          department: 'Administration',
+          status: 'active',
+        },
+      });
+    }
   }
 
-  findById(id: string) {
-    return this.users.find((user) => user.id === id) ?? null;
+  async findAll() {
+    const users = await this.prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    return users.map(this.mapUser);
   }
 
-  updatePassword(id: string, newPassword: string): boolean {
-    const user = this.findById(id);
-    if (!user) return false;
-    user.password = newPassword;
-    return true;
+  async findByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+    return user ? this.mapUser(user) : null;
   }
 
-  updateProfile(
+  async findById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    return user ? this.mapUser(user) : null;
+  }
+
+  async updatePassword(id: string, newPassword: string): Promise<boolean> {
+    try {
+      await this.prisma.user.update({
+        where: { id },
+        data: { password: newPassword },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async updateProfile(
     id: string,
     data: { name?: string; email?: string },
-  ): boolean {
-    const user = this.findById(id);
-    if (!user) return false;
-    if (data.name) user.name = data.name;
-    if (data.email) user.email = data.email.toLowerCase();
-    return true;
+  ): Promise<boolean> {
+    try {
+      await this.prisma.user.update({
+        where: { id },
+        data: {
+          ...(data.name && { name: data.name }),
+          ...(data.email && { email: data.email.toLowerCase() }),
+        },
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
-  private buildSeedUsers(): AuthUser[] {
-    const sharedPassword = process.env.DEMO_USER_PASSWORD ?? 'ChangeMe123!';
-
-    return [
-      this.createSeedUser(
-        'superadmin-1',
-        'Superadmin',
-        'superadmin@sns-erp.local',
-        'superadmin',
-        'Central Operations',
-        sharedPassword,
-      ),
-      this.createSeedUser(
-        'admin-1',
-        'School Admin',
-        'admin@sns-erp.local',
-        'admin',
-        'Administration',
-        sharedPassword,
-      ),
-      this.createSeedUser(
-        'leader-1',
-        'Assigned Leader',
-        'leader@sns-erp.local',
-        'leader',
-        'Academic Leadership',
-        sharedPassword,
-      ),
-      this.createSeedUser(
-        'teacher-1',
-        'Teacher User',
-        'teacher@sns-erp.local',
-        'teacher',
-        'Mathematics',
-        sharedPassword,
-      ),
-      this.createSeedUser(
-        'parent-1',
-        'Sharma Parent',
-        '1234567890',
-        'parent',
-        'Parent Portal',
-        sharedPassword,
-      ),
-      // Mock Students (Parent role for login, but represented as students in UI)
-      ...Array.from({ length: 10 }).map((_, i) => 
-        this.createSeedUser(
-          `student-${i + 1}`,
-          `Student ${String.fromCharCode(65 + i)}`,
-          `student${i + 1}@sns.edu`,
-          'parent',
-          'Academic',
-          sharedPassword,
-        )
-      ),
-      // Mock Teachers (Additional accounts for the teachers already in TeachersService)
-      ...Array.from({ length: 10 }).map((_, i) => 
-        this.createSeedUser(
-          `teacher-mock-${i + 1}`,
-          `Teacher ${i + 1}`,
-          `teacher${i + 1}@sns.edu`,
-          'teacher',
-          'Education',
-          sharedPassword,
-        )
-      ),
-    ];
+  async createTeacher(data: {
+    name: string;
+    email: string;
+    department: string;
+    employeeId: string;
+    designation: string;
+    specialization: string;
+  }) {
+    return this.prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email.toLowerCase(),
+        password: process.env.DEMO_USER_PASSWORD ?? 'ChangeMe123!',
+        role: 'teacher',
+        department: data.department,
+        status: 'active',
+        teacherProfile: {
+          create: {
+            employeeId: data.employeeId,
+            designation: data.designation,
+            specialization: data.specialization,
+          },
+        },
+      },
+    });
   }
 
-  private createSeedUser(
-    id: string,
-    name: string,
-    email: string,
-    role: AppRole,
-    department: string,
-    password: string,
-  ): AuthUser {
+  async createStudent(data: {
+    name: string;
+    email: string;
+    department: string;
+    studentId: string;
+    class: string;
+    section: string;
+  }) {
+    return this.prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email.toLowerCase(),
+        password: process.env.DEMO_USER_PASSWORD ?? 'ChangeMe123!',
+        role: 'parent',
+        department: data.department,
+        status: 'active',
+        studentProfile: {
+          create: {
+            studentId: data.studentId,
+            class: data.class,
+            section: data.section,
+          },
+        },
+      },
+    });
+  }
+
+  private mapUser(user: any): AuthUser {
     return {
-      id,
-      name,
-      email: email.toLowerCase(),
-      password,
-      role,
-      department,
-      status: role === 'teacher' ? 'away' : 'active',
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      role: user.role.toLowerCase() as any,
+      department: user.department,
+      status: user.status.toLowerCase() as any,
     };
   }
 }
+

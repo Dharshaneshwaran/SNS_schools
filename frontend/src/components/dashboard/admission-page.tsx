@@ -13,6 +13,7 @@ import {
   Info
 } from "@phosphor-icons/react";
 import { PageSection } from "./page-section";
+import { createStudent } from "../../services/users-service";
 
 type Step = 1 | 2 | 3;
 
@@ -34,12 +35,23 @@ export function AdmissionPage() {
   const nextStep = () => setStep((prev) => (prev + 1) as Step);
   const prevStep = () => setStep((prev) => (prev - 1) as Step);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
+    try {
+      await createStudent({
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email || `${formData.firstName.toLowerCase()}${Math.floor(Math.random()*1000)}@sns.edu`,
+        department: "Academic",
+        studentId: `STU-${Math.floor(Math.random() * 10000)}`,
+        class: formData.grade,
+        section: formData.section,
+      });
       setStep(3);
-    }, 2000);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to enroll student");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

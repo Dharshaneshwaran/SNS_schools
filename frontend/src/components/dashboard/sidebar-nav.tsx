@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import { useAuth } from "../../hooks/use-auth";
@@ -21,13 +22,15 @@ import {
   CalendarCheck,
   UserPlus,
   Student,
-  ChatCircleDots
+  ChatCircleDots,
+  UserCircle
 } from "@phosphor-icons/react";
 
 export function SidebarNav() {
   const pathname = usePathname();
   const { session, logout } = useAuth();
   const isAdmin = session?.user.role === "admin" || session?.user.role === "superadmin";
+  const isTeacher = session?.user.role === "teacher";
 
   const sections = [
     {
@@ -52,8 +55,9 @@ export function SidebarNav() {
     {
       title: "TOOLS",
       items: [
-        // Both can see Students, but it might be in different contexts
-        { label: "Students", href: "/dashboard/students", icon: <Student size={18} weight="duotone" /> },
+        ...(isTeacher ? [{ label: "My Profile", href: "/dashboard/profile", icon: <UserCircle size={18} weight="duotone" /> }] : []),
+        ...(isTeacher ? [{ label: "Substitution", href: "/dashboard/substitution", icon: <ArrowsLeftRight size={18} weight="duotone" /> }] : []),
+        { label: "Alumni", href: "/dashboard/alumni", icon: <Student size={18} weight="duotone" /> },
         { label: "Results", href: "/dashboard/results", icon: <GraduationCap size={18} weight="duotone" /> },
         { label: "Transport", href: "/dashboard/transport", icon: <Bus size={18} weight="duotone" /> },
         { label: "Reports", href: "/dashboard/reports", icon: <FileText size={18} weight="duotone" /> },
@@ -69,14 +73,14 @@ export function SidebarNav() {
       <div className="p-6 pb-7 border-b border-[#F1F5F9]">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white p-1.5 shadow-[0_8px_20px_rgba(0,0,0,0.06)] border border-black/5">
-            <img src="/images/logo.png" alt="Logo" className="w-full h-auto object-contain" />
+            <Image src="/images/logo.png" alt="Logo" width={40} height={40} className="w-full h-auto object-contain" />
           </div>
           <div>
             <p className="text-base font-extrabold tracking-tight text-slate-900 leading-none">
               SNS Academy
             </p>
             <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#FF7F50] mt-1.5">
-              {isAdmin ? "Admin Panel" : "Teacher Portal"}
+              {isAdmin ? "Admin Panel" : (isTeacher ? "Teacher Portal" : "User Portal")}
             </p>
           </div>
         </div>

@@ -51,7 +51,7 @@ const students: Student[] = [
 ];
 
 export default function ParentDashboard() {
-  const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
+  const [activeMenu, setActiveMenu] = useState<MenuKey>("events");
   const [academicTab, setAcademicTab] = useState<AcademicTab>("calendar");
   const [activeStudent, setActiveStudent] = useState(students[0]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -157,8 +157,8 @@ export default function ParentDashboard() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col p-4 md:p-8 lg:p-10">
-          {activeMenu !== 'dashboard' && (
+        <div className={`flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col ${activeMenu === 'messages' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
+          {activeMenu !== 'dashboard' && activeMenu !== 'messages' && (
             <div className="mb-8 md:mb-10 shrink-0">
               <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
                 {activeStudent.name}

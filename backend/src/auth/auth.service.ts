@@ -12,7 +12,7 @@ import type { AuthSession, AuthTokenPayload, LoginDto } from './auth.types';
 export class AuthService {
   constructor(private readonly usersService: UsersService) {}
 
-  login(payload: LoginDto): AuthSession {
+  async login(payload: LoginDto): Promise<AuthSession> {
     const email = payload.email?.trim().toLowerCase() ?? '';
     const password = payload.password ?? '';
 
@@ -22,7 +22,7 @@ export class AuthService {
       );
     }
 
-    const user = this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
 
     if (!user || !this.safeCompare(password, user.password)) {
       throw new UnauthorizedException('Invalid email or password.');
@@ -31,7 +31,7 @@ export class AuthService {
     return this.createSession(user);
   }
 
-  refresh(refreshToken?: string): AuthSession {
+  async refresh(refreshToken?: string): Promise<AuthSession> {
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token is required.');
     }
@@ -41,7 +41,7 @@ export class AuthService {
       appConfig.refreshSecret,
       'refresh',
     );
-    const user = this.usersService.findById(payload.sub);
+    const user = await this.usersService.findById(payload.sub);
 
     if (!user) {
       throw new UnauthorizedException('User not found.');
@@ -50,8 +50,8 @@ export class AuthService {
     return this.createSession(user);
   }
 
-  getProfile(userId: string) {
-    const user = this.usersService.findById(userId);
+  async getProfile(userId: string) {
+    const user = await this.usersService.findById(userId);
 
     if (!user) {
       throw new UnauthorizedException('User not found.');
@@ -67,12 +67,12 @@ export class AuthService {
     };
   }
 
-  changePassword(
+  async changePassword(
     userId: string,
     currentPassword: string,
     newPassword: string,
   ) {
-    const user = this.usersService.findById(userId);
+    const user = await this.usersService.findById(userId);
 
     if (!user) {
       throw new UnauthorizedException('User not found.');
@@ -88,27 +88,27 @@ export class AuthService {
       );
     }
 
-    this.usersService.updatePassword(userId, newPassword);
+    await this.usersService.updatePassword(userId, newPassword);
 
     return { message: 'Password changed successfully.' };
   }
 
-  updateProfile(userId: string, data: { name?: string; email?: string }) {
-    const user = this.usersService.findById(userId);
+  async updateProfile(userId: string, data: { name?: string; email?: string }) {
+    const user = await this.usersService.findById(userId);
 
     if (!user) {
       throw new UnauthorizedException('User not found.');
     }
 
     if (data.email && data.email !== user.email) {
-      const existing = this.usersService.findByEmail(data.email);
+      const existing = await this.usersService.findByEmail(data.email);
       if (existing && existing.id !== userId) {
         throw new UnprocessableEntityException('Email is already in use.');
       }
     }
 
-    this.usersService.updateProfile(userId, data);
-    const updated = this.usersService.findById(userId);
+    await this.usersService.updateProfile(userId, data);
+    const updated = await this.usersService.findById(userId);
 
     return {
       message: 'Profile updated successfully.',
@@ -128,7 +128,7 @@ export class AuthService {
   }
 
   private createSession(
-    user: ReturnType<UsersService['findByEmail']>,
+    user: any, // Use any or specific mapped user type
   ): AuthSession {
     if (!user) {
       throw new UnauthorizedException('User not found.');

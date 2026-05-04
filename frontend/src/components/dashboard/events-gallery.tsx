@@ -10,7 +10,7 @@ const events = [
     category: "Sports",
     time: "9 days ago",
     likes: 248,
-    image: "/Users/mac/.gemini/antigravity/brain/40e37e31-cc5e-4b55-a1dd-84a3238ba74c/sports_event_1777529776610.png",
+    image: "/events/sports-day.png",
     description: "What an incredible day of sportsmanship! 🏆 Our students showcased outstanding athletic abilities across multiple tracks.",
   },
   {
@@ -19,7 +19,7 @@ const events = [
     category: "Academic",
     time: "2 weeks ago",
     likes: 185,
-    image: "/Users/mac/.gemini/antigravity/brain/40e37e31-cc5e-4b55-a1dd-84a3238ba74c/workshop_event_1777529816615.png",
+    image: "/events/science-exhibition.png",
     description: "Future innovators in action. Students collaborating on real-world problem solving using Design Thinking methodologies.",
   },
 ];
