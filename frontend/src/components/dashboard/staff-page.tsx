@@ -251,7 +251,7 @@ export function StaffPage() {
                   
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button 
-                      onClick={() => { setStep(1); setFormData({fullName: "", email: "", phone: "", department: "", role: "teacher", permissions: ["view_attendance", "view_reports"]}); }}
+                      onClick={() => { setStep(1); setFormData({fullName: "", email: "", phone: "", department: "", employeeId: "", password: "", role: "teacher", permissions: ["view_attendance", "view_reports"]}); }}
                       className="px-8 py-4 bg-[#FF7F50] text-white rounded-2xl font-bold shadow-lg shadow-[#FF7F50]/30 hover:bg-[#e66a3e] transition-all"
                     >
                       Add Another Member
