@@ -14,7 +14,7 @@ const academicEvents = [
   { date: "2026-06-01", title: "Summer Break Starts", type: "holiday" },
 ];
 
-const teacherAttendance = {
+const teacherAttendance: Record<string, string> = {
   "2026-05-01": "present",
   "2026-05-02": "present",
   "2026-05-03": "holiday",
