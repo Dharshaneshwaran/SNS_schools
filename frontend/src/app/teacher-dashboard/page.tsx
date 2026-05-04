@@ -25,10 +25,17 @@ import TeacherChatSection from "../../components/teacher/sections/TeacherChatSec
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings, BarChart3, HelpCircle } from "lucide-react";
+import { useAuth } from "../../hooks/use-auth";
 
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const { session } = useAuth();
+
+  const teacherName = session?.user?.name || "Teacher";
+  const teacherEmail = session?.user?.email || "teacher@snsacademy.org";
+  const teacherDept = session?.user?.department || "Department";
+  const teacherInitial = teacherName.charAt(0).toUpperCase();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -58,20 +65,20 @@ export default function TeacherDashboard() {
           <div className="relative z-10">
             <div className="flex items-center gap-6 mb-10">
               <div className="w-24 h-24 rounded-[32px] bg-zinc-800 text-white flex items-center justify-center text-4xl font-black italic shadow-xl">
-                Y
+                {teacherInitial}
               </div>
               <div>
-                <h2 className="text-4xl font-black italic text-[var(--text-primary)] tracking-tight">Yukesh</h2>
-                <p className="text-[var(--accent)] font-black uppercase tracking-[0.2em] text-xs mt-1">Senior Teacher · Computer Science</p>
+                <h2 className="text-4xl font-black italic text-[var(--text-primary)] tracking-tight">{teacherName}</h2>
+                <p className="text-[var(--accent)] font-black uppercase tracking-[0.2em] text-xs mt-1">Senior Teacher · {teacherDept}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
                 { label: "Mobile Number", value: "+91 98765 43210" },
-                { label: "Email Address", value: "yukesh.v@snsacademy.org" },
+                { label: "Email Address", value: teacherEmail },
                 { label: "Employee ID", value: "SNS-T-2026-001" },
-                { label: "Department", value: "Science & Engineering" },
+                { label: "Department", value: teacherDept },
                 { label: "Address", value: "SNS Academy Campus, Coimbatore" },
                 { label: "Joining Date", value: "15th August 2026" },
               ].map((info, i) => (
