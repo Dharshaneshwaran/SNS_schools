@@ -12,11 +12,8 @@ Launch individual architecture segments independently.
 ```bash
 cd frontend
 npm run dev
-```
-<<<<<<< HEAD
-=======
+
 Access it at: [http://localhost:3001](http://localhost:3001)
->>>>>>> origin/Yukesh
 
 ### API endpoints (Server)
 ```bash
