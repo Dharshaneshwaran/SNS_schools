@@ -6,10 +6,6 @@ import {
   Users, 
   CheckCircle2, 
   XCircle, 
-  Search, 
-  ChevronDown, 
-  Filter,
-  Camera,
   Check
 } from "lucide-react";
 
@@ -59,7 +55,7 @@ export default function AttendanceSection() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header & Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -74,7 +70,7 @@ export default function AttendanceSection() {
             <select 
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="bg-transparent text-sm font-bold px-4 py-2 outline-none appearance-none cursor-pointer"
+              className="bg-transparent text-sm font-bold px-4 py-2 outline-none appearance-none cursor-pointer text-[var(--text-primary)]"
             >
               <option value="9">Grade 9</option>
               <option value="10">Grade 10</option>
@@ -85,7 +81,7 @@ export default function AttendanceSection() {
             <select 
               value={selectedSection}
               onChange={(e) => setSelectedSection(e.target.value)}
-              className="bg-transparent text-sm font-bold px-4 py-2 outline-none appearance-none cursor-pointer"
+              className="bg-transparent text-sm font-bold px-4 py-2 outline-none appearance-none cursor-pointer text-[var(--text-primary)]"
             >
               <option value="A">Section A</option>
               <option value="B">Section B</option>
@@ -124,38 +120,37 @@ export default function AttendanceSection() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "Total Students", value: students.length, color: "var(--text-primary)" },
           { label: "Present", value: Object.values(attendance).filter(v => v).length, color: "#10B981" },
           { label: "Absent", value: isMarkingMode ? students.length - Object.values(attendance).filter(v => v).length : 0, color: "#EF4444" },
         ].map((stat, i) => (
-          <div key={i} className="p-6 rounded-[32px] bg-[var(--bg-secondary)] border border-[var(--border)]">
-            <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-2">{stat.label}</p>
-            <p className="text-3xl font-black italic" style={{ color: stat.color }}>{stat.value.toString().padStart(2, '0')}</p>
+          <div key={i} className="p-5 rounded-[24px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-sm">
+            <p className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+            <p className="text-2xl font-black italic" style={{ color: stat.color }}>{stat.value.toString().padStart(2, '0')}</p>
           </div>
         ))}
       </div>
 
       {/* Student Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {students.map((student, i) => (
           <motion.div
             key={student.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: i * 0.02 }}
             onClick={() => toggleAttendance(student.id)}
-            className={`group relative p-4 rounded-[40px] border-2 transition-all cursor-pointer ${
+            className={`group relative p-3 rounded-[32px] border-2 transition-all cursor-pointer ${
               !isMarkingMode 
-                ? "bg-[var(--bg-secondary)] border-[var(--border)] opacity-80 cursor-default" 
+                ? "bg-[var(--bg-secondary)] border-[var(--border)] opacity-60 cursor-default" 
                 : attendance[student.id]
-                  ? "bg-green-500/5 border-green-500 shadow-lg shadow-green-500/10"
+                  ? "bg-green-500/10 border-green-500 shadow-md shadow-green-500/10"
                   : "bg-[var(--bg-secondary)] border-[var(--border)] hover:border-[var(--accent)]"
             }`}
           >
-            {/* Image Container */}
-            <div className="relative aspect-square rounded-[32px] overflow-hidden mb-4 border border-[var(--border)]">
+            <div className="relative aspect-square rounded-[24px] overflow-hidden mb-3 border border-[var(--border)] bg-zinc-800">
               <img 
                 src={student.image} 
                 alt={student.name} 
@@ -168,10 +163,10 @@ export default function AttendanceSection() {
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
-                    className="absolute inset-0 bg-green-500/40 backdrop-blur-[2px] flex items-center justify-center"
+                    className="absolute inset-0 bg-green-500/40 backdrop-blur-[1px] flex items-center justify-center"
                   >
-                    <div className="w-12 h-12 rounded-full bg-white text-green-500 flex items-center justify-center shadow-xl">
-                      <CheckCircle2 size={32} strokeWidth={3} />
+                    <div className="w-10 h-10 rounded-full bg-white text-green-500 flex items-center justify-center shadow-lg">
+                      <Check size={24} strokeWidth={4} />
                     </div>
                   </motion.div>
                 )}
@@ -179,16 +174,15 @@ export default function AttendanceSection() {
             </div>
 
             <div className="text-center">
-              <p className="text-xs font-black text-[var(--text-primary)] truncate px-2">{student.name}</p>
-              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mt-1">{student.roll}</p>
+              <p className="text-[11px] font-black text-[var(--text-primary)] truncate px-1 uppercase italic tracking-tight">{student.name}</p>
+              <p className="text-[9px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mt-0.5">{student.roll}</p>
             </div>
 
-            {/* Attendance Status Badge */}
             {isMarkingMode && (
-              <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full border-4 border-[var(--bg-primary)] flex items-center justify-center shadow-lg transition-colors ${
+              <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full border-2 border-[var(--bg-primary)] flex items-center justify-center shadow-md transition-colors ${
                 attendance[student.id] ? "bg-green-500 text-white" : "bg-red-500 text-white"
               }`}>
-                {attendance[student.id] ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+                {attendance[student.id] ? <Check size={12} strokeWidth={4} /> : <XCircle size={12} strokeWidth={4} />}
               </div>
             )}
           </motion.div>
@@ -196,15 +190,15 @@ export default function AttendanceSection() {
       </div>
 
       {!isMarkingMode && (
-        <div className="p-10 rounded-[48px] bg-[var(--bg-secondary)] border-4 border-dashed border-[var(--border)] flex flex-col items-center justify-center text-center">
-          <div className="w-20 h-20 rounded-3xl bg-[var(--bg-primary)] text-[var(--text-secondary)] flex items-center justify-center mb-6">
-            <Users size={40} />
+        <div className="p-8 rounded-[40px] bg-[var(--bg-secondary)] border-2 border-dashed border-[var(--border)] flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--bg-primary)] text-[var(--text-secondary)] flex items-center justify-center mb-4">
+            <Users size={32} />
           </div>
-          <h3 className="text-xl font-black italic uppercase tracking-tight text-[var(--text-primary)] mb-2">Ready to take attendance?</h3>
-          <p className="text-[var(--text-secondary)] max-w-sm font-medium mb-8">Click 'Start Marking' to enable the interactive student grid and record presence for today.</p>
+          <h3 className="text-lg font-black italic uppercase tracking-tight text-[var(--text-primary)] mb-1">Ready to take attendance?</h3>
+          <p className="text-[var(--text-secondary)] text-xs font-medium mb-6">Click 'Start Marking' to record presence for today.</p>
           <button 
             onClick={() => setIsMarkingMode(true)}
-            className="px-10 py-4 rounded-2xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-xs hover:shadow-2xl hover:shadow-[var(--accent-glow)] transition-all active:scale-95"
+            className="px-8 py-3 rounded-xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-[10px] hover:shadow-xl hover:shadow-[var(--accent-glow)] transition-all"
           >
             Enable Marking Mode
           </button>
