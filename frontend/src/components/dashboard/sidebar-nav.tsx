@@ -21,13 +21,15 @@ import {
   CalendarCheck,
   UserPlus,
   Student,
-  ChatCircleDots
+  ChatCircleDots,
+  UserCircle
 } from "@phosphor-icons/react";
 
 export function SidebarNav() {
   const pathname = usePathname();
   const { session, logout } = useAuth();
   const isAdmin = session?.user.role === "admin" || session?.user.role === "superadmin";
+  const isTeacher = session?.user.role === "teacher";
 
   const sections = [
     {
@@ -52,8 +54,9 @@ export function SidebarNav() {
     {
       title: "TOOLS",
       items: [
-        // Both can see Students, but it might be in different contexts
-        { label: "Students", href: "/dashboard/students", icon: <Student size={18} weight="duotone" /> },
+        ...(isTeacher ? [{ label: "My Profile", href: "/dashboard/profile", icon: <UserCircle size={18} weight="duotone" /> }] : []),
+        ...(isTeacher ? [{ label: "Substitution", href: "/dashboard/substitution", icon: <ArrowsLeftRight size={18} weight="duotone" /> }] : []),
+        { label: "Alumni", href: "/dashboard/alumni", icon: <Student size={18} weight="duotone" /> },
         { label: "Results", href: "/dashboard/results", icon: <GraduationCap size={18} weight="duotone" /> },
         { label: "Transport", href: "/dashboard/transport", icon: <Bus size={18} weight="duotone" /> },
         { label: "Reports", href: "/dashboard/reports", icon: <FileText size={18} weight="duotone" /> },
@@ -76,7 +79,7 @@ export function SidebarNav() {
               SNS Academy
             </p>
             <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#FF7F50] mt-1.5">
-              {isAdmin ? "Admin Panel" : "Teacher Portal"}
+              {isAdmin ? "Admin Panel" : (isTeacher ? "Teacher Portal" : "User Portal")}
             </p>
           </div>
         </div>

@@ -9,6 +9,7 @@ import {
   Clock, 
   ShieldCheck, 
   UserPlus, 
+  IdentificationCard,
   FileText,
   ListChecks,
   DotsThreeVertical,
@@ -76,7 +77,7 @@ export function AdminDashboard() {
       <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <AdminStatCard 
           label="Total Students" 
-          value={isLoading ? "..." : users.length.toString()} 
+          value={isLoading ? "..." : users.length.toLocaleString()} 
           change="+12" 
           trend="up" 
           icon={<Users size={24} />} 
@@ -175,7 +176,7 @@ export function AdminDashboard() {
                 icon={<Student size={28} weight="duotone" />} 
                 label="Alumni" 
                 description="Past students"
-                href="/dashboard/students"
+                href="/dashboard/alumni"
               />
               <ManagementAction 
                 icon={<FileText size={28} weight="duotone" />} 
@@ -238,7 +239,7 @@ export function AdminDashboard() {
                       <td className="py-4 text-slate-500">{student.department}</td>
                       <td className="py-4">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          student.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                          student.status?.toLowerCase() === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
                         }`}>
                           {student.status}
                         </span>
@@ -342,27 +343,23 @@ export function AdminDashboard() {
   );
 }
 
-function ManagementAction({ icon, label, description, href }: { icon: React.ReactNode, label: string, description: string, href?: string }) {
-  const content = (
-    <motion.div 
-      whileHover={{ y: -5 }}
-      className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-[#FF7F50]/30 hover:bg-white hover:shadow-xl transition-all text-center group h-full cursor-pointer"
-    >
-      <div className="text-slate-400 group-hover:text-[#FF7F50] transition-colors">
-        {icon}
-      </div>
-      <div>
-        <div className="text-sm font-bold text-slate-900 mb-0.5">{label}</div>
-        <div className="text-[10px] text-slate-500 uppercase tracking-tighter">{description}</div>
-      </div>
-    </motion.div>
+function ManagementAction({ icon, label, description, href }: { icon: React.ReactNode, label: string, description: string, href: string }) {
+  return (
+    <Link href={href}>
+      <motion.div 
+        whileHover={{ y: -5 }}
+        className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-[#FF7F50]/30 hover:bg-white hover:shadow-xl transition-all text-center group h-full cursor-pointer"
+      >
+        <div className="text-slate-400 group-hover:text-[#FF7F50] transition-colors">
+          {icon}
+        </div>
+        <div>
+          <div className="text-sm font-bold text-slate-900 mb-0.5">{label}</div>
+          <div className="text-[10px] text-slate-500 uppercase tracking-tighter">{description}</div>
+        </div>
+      </motion.div>
+    </Link>
   );
-
-  if (href) {
-    return <Link href={href}>{content}</Link>;
-  }
-
-  return content;
 }
 
 function ApprovalItem({ name, type, date }: { name: string, type: string, date: string }) {

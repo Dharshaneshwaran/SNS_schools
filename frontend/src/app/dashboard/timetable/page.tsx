@@ -1,5 +1,5 @@
 import { TimetablePage } from "../../../components/dashboard/timetable-page";
 
-export default function DashboardTimetablePage() {
+export default function Page() {
   return <TimetablePage />;
 }

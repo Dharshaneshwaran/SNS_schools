@@ -10,8 +10,11 @@ import {
   Calendar as CalendarIcon,
   Clock,
   MapPin,
-  X
+  X,
+  CheckCircle,
+  Tag
 } from "@phosphor-icons/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/use-auth";
 import { PageSection } from "./page-section";
 
@@ -83,7 +86,10 @@ export function CalendarPage() {
     if (event) {
       setEditingEvent(event);
       setFormData({ 
-        ...event, 
+        title: event.title,
+        date: event.date,
+        time: event.time,
+        type: event.type,
         location: event.location || "", 
         description: event.description || "" 
       });
@@ -98,7 +104,7 @@ export function CalendarPage() {
     if (editingEvent) {
       setEvents(events.map(e => e.id === editingEvent.id ? { ...formData, id: e.id } : e));
     } else {
-      setEvents([...events, { ...formData, id: Math.random().toString(36).substr(2, 9) }]);
+      setEvents([...events, { ...formData, id: Math.random().toString(36).substring(2, 11) }]);
     }
     setIsModalOpen(false);
   };
@@ -121,159 +127,178 @@ export function CalendarPage() {
 
   return (
     <>
-    <div className="flex flex-col gap-6 p-6 lg:p-10 -mt-6">
-      {/* Unified Calendar Card */}
-      <div className="w-full rounded-[2.5rem] border border-slate-200 bg-white shadow-2xl shadow-slate-200/40 overflow-hidden flex flex-col">
-        {/* Unified Top Header: Title + Month Controls */}
-        <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-6 shrink-0">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3">
-              <CalendarIcon size={24} weight="duotone" className="text-[#FF7F50]" />
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none uppercase">School Schedule</h1>
-            </div>
-            <p className="text-xs font-bold text-slate-400 mt-2 ml-9">Academic events, exams and holidays for the current year.</p>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <h2 className="text-2xl font-black text-slate-900 leading-none">
-              {monthName} <span className="text-slate-300 font-bold ml-1">{year}</span>
-            </h2>
-            <div className="flex items-center bg-white border border-slate-200 rounded-2xl overflow-hidden p-1 shadow-sm">
-              <button onClick={handlePrevMonth} className="p-2 hover:bg-slate-50 rounded-xl text-slate-500 transition-all active:scale-90">
-                <CaretLeft size={20} weight="bold" />
-              </button>
-              <div className="w-px h-6 bg-slate-100 mx-1"></div>
-              <button onClick={handleNextMonth} className="p-2 hover:bg-slate-50 rounded-xl text-slate-500 transition-all active:scale-90">
-                <CaretRight size={20} weight="bold" />
-              </button>
-            </div>
-            
-            {isAdmin && (
-              <button 
-                onClick={() => openModal()}
-                className="hidden md:flex items-center gap-2 bg-[#FF7F50] text-white px-6 py-3 rounded-2xl font-black text-xs shadow-lg shadow-[#FF7F50]/20 hover:bg-[#e66a3e] transition-all"
-              >
-                <Plus size={18} weight="bold" />
-                <span>ADD EVENT</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-          {/* Grid Headers - Compact */}
-          <div className="grid grid-cols-7 border-b border-slate-100 bg-white shrink-0">
-            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
-              <div key={d} className="py-2 text-center text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                <span className="hidden md:inline">{d}</span>
-                <span className="md:hidden">{d.substring(0, 3)}</span>
+    <PageSection
+      eyebrow="Schedule & Events"
+      title="School Calendar"
+      description="Manage the official school timeline, schedule events, and broadcast academic dates to the community."
+    >
+      <div className="flex flex-col gap-6 -mt-6">
+        {/* Unified Calendar Card */}
+        <div className="w-full rounded-[2.5rem] border border-slate-200 bg-white shadow-2xl shadow-slate-200/40 overflow-hidden flex flex-col">
+          {/* Unified Top Header: Title + Month Controls */}
+          <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-6 shrink-0">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-3">
+                <CalendarIcon size={24} weight="duotone" className="text-[#FF7F50]" />
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none uppercase">School Schedule</h1>
               </div>
-            ))}
-          </div>
+              <p className="text-xs font-bold text-slate-400 mt-2 ml-9">Academic events, exams and holidays for the current year.</p>
+            </div>
 
-          {/* Calendar Grid - Auto-filling height */}
-          <div className="grid grid-cols-7 border-l border-slate-100 flex-1 overflow-hidden">
-            {days.map((day, idx) => {
-              const dayEvents = day ? getEventsForDay(day) : [];
-              const isToday = day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
+            <div className="flex items-center gap-6">
+              <h2 className="text-2xl font-black text-slate-900 leading-none">
+                {monthName} <span className="text-slate-300 font-bold ml-1">{year}</span>
+              </h2>
+              <div className="flex items-center bg-white border border-slate-200 rounded-2xl overflow-hidden p-1 shadow-sm">
+                <button onClick={handlePrevMonth} className="p-2 hover:bg-slate-50 rounded-xl text-slate-500 transition-all active:scale-90">
+                  <CaretLeft size={20} weight="bold" />
+                </button>
+                <div className="w-px h-6 bg-slate-100 mx-1"></div>
+                <button onClick={handleNextMonth} className="p-2 hover:bg-slate-50 rounded-xl text-slate-500 transition-all active:scale-90">
+                  <CaretRight size={20} weight="bold" />
+                </button>
+              </div>
               
-              return (
-                <div 
-                  key={idx} 
-                  className={`min-h-0 flex-1 p-1 border-r border-b border-slate-100 relative transition-colors flex flex-col ${day ? 'bg-white hover:bg-slate-50/30' : 'bg-slate-50/20'}`}
+              {isAdmin && (
+                <button 
+                  onClick={() => openModal()}
+                  className="hidden md:flex items-center gap-2 bg-[#FF7F50] text-white px-6 py-3 rounded-2xl font-black text-xs shadow-lg shadow-[#FF7F50]/20 hover:bg-[#e66a3e] transition-all"
                 >
-                  {day && (
-                    <>
-                      <div className="flex justify-between items-start mb-1">
-                        <span className={`text-[11px] font-black w-5 h-5 flex items-center justify-center rounded-lg transition-all ${isToday ? 'bg-[#FF7F50] text-white shadow-lg shadow-[#FF7F50]/40 rotate-6' : 'text-slate-400'}`}>
-                          {day}
-                        </span>
-                      </div>
-                      
-                      <div className="space-y-1.5 px-1">
-                        {dayEvents.map(event => (
-                          <div 
-                            key={event.id}
-                            onClick={() => openModal(event)}
-                            className={`group cursor-pointer px-1.5 py-0.5 rounded-lg border text-[8px] font-black uppercase tracking-wider truncate transition-all hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${getTypeColor(event.type)}`}
-                            title={event.title}
-                          >
-                            <div className="flex items-center gap-1.5">
-                              <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                event.type === 'academic' ? 'bg-blue-400' : 
-                                event.type === 'holiday' ? 'bg-rose-400' : 
-                                event.type === 'exam' ? 'bg-amber-400' : 'bg-emerald-400'
-                              }`}></div>
-                              {event.title}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Bottom Section - Condensed */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 shrink-0">
-          {/* Upcoming Schedule - Slimmed */}
-          <div className="bg-[#FF7F50] rounded-[1.5rem] p-6 text-white shadow-lg shadow-[#FF7F50]/30 relative overflow-hidden group">
-            <div className="relative z-10 flex flex-col md:flex-row gap-6">
-              <div className="shrink-0">
-                <h3 className="text-lg font-black tracking-tight mb-2 text-white">Next Events</h3>
-                <div className="bg-white/20 px-3 py-1 rounded-lg border border-white/20 text-[8px] font-black uppercase tracking-widest inline-block text-white">
-                  Academic Focus
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-x-6 gap-y-4 flex-1">
-                {events.filter(e => new Date(e.date) >= new Date(2026, 4, 1)).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 4).map(event => (
-                  <div key={event.id} className="flex gap-3 group/item cursor-pointer">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex flex-col items-center justify-center shrink-0 border border-white/20 group-hover/item:bg-white group-hover/item:text-[#FF7F50] transition-all">
-                      <span className="text-[8px] font-black uppercase opacity-90">{new Date(event.date).toLocaleString('default', { month: 'short' })}</span>
-                      <span className="text-sm font-black leading-none">{new Date(event.date).getDate()}</span>
-                    </div>
-                    <div className="min-w-0 flex flex-col justify-center">
-                      <p className="font-black text-xs truncate text-white group-hover/item:text-white/90">{event.title}</p>
-                      <p className="text-[9px] text-white/80 font-bold mt-0.5">{event.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  <Plus size={18} weight="bold" />
+                  <span>ADD EVENT</span>
+                </button>
+              )}
             </div>
-            {/* Design Element */}
-            <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-2xl transition-all group-hover:bg-white/20 pointer-events-none"></div>
           </div>
 
-          {/* Legend - Inline layout */}
-          <div className="bg-white rounded-[1.5rem] border border-slate-200 p-6 shadow-sm flex items-center justify-between">
-            <div className="grid grid-cols-2 gap-x-6 gap-y-3 flex-1">
-              {[
-                { type: 'Academic', color: 'bg-blue-400' },
-                { type: 'Holiday', color: 'bg-rose-400' },
-                { type: 'Exam', color: 'bg-amber-400' },
-                { type: 'Event', color: 'bg-emerald-400' }
-              ].map(item => (
-                <div key={item.type} className="flex items-center gap-3">
-                  <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${item.color}`}></span>
-                  <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">{item.type}</span>
+            {/* Grid Headers - Compact */}
+            <div className="grid grid-cols-7 border-b border-slate-100 bg-white shrink-0">
+              {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
+                <div key={d} className="py-2 text-center text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  <span className="hidden md:inline">{d}</span>
+                  <span className="md:hidden">{d.substring(0, 3)}</span>
                 </div>
               ))}
             </div>
-            <div className="hidden sm:flex shrink-0 ml-4 items-center gap-2 text-slate-300 font-black italic text-xs">
-              <CalendarIcon size={20} weight="duotone" className="text-[#FF7F50]/40" />
-              SNS ACADEMY
+
+            {/* Calendar Grid - Auto-filling height */}
+            <div className="grid grid-cols-7 border-l border-slate-100 flex-1 overflow-hidden">
+              {days.map((day, idx) => {
+                const dayEvents = day ? getEventsForDay(day) : [];
+                const isToday = day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
+                
+                return (
+                  <div 
+                    key={idx} 
+                    className={`min-h-[120px] flex-1 p-1 border-r border-b border-slate-100 relative transition-colors flex flex-col ${day ? 'bg-white hover:bg-slate-50/30' : 'bg-slate-50/20'}`}
+                  >
+                    {day && (
+                      <>
+                        <div className="flex justify-between items-start mb-1">
+                          <span className={`text-[11px] font-black w-5 h-5 flex items-center justify-center rounded-lg transition-all ${isToday ? 'bg-[#FF7F50] text-white shadow-lg shadow-[#FF7F50]/40 rotate-6' : 'text-slate-400'}`}>
+                            {day}
+                          </span>
+                        </div>
+                        
+                        <div className="space-y-1.5 px-1">
+                          {dayEvents.map(event => (
+                            <div 
+                              key={event.id}
+                              onClick={() => openModal(event)}
+                              className={`group cursor-pointer px-1.5 py-0.5 rounded-lg border text-[8px] font-black uppercase tracking-wider truncate transition-all hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${getTypeColor(event.type)}`}
+                              title={event.title}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                  event.type === 'academic' ? 'bg-blue-400' : 
+                                  event.type === 'holiday' ? 'bg-rose-400' : 
+                                  event.type === 'exam' ? 'bg-amber-400' : 'bg-emerald-400'
+                                }`}></div>
+                                {event.title}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Bottom Section - Condensed */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 shrink-0">
+            {/* Upcoming Schedule - Slimmed */}
+            <div className="bg-[#FF7F50] rounded-[1.5rem] p-6 text-white shadow-lg shadow-[#FF7F50]/30 relative overflow-hidden group">
+              <div className="relative z-10 flex flex-col md:flex-row gap-6">
+                <div className="shrink-0">
+                  <h3 className="text-lg font-black tracking-tight mb-2 text-white">Next Events</h3>
+                  <div className="bg-white/20 px-3 py-1 rounded-lg border border-white/20 text-[8px] font-black uppercase tracking-widest inline-block text-white">
+                    Academic Focus
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4 flex-1">
+                  {events.filter(e => new Date(e.date) >= new Date(2026, 4, 1)).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 4).map(event => (
+                    <div key={event.id} className="flex gap-3 group/item cursor-pointer">
+                      <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex flex-col items-center justify-center shrink-0 border border-white/20 group-hover/item:bg-white group-hover/item:text-[#FF7F50] transition-all">
+                        <span className="text-[8px] font-black uppercase opacity-90">{new Date(event.date).toLocaleString('default', { month: 'short' })}</span>
+                        <span className="text-sm font-black leading-none">{new Date(event.date).getDate()}</span>
+                      </div>
+                      <div className="min-w-0 flex flex-col justify-center">
+                        <p className="font-black text-xs truncate text-white group-hover/item:text-white/90">{event.title}</p>
+                        <p className="text-[9px] text-white/80 font-bold mt-0.5">{event.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Design Element */}
+              <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-2xl transition-all group-hover:bg-white/20 pointer-events-none"></div>
+            </div>
+
+            {/* Legend - Inline layout */}
+            <div className="bg-white rounded-[1.5rem] border border-slate-200 p-6 shadow-sm flex items-center justify-between">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 flex-1">
+                {[
+                  { type: 'Academic', color: 'bg-blue-400' },
+                  { type: 'Holiday', color: 'bg-rose-400' },
+                  { type: 'Exam', color: 'bg-amber-400' },
+                  { type: 'Event', color: 'bg-emerald-400' }
+                ].map(item => (
+                  <div key={item.type} className="flex items-center gap-3">
+                    <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${item.color}`}></span>
+                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">{item.type}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="hidden sm:flex shrink-0 ml-4 items-center gap-2 text-slate-300 font-black italic text-xs">
+                <CalendarIcon size={20} weight="duotone" className="text-[#FF7F50]/40" />
+                SNS ACADEMY
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </PageSection>
 
       {/* Admin Modal */}
+      <AnimatePresence>
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsModalOpen(false)}
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+          />
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            className="relative bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden"
+          >
             <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <h3 className="text-xl font-black text-slate-900">
                 {editingEvent ? "Edit Event" : "Create New Event"}
@@ -363,9 +388,10 @@ export function CalendarPage() {
                 {editingEvent ? "Update Event" : "Create Event"}
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
+      </AnimatePresence>
     </>
   );
 }
