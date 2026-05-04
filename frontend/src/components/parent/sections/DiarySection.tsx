@@ -16,14 +16,13 @@ import {
 import { Student } from "../../../types/dashboard";
 import { DashboardTheme } from "../../../types/theme";
 
-type Tab = "homework" | "classtimetable" | "examtimetable" | "events" | "notifications";
+type Tab = "homework" | "classtimetable" | "examtimetable" | "events";
 
 const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: "homework",       label: "Homework",        icon: <BookOpen size={16} /> },
   { key: "classtimetable", label: "Class Timetable", icon: <Clock size={16} /> },
   { key: "examtimetable",  label: "Exam Timetable",  icon: <CalendarCheck size={16} /> },
   { key: "events",         label: "Upcoming Events", icon: <CalendarBlank size={16} /> },
-  { key: "notifications",  label: "Notifications",   icon: <Bell size={16} /> },
 ];
 
 const hwData = [
@@ -61,8 +60,8 @@ const notifications = [
   { msg: "Science project submission reminder", time: "2 days ago", type: "reminder" },
 ];
 
-export default function DiarySection({ student, theme, showOnlyNotifications = false }: { student: Student; theme: DashboardTheme; showOnlyNotifications?: boolean }) {
-  const [activeTab, setActiveTab] = useState<Tab>(showOnlyNotifications ? "notifications" : "homework");
+export default function DiarySection({ student, theme }: { student: Student; theme: DashboardTheme }) {
+  const [activeTab, setActiveTab] = useState<Tab>("homework");
   const [hwFilter, setHwFilter] = useState<string>("All");
 
   const subjects = ["All", ...Array.from(new Set(hwData.map(h => h.subject)))];
@@ -71,8 +70,7 @@ export default function DiarySection({ student, theme, showOnlyNotifications = f
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Tabs */}
-      {!showOnlyNotifications && (
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", background: theme.isDark ? "rgba(255,255,255,0.05)" : "#f1f5f9", padding: "6px", borderRadius: 16, width: "fit-content" }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", background: theme.isDark ? "rgba(255,255,255,0.05)" : "#f1f5f9", padding: "6px", borderRadius: 16, width: "fit-content" }}>
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
             return (
@@ -92,7 +90,7 @@ export default function DiarySection({ student, theme, showOnlyNotifications = f
             );
           })}
         </div>
-      )}
+
 
       {/* Content */}
       <AnimatePresence mode="wait">
@@ -325,45 +323,6 @@ export default function DiarySection({ student, theme, showOnlyNotifications = f
                   background: theme.isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9",
                   color: "#FF7F50",
                 }}>{ev.type}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-
-        {activeTab === "notifications" && (
-          <motion.div 
-            key="notifications" 
-            initial={{ opacity: 0, y: 12 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: -12 }} 
-            transition={{ duration: 0.2 }}
-            style={{ width: "100%", display: "flex", flexDirection: "column", gap: 20 }}
-          >
-            {notifications.map((n, i) => (
-              <motion.div
-                key={`notif-${i}`}
-                className="premium-card"
-                style={{
-                  padding: "24px",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 16,
-                }}
-              >
-                <div style={{ 
-                  width: 44, height: 44, borderRadius: 14, 
-                  background: n.type === "alert" ? "#fef2f2" : "rgba(255,127,80,0.08)", 
-                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                }}>
-                  <Bell size={24} color={n.type === "alert" ? "#ef4444" : "#FF7F50"} weight="bold" />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: theme.text, lineHeight: 1.4 }}>{n.msg}</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FF7F50" }} />
-                    <p style={{ fontSize: 13, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>{n.time}</p>
-                  </div>
-                </div>
               </motion.div>
             ))}
           </motion.div>

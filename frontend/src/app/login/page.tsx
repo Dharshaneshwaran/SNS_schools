@@ -241,7 +241,7 @@ export default function LoginPage() {
                       </h2>
                     </div>
                     <p style={{ color: "#636E72", fontSize: 13.5 }}>
-                      Enter your {role === "parent" ? "mobile number" : "email address"} and password
+                      Enter your {role === "parent" ? "student ID" : "email address"} and password
                     </p>
                   </div>
 
@@ -271,13 +271,13 @@ export default function LoginPage() {
                     {/* Email / Mobile */}
                     <div style={{ marginBottom: 16 }}>
                       <label style={labelStyle}>
-                        {role === "parent" ? "Mobile Number" : "Email Address"}
+                        {role === "parent" ? "Student ID" : "Email Address"}
                       </label>
                       <input
-                        type={role === "parent" ? "tel" : "email"}
+                        type={role === "parent" ? "text" : "email"}
                         value={emailOrMobile}
                         onChange={(e) => setEmailOrMobile(e.target.value)}
-                        placeholder={role === "admin" ? "admin@sns-erp.local" : role === "parent" ? "+91 9XXXXXXXXX" : "teacher@sns-erp.local"}
+                        placeholder={role === "admin" ? "admin@sns-erp.local" : role === "parent" ? "SNS-2026-XXXX" : "teacher@sns-erp.local"}
                         required
                         style={inputStyle}
                         onFocus={(e) => {
@@ -349,38 +349,53 @@ export default function LoginPage() {
                       disabled={isLoading}
                       style={{
                         width: "100%",
-                        padding: "16px 0",
-                        borderRadius: 8,
-                        background: isLoading ? "rgba(255,127,80,0.5)" : "#FF7F50",
+                        padding: "18px 0",
+                        borderRadius: 16,
+                        background: isLoading 
+                          ? "rgba(255,127,80,0.5)" 
+                          : "linear-gradient(135deg, #FF7F50 0%, #FF6347 100%)",
                         color: "white",
                         border: "none",
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: 700,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.05em",
+                        textTransform: "none",
+                        letterSpacing: "-0.01em",
                         cursor: isLoading ? "not-allowed" : "pointer",
                         fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
-                        transition: "all 0.2s ease",
+                        transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: 10,
+                        gap: 12,
+                        boxShadow: "0 10px 30px rgba(255,127,80,0.25)",
+                        position: "relative",
+                        overflow: "hidden"
                       }}
                       onMouseEnter={(e) => {
                         if (!isLoading) {
-                          e.currentTarget.style.background = "#121212";
-                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.transform = "translateY(-4px)";
+                          e.currentTarget.style.boxShadow = "0 20px 40px rgba(255,127,80,0.4)";
+                          e.currentTarget.style.filter = "brightness(1.05)";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isLoading) {
-                          e.currentTarget.style.background = "#FF7F50";
                           e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 10px 30px rgba(255,127,80,0.25)";
+                          e.currentTarget.style.filter = "brightness(1)";
                         }
                       }}
                     >
-                      {isLoading ? "Signing In..." : (
-                        <><span>Sign In</span><ArrowRight size={18} weight="bold" /></>
+                      {isLoading ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div className="animate-spin" style={{ width: 18, height: 18, border: "3px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%" }} />
+                          <span>Signing In...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span>Sign In to Dashboard</span>
+                          <ArrowRight size={20} weight="bold" />
+                        </>
                       )}
                     </button>
                   </form>

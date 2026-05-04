@@ -12,23 +12,29 @@ export default function ProfileSection({ student, theme }: { student: Student; t
     { label: "Full Name", value: student.name, icon: <User size={18} /> },
     { label: "Class", value: `Class ${student.class} – Section ${student.section}`, icon: <GraduationCap size={18} /> },
     { label: "School", value: "SNS Academy, Coimbatore", icon: <MapPin size={18} /> },
-    { label: "Guardian Mobile", value: student.guardianNumber || "Not Provided", icon: <Phone size={18} /> },
+    { label: "Student ID", value: "SNS-2026-0042", icon: <PencilSimple size={18} /> },
   ];
 
   const parentDetails = [
     { 
       type: "Father", 
-      name: "Mr. Sharma", // Mock name
+      name: "Mr. Rajesh Sharma", 
       mobile: student.fatherNumber, 
       email: student.fatherEmail || "father@snsacademy.org" 
     },
     { 
       type: "Mother", 
-      name: "Mrs. Sharma", // Mock name
+      name: "Mrs. Meena Sharma", 
       mobile: student.motherNumber, 
       email: student.motherEmail || "mother@snsacademy.org" 
     },
   ];
+
+  const guardianDetail = {
+    name: "Mr. Vijay Sharma",
+    mobile: student.guardianNumber || "Not Provided",
+    relation: "Uncle / Emergency Contact"
+  };
 
   const teacherDetails = [
     { label: "Class Teacher", value: student.classTeacher, icon: <User size={18} /> },
@@ -98,7 +104,7 @@ export default function ProfileSection({ student, theme }: { student: Student; t
             <h3 style={{ fontSize: 16, fontWeight: 800, color: theme.text, letterSpacing: "-0.01em", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FF7F50" }} /> Parent Information
             </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
               {parentDetails.map((p, i) => (
                 <div key={i} style={{ 
                   padding: "20px", borderRadius: 16, 
@@ -107,7 +113,7 @@ export default function ProfileSection({ student, theme }: { student: Student; t
                   boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
                 }}>
                   <p style={{ fontSize: 11, fontWeight: 900, color: theme.primary, textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
-                    <User size={14} weight="bold" /> {p.type}'s Details
+                    <User size={14} weight="bold" /> {p.type}: {p.name}
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -121,6 +127,28 @@ export default function ProfileSection({ student, theme }: { student: Student; t
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Guardian Information Below */}
+            <div style={{ 
+              padding: "16px 20px", borderRadius: 16, 
+              background: theme.isDark ? "rgba(255,127,80,0.05)" : "rgba(255,127,80,0.02)", 
+              border: `1px dashed ${theme.accent}`,
+              display: "flex", alignItems: "center", justifyContent: "space-between"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: theme.accent, color: "white", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <User size={20} weight="fill" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted, textTransform: "uppercase" }}>Guardian / Emergency Contact</p>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: theme.text }}>{guardianDetail.name} ({guardianDetail.relation})</p>
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <p style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted, textTransform: "uppercase" }}>Contact Number</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: theme.primary }}>{guardianDetail.mobile}</p>
+              </div>
             </div>
           </div>
 

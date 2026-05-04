@@ -53,89 +53,98 @@ const messages = [
 
 export default function MessagesSection({ theme }: Props) {
   return (
-    <div className="flex flex-col gap-8 h-full overflow-y-auto hide-scrollbar pb-8">
+    <div style={{ display: "flex", flexDirection: "column", gap: 32, paddingBottom: 40 }}>
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div 
-            className="flex h-10 w-10 items-center justify-center rounded-xl border"
             style={{ 
-              background: `${theme.accent}10`, 
-              borderColor: `${theme.accent}20` 
+              display: "flex", height: 48, width: 48, alignItems: "center", justifyContent: "center", 
+              borderRadius: 14, background: `${theme.accent}15`, 
+              border: `1px solid ${theme.accent}30`,
+              boxShadow: `0 4px 12px ${theme.accent}10`
             }}
           >
-            <Bell size={24} style={{ color: theme.accent }} weight="duotone" />
+            <Bell size={26} style={{ color: theme.accent }} weight="duotone" />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight" style={{ color: theme.text }}>
-            Messages
-          </h2>
+          <div>
+            <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, letterSpacing: "-0.03em" }}>
+              Messages
+            </h2>
+            <p style={{ fontSize: 14, fontWeight: 600, color: theme.textMuted }}>
+              View all official announcements and notifications
+            </p>
+          </div>
         </div>
-        <p className="text-sm max-w-2xl" style={{ color: theme.textMuted }}>
-          View all official announcements and notifications from SNS Academy.
-        </p>
       </div>
 
       {/* Messages List */}
-      <div className="grid grid-cols-1 gap-6">
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         {messages.map((msg, index) => (
           <motion.div
             key={msg.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="rounded-3xl border p-6 shadow-sm"
+            className="premium-card"
             style={{ 
-              background: theme.cardBg, 
-              borderColor: theme.border 
+              padding: "32px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 20
             }}
           >
             {/* Message Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <div 
-                  className="p-2 rounded-xl"
                   style={{ 
-                    background: msg.type === "general" ? `${theme.accent}10` : "#4F46E510" 
+                    padding: "12px", borderRadius: 14,
+                    background: msg.type === "general" ? `${theme.accent}10` : "#4F46E510",
+                    display: "flex", alignItems: "center", justifyContent: "center"
                   }}
                 >
                   {msg.type === "general" ? (
-                    <Users size={20} style={{ color: theme.accent }} weight="duotone" />
+                    <Users size={24} style={{ color: theme.accent }} weight="duotone" />
                   ) : (
-                    <UserCircle size={20} style={{ color: "#4F46E5" }} weight="duotone" />
+                    <UserCircle size={24} style={{ color: "#4F46E5" }} weight="duotone" />
                   )}
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg" style={{ color: theme.text }}>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: theme.text, marginBottom: 4 }}>
                     {msg.title}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span 
-                      className="text-xs font-bold uppercase px-2 py-0.5 rounded-full"
                       style={{ 
-                        background: `${theme.accent}10`, 
-                        color: theme.accent 
+                        fontSize: 10, fontWeight: 900, textTransform: "uppercase", 
+                        padding: "4px 12px", borderRadius: 8,
+                        background: `${theme.accent}10`, color: theme.accent,
+                        letterSpacing: "0.05em"
                       }}
                     >
                       {msg.type}
                     </span>
-                    <span className="text-xs" style={{ color: theme.textMuted }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: theme.textMuted }}>
                       • {msg.audience}
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-xs" style={{ color: theme.textMuted }}>
-                <ClockCounterClockwise size={14} />
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: theme.textMuted }}>
+                <ClockCounterClockwise size={16} />
                 <span>{msg.date}</span>
               </div>
             </div>
 
             {/* Message Content */}
             <div 
-              className="p-4 rounded-2xl text-sm leading-relaxed"
               style={{ 
+                padding: "20px 24px", borderRadius: 18, 
+                fontSize: 15, lineHeight: "1.7",
                 background: theme.isDark ? "rgba(255,255,255,0.03)" : "#f8fafc",
-                color: theme.text 
+                color: theme.text,
+                border: `1px solid ${theme.border}`
               }}
             >
               {msg.content}
@@ -147,17 +156,17 @@ export default function MessagesSection({ theme }: Props) {
       {/* Empty State (if no messages) */}
       {messages.length === 0 && (
         <div 
-          className="flex flex-col items-center justify-center py-20 rounded-3xl border"
+          className="premium-card"
           style={{ 
-            background: theme.cardBg, 
-            borderColor: theme.border 
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            padding: "80px 40px", textAlign: "center"
           }}
         >
-          <Bell size={64} style={{ color: theme.textMuted }} weight="duotone" />
-          <h3 className="mt-4 text-lg font-bold" style={{ color: theme.text }}>
+          <Bell size={64} style={{ color: theme.textMuted, margin: "0 auto 20px" }} weight="duotone" />
+          <h3 style={{ fontSize: 20, fontWeight: 800, color: theme.text }}>
             No Messages Yet
           </h3>
-          <p className="text-sm mt-2" style={{ color: theme.textMuted }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: theme.textMuted, marginTop: 8 }}>
             You'll see all school announcements here.
           </p>
         </div>

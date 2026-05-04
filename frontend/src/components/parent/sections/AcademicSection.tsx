@@ -20,13 +20,25 @@ import {
 import { Student, AcademicTab } from "../../../types/dashboard";
 import { DashboardTheme } from "../../../types/theme";
 
-const tabs: { key: AcademicTab; label: string; icon: React.ReactNode }[] = [
+const tabs: { key: AcademicTab | "timetable"; label: string; icon: React.ReactNode }[] = [
   { key: "calendar",   label: "Academic Calendar", icon: <CalendarBlank size={15} /> },
   { key: "attendance", label: "Attendance",         icon: <CalendarCheck size={15} /> },
+  { key: "timetable",  label: "Time Table",         icon: <ClipboardText size={15} /> },
   { key: "exam",       label: "Exam Report Card",   icon: <ChartBar size={15} /> },
   { key: "schedule",   label: "Exam Schedule",      icon: <ClipboardText size={15} /> },
   { key: "leave",      label: "Leave Application",  icon: <PaperPlaneTilt size={15} /> },
 ];
+
+const timeTableData = [
+  { day: "Monday",    periods: ["Math", "Physics", "English", "LUNCH", "", "L A B", "", "Hindi"] },
+  { day: "Tuesday",   periods: ["", "L A B", "L A B", "LUNCH", "Art", "Physics", "Statistics", "SPORTS"] },
+  { day: "Wednesday", periods: ["Biology", "English", "Math", "LUNCH", "Science", "", "L I B R A R Y", "Algebra"] },
+  { day: "Thursday",  periods: ["Physics", "Math", "Hindi", "LUNCH", "", "L A B", "", "Biology"] },
+  { day: "Friday",    periods: ["", "L A B", "L A B", "LUNCH", "Art", "Drama", "Math", "Lab"] },
+  { day: "Saturday",  periods: ["-", "-", "-", "LUNCH", "", "S E M I N A R", "", "SPORTS"] },
+];
+
+const periodHeaders = ["I", "II", "III", "LUNCH", "IV", "V", "VI", "VII"];
 
 const reportData: Record<string, any> = {
   periodic: {
@@ -87,7 +99,8 @@ const attendanceData: Record<string, Record<number, { status: string, reason?: s
   "2026-3": { // April
     1: { status: "P" }, 2: { status: "P" }, 3: { status: "P" }, 4: { status: "H", reason: "Easter Break" }, 5: { status: "H", reason: "Easter Break" },
     6: { status: "P" }, 7: { status: "P" }, 8: { status: "A", reason: "Health Issue" }, 9: { status: "P" }, 10: { status: "P" },
-    20: { status: "H", reason: "Sports Day" }, 25: { status: "H", reason: "Founder's Day" }
+    11: { status: "P" }, 12: { status: "P" }, 13: { status: "P" }, 14: { status: "P" }, 15: { status: "P" },
+    16: { status: "P" }, 17: { status: "P" }, 18: { status: "P" }, 19: { status: "P" }, 20: { status: "H", reason: "Sports Day" }, 25: { status: "H", reason: "Founder's Day" }
   },
   "2026-4": { // May
     1: { status: "H", reason: "Labour Day" },
@@ -95,8 +108,8 @@ const attendanceData: Record<string, Record<number, { status: string, reason?: s
   }
 };
 
-export default function AcademicSection({ student, theme, initialTab }: { student: Student; theme: DashboardTheme; initialTab?: AcademicTab }) {
-  const [activeTab, setActiveTab] = useState<AcademicTab>(initialTab || "calendar");
+export default function AcademicSection({ student, theme, initialTab }: { student: Student; theme: DashboardTheme; initialTab?: AcademicTab | "timetable" }) {
+  const [activeTab, setActiveTab] = useState<AcademicTab | "timetable">(initialTab || "calendar");
   const [examType, setExamType] = useState<"periodic" | "cycle" | "term">("term");
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1)); // April 2026
   const [leaveSubmitted, setLeaveSubmitted] = useState(false);
@@ -111,6 +124,12 @@ export default function AcademicSection({ student, theme, initialTab }: { studen
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   };
 
+  // Calculate stats for current month
+  const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+  const monthData = attendanceData[monthKey] || {};
+  const totalPresent = Object.values(monthData).filter(d => d.status === "P").length;
+  const totalAbsent = Object.values(monthData).filter(d => d.status === "A").length;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* Tabs */}
@@ -118,7 +137,7 @@ export default function AcademicSection({ student, theme, initialTab }: { studen
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+            <button key={tab.key} onClick={() => setActiveTab(tab.key as any)}
               style={{
                 display: "flex", alignItems: "center", gap: 10,
                 padding: "10px 20px", borderRadius: 12, border: "none",
@@ -168,12 +187,24 @@ export default function AcademicSection({ student, theme, initialTab }: { studen
           
           {(activeTab === "attendance" || activeTab === "calendar") && (
             <div className="premium-card" style={{ padding: "24px" }}>
+              {activeTab === "attendance" && (
+                <div style={{ display: "flex", gap: 20, marginBottom: 24 }}>
+                  <div style={{ flex: 1, padding: "20px", borderRadius: 16, background: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.1)" }}>
+                    <p style={{ fontSize: 12, fontWeight: 800, color: "#10B981", textTransform: "uppercase", marginBottom: 4 }}>Total Present</p>
+                    <p style={{ fontSize: 24, fontWeight: 900, color: "#10B981" }}>{totalPresent} Days</p>
+                  </div>
+                  <div style={{ flex: 1, padding: "20px", borderRadius: 16, background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.1)" }}>
+                    <p style={{ fontSize: 12, fontWeight: 800, color: "#EF4444", textTransform: "uppercase", marginBottom: 4 }}>Total Absent</p>
+                    <p style={{ fontSize: 24, fontWeight: 900, color: "#EF4444" }}>{totalAbsent} Day{totalAbsent !== 1 ? 's' : ''}</p>
+                  </div>
+                </div>
+              )}
               <CalendarGrid 
                 theme={theme} 
                 date={currentDate} 
                 onPrev={handlePrevMonth} 
                 onNext={handleNextMonth}
-                data={attendanceData[`${currentDate.getFullYear()}-${currentDate.getMonth()}`] || {}} 
+                data={monthData} 
                 type={activeTab === "attendance" ? "attendance" : "events"} 
               />
               <div style={{ display: "flex", gap: 20, marginTop: 24, justifyContent: "center", flexWrap: "wrap" }}>
@@ -181,6 +212,50 @@ export default function AcademicSection({ student, theme, initialTab }: { studen
                 <LegendItem color={theme.danger} label="Absent" theme={theme} />
                 <LegendItem color="#3B82F6" label="Leave" theme={theme} />
                 <LegendItem color={theme.isDark ? "rgba(255,255,255,0.1)" : "#f1f5f9"} label="Holiday" theme={theme} />
+              </div>
+            </div>
+          )}
+
+          {activeTab === "timetable" && (
+            <div className="premium-card" style={{ padding: 0, overflow: "hidden", border: `1px solid ${theme.border}` }}>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ background: theme.isDark ? "rgba(255,255,255,0.02)" : "#F8FAFC" }}>
+                      <th style={{ padding: "20px", textAlign: "left", fontSize: 11, fontWeight: 900, color: "#475569", textTransform: "uppercase", borderBottom: `1px solid ${theme.border}` }}>DAY/PERIOD</th>
+                      {periodHeaders.map(h => (
+                        <th key={h} style={{ padding: "20px", textAlign: "center", fontSize: 13, fontWeight: 900, color: "#1e293b", borderBottom: `1px solid ${theme.border}` }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {timeTableData.map((row, ri) => (
+                      <tr key={ri} style={{ borderBottom: ri < timeTableData.length - 1 ? `1px solid ${theme.border}` : "none" }}>
+                        <td style={{ padding: "20px", fontSize: 14, fontWeight: 900, color: "#1e293b", background: theme.isDark ? "rgba(255,255,255,0.01)" : "transparent" }}>{row.day}</td>
+                        {row.periods.map((p, pi) => {
+                          const isLunch = p === "LUNCH";
+                          const isSpecial = p === "L A B" || p === "L I B R A R Y" || p === "S E M I N A R" || p === "SPORTS";
+                          return (
+                            <td key={pi} style={{ 
+                              padding: "20px", 
+                              textAlign: "center", 
+                              fontSize: 13, 
+                              fontWeight: isLunch || isSpecial ? 900 : 700,
+                              color: isLunch ? "#94a3b8" : (isSpecial ? "#475569" : "#334155"),
+                              background: isLunch ? "transparent" : (p === "" ? "transparent" : (theme.isDark ? "rgba(255,255,255,0.02)" : "white")),
+                              letterSpacing: isSpecial ? "0.2em" : "normal",
+                              opacity: isLunch ? 0.6 : 1
+                            }}>
+                              {p === "SPORTS" ? (
+                                <span style={{ background: "#f1f5f9", padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 800, color: "#475569", textTransform: "uppercase" }}>SPORTS</span>
+                              ) : p}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
@@ -274,10 +349,6 @@ export default function AcademicSection({ student, theme, initialTab }: { studen
                       <span style={{ fontSize: 13, fontWeight: 700, color: theme.textMuted }}>{e.date}</span>
                     </div>
                     <h4 style={{ fontSize: 18, fontWeight: 800, color: theme.text }}>{e.subject}</h4>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 600, color: theme.textMuted }}>
-                      <span>Hall: <strong style={{ color: theme.text }}>{e.hall}</strong></span>
-                      <span>Seat: <strong style={{ color: theme.text }}>{e.seat}</strong></span>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -389,94 +460,185 @@ function LegendItem({ color, label, theme }: { color: string, label: string, the
 
 function CalendarGrid({ theme, date, onPrev, onNext, data, type }: any) {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const weekDays = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
   
   const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  const offset = firstDay === 0 ? 6 : firstDay - 1; // Adjust for Monday start
   const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   
+  // Example events for May 2026 as per image
+  const events: Record<number, { label: string, color: string, category: string }[]> = {
+    1: [{ label: "LABOR DAY HOLIDAY", color: "#FFDEE2", category: "holiday" }],
+    15: [{ label: "MID-TERM EXAMINATION", color: "#FFF4CC", category: "exam" }],
+    22: [{ label: "ANNUAL SPORTS MEET", color: "#D9F9E6", category: "event" }],
+    28: [{ label: "PARENT TEACHER MEETING", color: "#E0F2FE", category: "academic" }],
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch(category) {
+      case 'academic': return '#3B82F6';
+      case 'holiday': return '#F43F5E';
+      case 'exam': return '#F59E0B';
+      case 'event': return '#10B981';
+      default: return theme.primary;
+    }
+  };
+
   return (
-    <div style={{ position: "relative" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <CalendarBlank size={20} weight="bold" color={theme.primary} />
-          <h3 style={{ fontSize: 20, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.02em" }}>
-            {monthNames[date.getMonth()]} {date.getFullYear()}
-          </h3>
+    <div style={{ position: "relative", width: "100%" }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
+          <div style={{ 
+            width: 48, height: 48, borderRadius: 12, 
+            background: "rgba(255,127,80,0.1)", color: "#FF7F50",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}>
+            <CalendarBlank size={24} weight="bold" />
+          </div>
+          <div>
+            <h3 style={{ fontSize: 28, fontWeight: 900, color: "#1e293b", fontFamily: "var(--font-poppins)", letterSpacing: "-0.02em", textTransform: "uppercase" }}>
+              SCHOOL SCHEDULE
+            </h3>
+            <p style={{ color: "#64748b", fontSize: 14, fontWeight: 500 }}>
+              Academic events, exams and holidays for the current year.
+            </p>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onPrev} style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${theme.border}`, background: theme.cardBg, cursor: "pointer", color: theme.text, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>&larr;</button>
-          <button onClick={onNext} style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${theme.border}`, background: theme.cardBg, cursor: "pointer", color: theme.text, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>&rarr;</button>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          <div style={{ textAlign: "right" }}>
+            <span style={{ fontSize: 32, fontWeight: 900, color: "#1e293b" }}>{monthNames[date.getMonth()]}</span>
+            <span style={{ fontSize: 32, fontWeight: 900, color: "#cbd5e1", marginLeft: 8 }}>{date.getFullYear()}</span>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={onPrev} style={{ width: 44, height: 44, borderRadius: 12, border: "1px solid #e2e8f0", background: "white", cursor: "pointer", color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}><ChevronLeft size={20} weight="bold" /></button>
+            <button onClick={onNext} style={{ width: 44, height: 44, borderRadius: 12, border: "1px solid #e2e8f0", background: "white", cursor: "pointer", color: "#64748b", display: "flex", alignItems: "center", justifyContent: "center" }}><ChevronRight size={20} weight="bold" /></button>
+          </div>
         </div>
       </div>
       
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px 0" }}>
+      {/* Grid */}
+      <div style={{ 
+        display: "grid", 
+        gridTemplateColumns: "repeat(7, 1fr)", 
+        border: "1px solid #f1f5f9",
+        borderRadius: "0 0 24px 24px",
+        overflow: "hidden"
+      }}>
         {weekDays.map(d => (
-          <div key={d} style={{ textAlign: "center", fontSize: 12, fontWeight: 800, color: theme.textMuted, paddingBottom: 16, textTransform: "uppercase", letterSpacing: "0.05em" }}>{d}</div>
+          <div key={d} style={{ 
+            textAlign: "center", fontSize: 11, fontWeight: 900, color: "#94a3b8", 
+            padding: "16px 0", borderBottom: "1px solid #f1f5f9", letterSpacing: "0.05em"
+          }}>{d}</div>
         ))}
-        {Array.from({ length: offset }).map((_, i) => <div key={`offset-${i}`} />)}
+        
+        {Array.from({ length: firstDay }).map((_, i) => (
+          <div key={`offset-${i}`} style={{ borderRight: "1px solid #f1f5f9", borderBottom: "1px solid #f1f5f9", height: 120, background: "#fcfcfd" }} />
+        ))}
+        
         {days.map(d => {
-          const item = data[d];
-          const isHighlighted = !!item;
-          
-          let bgColor = "transparent";
-          let textColor = theme.text;
-          
-          if (isHighlighted) {
-            if (item.status === "P") { bgColor = theme.success + "15"; textColor = theme.success; }
-            else if (item.status === "A") { bgColor = theme.danger + "15"; textColor = theme.danger; }
-            else if (item.status === "H") { bgColor = theme.isDark ? "rgba(255,255,255,0.05)" : "#f1f5f9"; textColor = theme.textMuted; }
-            else { bgColor = "#3B82F615"; textColor = "#3B82F6"; }
-          }
-
+          const dayEvents = events[d] || [];
           return (
             <div key={d} style={{ 
-              height: 55,
-              display: "flex", 
-              flexDirection: "column",
-              alignItems: "center", 
-              justifyContent: "center", 
-              position: "relative"
+              height: 120, 
+              borderRight: "1px solid #f1f5f9", 
+              borderBottom: "1px solid #f1f5f9",
+              padding: "12px",
+              position: "relative",
+              background: "white"
             }}>
-              <motion.div 
-                whileHover={{ scale: 1.1 }}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 12,
-                  background: bgColor,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 14,
-                  fontWeight: isHighlighted ? 900 : 600,
-                  color: textColor,
-                  transition: "all 0.2s"
-                }}
-              >
-                {d}
-              </motion.div>
-              {item?.reason && (
-                <div style={{ 
-                  marginTop: 4,
-                  fontSize: 9,
-                  fontWeight: 800,
-                  color: theme.primary,
-                  textTransform: "uppercase",
-                  textAlign: "center",
-                  maxWidth: 60,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap"
-                }}>
-                  {item.reason}
-                </div>
-              )}
+              <span style={{ fontSize: 16, fontWeight: 700, color: "#64748b" }}>{d}</span>
+              <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
+                {dayEvents.map((ev, i) => (
+                  <div key={i} style={{ 
+                    padding: "4px 8px", 
+                    borderRadius: 6, 
+                    background: ev.color, 
+                    fontSize: 9, 
+                    fontWeight: 900, 
+                    color: getCategoryColor(ev.category),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4
+                  }}>
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: getCategoryColor(ev.category) }} />
+                    {ev.label}
+                  </div>
+                ))}
+              </div>
             </div>
           );
         })}
       </div>
+
+      {/* Footer: Next Events & Legend */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, marginTop: 40 }}>
+        {/* Next Events Card */}
+        <div style={{ 
+          background: "linear-gradient(135deg, #FF7F50 0%, #FF6347 100%)", 
+          borderRadius: 32, 
+          padding: "32px",
+          color: "white",
+          boxShadow: "0 20px 40px rgba(255,127,80,0.2)"
+        }}>
+          <h4 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>Next Events</h4>
+          <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(255,255,255,0.2)", padding: "4px 12px", borderRadius: 8, textTransform: "uppercase" }}>Academic Focus</span>
+          
+          <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {[
+              { date: "MAY 1", title: "Labor Day Holiday", time: "Full Day" },
+              { date: "MAY 15", title: "Mid-Term Exami...", time: "09:00 AM" },
+              { date: "MAY 22", title: "Annual Sports M...", time: "08:30 AM" },
+              { date: "MAY 28", title: "Parent Teacher...", time: "10:00 AM" },
+            ].map((ev, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ 
+                  width: 44, height: 44, borderRadius: "50%", 
+                  background: "rgba(255,255,255,0.2)", 
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  fontSize: 9, fontWeight: 900
+                }}>
+                  <span>{ev.date.split(' ')[0]}</span>
+                  <span style={{ fontSize: 14 }}>{ev.date.split(' ')[1]}</span>
+                </div>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 800 }}>{ev.title}</p>
+                  <p style={{ fontSize: 11, opacity: 0.8 }}>{ev.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Legend Card */}
+        <div style={{ 
+          background: "white", 
+          borderRadius: 32, 
+          padding: "32px", 
+          border: "1px solid #f1f5f9",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center"
+        }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+            <LegendItem color="#3B82F6" label="ACADEMIC" theme={theme} />
+            <LegendItem color="#F43F5E" label="HOLIDAY" theme={theme} />
+            <LegendItem color="#F59E0B" label="EXAM" theme={theme} />
+            <LegendItem color="#10B981" label="EVENT" theme={theme} />
+          </div>
+          <div style={{ marginTop: 32, display: "flex", justifyContent: "flex-end", opacity: 0.3 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <img src="/images/logo.png" alt="Logo" style={{ width: 24, height: 24, filter: "grayscale(1)" }} />
+              <span style={{ fontSize: 14, fontWeight: 900, color: "#1e293b", letterSpacing: "0.05em" }}>SNS ACADEMY</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
+
+// Helper Components
+function ChevronLeft({ size, weight }: any) { return <span style={{ fontSize: size, fontWeight: weight }}>&larr;</span>; }
+function ChevronRight({ size, weight }: any) { return <span style={{ fontSize: size, fontWeight: weight }}>&rarr;</span>; }

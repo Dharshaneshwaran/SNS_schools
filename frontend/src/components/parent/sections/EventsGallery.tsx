@@ -30,12 +30,12 @@ const events = [
     category: "Sports", 
     color: "#FF7F50",
     icon: <Trophy size={16} weight="fill" />,
-    image: "/events/sports-day.png",
+    image: "https://images.unsplash.com/photo-1526676037777-05a232554f77?auto=format&fit=crop&q=80&w=800",
     likes: 1248,
     comments: 48,
-    description: "What an incredible display of talent and sportsmanship! 🏆 Our students showcased outstanding athletic abilities across track, field, and team sports. Proud of every participant who gave their best!",
-    hashtags: ["#SportsDay2026", "#SNSAcademy", "#Champions"],
-    postedTime: "2 hours ago"
+    description: "What an incredible display of talent and sportsmanship! 🏆",
+    hashtags: ["#SportsDay2026", "#Champions"],
+    postedTime: "2h ago"
   },
   { 
     id: 2,
@@ -45,12 +45,12 @@ const events = [
     category: "Academic", 
     color: "#6C63FF",
     icon: <Flask size={16} weight="fill" />,
-    image: "/events/science-exhibition.png",
+    image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=800",
     likes: 856,
     comments: 32,
-    description: "Exploring the future! 🔬 Our young scientists blew everyone away at this year's Science Exhibition. From renewable energy models to AI-powered robots — the future is bright!",
-    hashtags: ["#ScienceFair", "#Innovation", "#FutureScientists"],
-    postedTime: "1 day ago"
+    description: "Exploring the future! 🔬 Our young scientists blew everyone away.",
+    hashtags: ["#ScienceFair", "#Innovation"],
+    postedTime: "1d ago"
   },
   { 
     id: 3,
@@ -60,12 +60,12 @@ const events = [
     category: "Cultural", 
     color: "#10B981",
     icon: <MaskHappy size={16} weight="fill" />,
-    image: "/events/cultural-fest.png",
+    image: "https://images.unsplash.com/photo-1514525253361-bee8718a747c?auto=format&fit=crop&q=80&w=800",
     likes: 2432,
     comments: 156,
-    description: "A night filled with music, dance, and vibrant performances! 🎭 From classical performances to modern fusion — our students proved that art knows no boundaries.",
-    hashtags: ["#CulturalFest", "#ArtAndCulture", "#SNSPride"],
-    postedTime: "3 days ago"
+    description: "A night filled with music, dance, and vibrant performances! 🎭",
+    hashtags: ["#CulturalFest", "#SNSPride"],
+    postedTime: "3d ago"
   },
   { 
     id: 4,
@@ -75,12 +75,12 @@ const events = [
     category: "Meeting", 
     color: "#F59E0B",
     icon: <Handshake size={16} weight="fill" />,
-    image: "/events/parent-teacher-meet.png",
+    image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=800",
     likes: 432,
     comments: 12,
-    description: "A productive Parent-Teacher Meet discussing student progress and future goals. 🤝 Together, we build a better future for our students!",
-    hashtags: ["#PTM", "#ParentTeacher", "#Education"],
-    postedTime: "1 week ago"
+    description: "A productive Parent-Teacher Meet discussing student progress. 🤝",
+    hashtags: ["#PTM", "#Education"],
+    postedTime: "1w ago"
   },
   {
     id: 5,
@@ -90,12 +90,12 @@ const events = [
     category: "Academic",
     color: "#8B5CF6",
     icon: <Microphone size={16} weight="fill" />,
-    image: "/events/debate-competition.png",
+    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&q=80&w=800",
     likes: 176,
     comments: 21,
-    description: "Our debate team represented SNS Academy brilliantly at the Inter-School Debate Championship! 🎙️ Articulate, confident, and well-prepared — these students are natural leaders.",
-    hashtags: ["#DebateChampionship", "#PublicSpeaking", "#Leaders"],
-    postedTime: "1 month ago"
+    description: "Our debate team represented SNS Academy brilliantly! 🎙️",
+    hashtags: ["#Debate", "#Leaders"],
+    postedTime: "1mo ago"
   },
   {
     id: 6,
@@ -105,19 +105,19 @@ const events = [
     category: "Health",
     color: "#10B981",
     icon: <Barbell size={16} weight="fill" />,
-    image: "/events/yoga-wellness.png",
+    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800",
     likes: 203,
     comments: 15,
-    description: "Mind, body, and soul — all aligned on Yoga & Wellness Day! 🧘 Students and teachers came together for a rejuvenating session of yoga, meditation, and mindfulness.",
-    hashtags: ["#YogaDay", "#Wellness", "#MindfulSchool"],
-    postedTime: "1 month ago"
+    description: "Mind, body, and soul — all aligned on Yoga Day! 🧘",
+    hashtags: ["#YogaDay", "#Wellness"],
+    postedTime: "1mo ago"
   },
 ];
 
 export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
   const [savedPosts, setSavedPosts] = useState<Set<number>>(new Set());
-  const [expandedCaptions, setExpandedCaptions] = useState<Set<number>>(new Set());
+  const [selectedStory, setSelectedStory] = useState<number | null>(null);
 
   const toggleLike = (id: number) => {
     setLikedPosts(prev => {
@@ -137,18 +137,13 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
     });
   };
 
-  const toggleCaption = (id: number) => {
-    setExpandedCaptions(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const filteredEvents = selectedStory 
+    ? events.filter(e => e.id === selectedStory)
+    : events;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-      {/* Stories - Inspired by Instagram */}
+      {/* Stories */}
       <div style={{ 
         display: "flex", 
         gap: 20, 
@@ -156,17 +151,43 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
         paddingBottom: 10,
         paddingLeft: 4
       }} className="hide-scrollbar">
+        {/* "All" Story Option */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setSelectedStory(null)}
+            style={{
+              width: 64, height: 64, borderRadius: "50%", padding: 2,
+              background: !selectedStory ? "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)" : (theme.isDark ? "#333" : "#eee"),
+              cursor: "pointer"
+            }}
+          >
+            <div style={{ 
+              width: "100%", height: "100%", borderRadius: "50%", 
+              border: `2px solid ${theme.cardBg}`,
+              overflow: "hidden",
+              background: theme.isDark ? "rgba(255,255,255,0.05)" : "#fff",
+              display: "flex", alignItems: "center", justifyContent: "center"
+            }}>
+              <span style={{ fontSize: 12, fontWeight: 900, color: theme.text }}>ALL</span>
+            </div>
+          </motion.div>
+          <span style={{ fontSize: 10, fontWeight: 700, color: theme.text }}>Show All</span>
+        </div>
+
         {events.map((event) => (
           <div key={event.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setSelectedStory(event.id)}
               style={{
-                width: 72,
-                height: 72,
+                width: 64,
+                height: 64,
                 borderRadius: "50%",
-                padding: 3,
-                background: "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
+                padding: 2,
+                background: selectedStory === event.id ? "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)" : (theme.isDark ? "#333" : "#eee"),
                 cursor: "pointer"
               }}
             >
@@ -174,114 +195,54 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                 width: "100%", 
                 height: "100%", 
                 borderRadius: "50%", 
-                border: `3px solid ${theme.cardBg}`,
+                border: `2px solid ${theme.cardBg}`,
                 overflow: "hidden",
                 background: "#eee"
               }}>
                 <img src={event.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
             </motion.div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: theme.text, maxWidth: 80, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: theme.text, maxWidth: 64, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {event.title.split(" ")[0]}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Category Pills */}
-      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }} className="hide-scrollbar">
-        {["All", "Sports", "Academic", "Cultural", "Meeting", "Health"].map(cat => (
-          <button
-            key={cat}
-            style={{
-              padding: "7px 18px", borderRadius: 20,
-              background: cat === "All" ? "linear-gradient(90deg,#FF7F50,#e66a3e)" : theme.cardBg,
-              color: cat === "All" ? "white" : theme.textMuted,
-              border: cat === "All" ? "none" : `1px solid ${theme.border}`,
-              fontSize: 13, fontWeight: 600, cursor: "pointer",
-              whiteSpace: "nowrap", transition: "all 0.2s",
-              fontFamily: "var(--font-inter,'Inter',sans-serif)",
-            }}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Feed - Instagram/LinkedIn Style Post Cards */}
+      {/* Grid Feed */}
       <div style={{
-        display: "flex", flexDirection: "column", gap: 32,
-        maxWidth: 640, margin: "0 auto", width: "100%",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+        gap: 24,
         paddingBottom: 60 
       }}>
         <AnimatePresence mode="popLayout">
-          {events.map((event) => {
+          {filteredEvents.map((event) => {
             const isLiked = likedPosts.has(event.id);
             const isSaved = savedPosts.has(event.id);
-            const isExpanded = expandedCaptions.has(event.id);
-            const text = event.description;
 
             return (
               <motion.article
                 key={event.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 30 }}
-                transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
                 style={{
                   background: theme.cardBg,
-                  borderRadius: 24,
+                  borderRadius: 20,
                   border: `1px solid ${theme.border}`,
                   overflow: "hidden",
-                  boxShadow: theme.isDark ? "0 10px 40px rgba(0,0,0,0.3)" : "0 10px 40px rgba(0,0,0,0.05)"
+                  boxShadow: theme.isDark ? "0 8px 30px rgba(0,0,0,0.2)" : "0 8px 30px rgba(0,0,0,0.04)",
+                  display: "flex",
+                  flexDirection: "column"
                 }}
               >
-                {/* Header */}
-                <div style={{ 
-                  padding: "16px 20px", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "space-between" 
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    <div style={{ 
-                      width: 44, 
-                      height: 44, 
-                      borderRadius: "15px", 
-                      background: "linear-gradient(135deg, #FF7F50, #FFD700)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "white",
-                      fontWeight: 800,
-                      fontSize: 16,
-                      boxShadow: "0 4px 10px rgba(255,127,80,0.3)"
-                    }}>
-                      S
-                    </div>
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <span style={{ color: theme.text, fontWeight: 800, fontSize: 15 }}>SNS Academy</span>
-                        <CheckCircle size={16} weight="fill" color="#4f46e5" />
-                      </div>
-                      <div style={{ color: theme.textMuted, fontSize: 12, fontWeight: 600 }}>{event.location} • {event.postedTime}</div>
-                    </div>
-                  </div>
-                  <motion.button 
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: theme.textMuted }}
-                  >
-                    <DotsThreeOutlineVertical size={24} weight="fill" />
-                  </motion.button>
-                </div>
-
-                {/* Image Area - Double Tap to Like */}
+                {/* Image Area */}
                 <div 
                   style={{ 
                     width: "100%", 
-                    aspectRatio: "4/5", 
+                    aspectRatio: "1/1", 
                     background: theme.isDark ? "#121212" : "#f0f0f0",
                     position: "relative",
                     overflow: "hidden",
@@ -295,111 +256,94 @@ export default function EventsGallery({ theme }: { theme: DashboardTheme }) {
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                   
+                  {/* SNS Logo Overlay */}
+                  <div style={{
+                    position: "absolute",
+                    top: 12,
+                    left: 12,
+                    width: 32,
+                    height: 32,
+                    background: "white",
+                    borderRadius: 8,
+                    padding: 4,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
+                    <img src="/images/logo.png" alt="SNS" style={{ width: "100%", height: "auto" }} />
+                  </div>
+
                   {/* Category Badge */}
                   <div style={{
                     position: "absolute",
-                    top: 20,
-                    right: 20,
-                    padding: "6px 14px",
-                    background: "rgba(255,255,255,0.2)",
-                    backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(255,255,255,0.3)",
-                    borderRadius: 100,
+                    bottom: 12,
+                    right: 12,
+                    padding: "4px 10px",
+                    background: "rgba(0,0,0,0.4)",
+                    backdropFilter: "blur(8px)",
+                    borderRadius: 8,
                     color: "white",
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: 800,
                     textTransform: "uppercase",
-                    letterSpacing: "0.05em",
                     display: "flex",
                     alignItems: "center",
-                    gap: 6
+                    gap: 4
                   }}>
                     {event.icon}
                     {event.category}
                   </div>
                 </div>
 
-                {/* Interaction & Details */}
-                <div style={{ padding: "20px 24px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                {/* Content */}
+                <div style={{ padding: "16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                       <motion.button 
                         whileTap={{ scale: 0.7 }}
                         onClick={() => toggleLike(event.id)}
                         style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
                       >
-                        <Heart 
-                          size={30} 
-                          weight={isLiked ? "fill" : "bold"} 
-                          color={isLiked ? "#ef4444" : theme.text} 
-                        />
+                        <Heart size={24} weight={isLiked ? "fill" : "bold"} color={isLiked ? "#ef4444" : theme.text} />
                       </motion.button>
-                      <ChatCircle size={30} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
-                      <ShareNetwork size={30} weight="bold" color={theme.text} style={{ cursor: "pointer" }} />
+                      <ChatCircle size={24} weight="bold" color={theme.text} />
+                      <ShareNetwork size={24} weight="bold" color={theme.text} />
                     </div>
                     <motion.button
                       whileTap={{ scale: 0.8 }}
                       onClick={() => toggleSave(event.id)}
                       style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
                     >
-                      <BookmarkSimple size={30} weight={isSaved ? "fill" : "bold"} color={isSaved ? "#FF7F50" : theme.text} />
+                      <BookmarkSimple size={24} weight={isSaved ? "fill" : "bold"} color={isSaved ? "#FF7F50" : theme.text} />
                     </motion.button>
                   </div>
 
-                  {/* Likes and Caption */}
-                  <div style={{ color: theme.text, fontWeight: 800, fontSize: 15, marginBottom: 10 }}>
-                    {(isLiked ? event.likes + 1 : event.likes).toLocaleString()} likes
+                  <div style={{ fontWeight: 800, fontSize: 13, color: theme.text, marginBottom: 4 }}>
+                    {event.title}
                   </div>
-                  
-                  <div style={{ fontSize: 15, lineHeight: "1.6", color: theme.text }}>
-                    <span style={{ fontWeight: 800, marginRight: 10 }}>SNS Academy</span>
-                    <span>
-                      {isExpanded ? text : (text.length > 100 ? text.substring(0, 100) + "..." : text)}
-                    </span>
-                    {text.length > 100 && (
-                      <button 
-                        onClick={() => toggleCaption(event.id)}
-                        style={{ 
-                          background: "none", 
-                          border: "none", 
-                          color: theme.textMuted, 
-                          fontWeight: 700, 
-                          marginLeft: 6,
-                          cursor: "pointer" 
-                        }}
-                      >
-                        {isExpanded ? "show less" : "more"}
-                      </button>
-                    )}
+                  <div style={{ fontSize: 12, color: theme.textMuted, lineHeight: "1.4", marginBottom: 8 }}>
+                    {event.description}
                   </div>
 
-                  {/* Hashtags */}
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
                     {event.hashtags.map((h, hi) => (
-                      <span key={hi} style={{ color: event.color, fontWeight: 700, fontSize: 14, cursor: "pointer" }}>{h}</span>
+                      <span key={hi} style={{ color: event.color, fontWeight: 700, fontSize: 11 }}>{h}</span>
                     ))}
                   </div>
 
-                  <div style={{ color: theme.textMuted, fontSize: 14, marginTop: 14, fontWeight: 600, cursor: "pointer" }}>
-                    View all {event.comments} comments
-                  </div>
-
                   <div style={{ 
-                    marginTop: 16, 
-                    paddingTop: 16, 
+                    paddingTop: 12, 
                     borderTop: `1px solid ${theme.border}`,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between"
+                    justifyContent: "space-between",
+                    color: theme.textMuted,
+                    fontSize: 11,
+                    fontWeight: 700
                   }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, color: theme.textMuted }}>
-                      <CalendarBlank size={18} weight="bold" />
-                      <span style={{ fontSize: 13, fontWeight: 700 }}>{event.date}</span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: theme.primary }}>
-                      <MapPin size={18} weight="fill" />
-                      <span style={{ fontSize: 13, fontWeight: 800 }}>{event.location}</span>
-                    </div>
+                    <span>{event.date}</span>
+                    <span style={{ color: theme.primary }}>{event.location}</span>
                   </div>
                 </div>
               </motion.article>

@@ -73,21 +73,43 @@ export default function ParentSidebar({ students, activeStudent, setActiveStuden
       overflow: "visible"
     }}>
       {/* Logo Section */}
-      <div style={{ padding: "28px 24px 20px" }}>
+      <div style={{ padding: "32px 24px 24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ 
-            width: 40, height: 40, 
+            width: 42, height: 42, 
             display: "flex", alignItems: "center", justifyContent: "center",
-            background: theme.accent,
+            background: "#fff",
             borderRadius: 12,
-            boxShadow: `0 8px 20px ${theme.accent}44`,
-            padding: 6,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+            padding: 7,
+            border: "1px solid rgba(0,0,0,0.04)"
           }}>
-            <GraduationCap size={24} weight="fill" color="white" />
+            <img 
+              src="/images/logo.png" 
+              alt="Logo" 
+              style={{ width: "100%", height: "auto", objectFit: "contain" }} 
+            />
           </div>
-          <div>
-            <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 800, fontSize: 16, color: theme.text, lineHeight: 1.1 }}>SNS Academy</p>
-            <p style={{ fontSize: 9, color: "#FF7F50", fontWeight: 800, letterSpacing: "0.08em", marginTop: 4, textTransform: "uppercase" }}>Parent Portal</p>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ 
+              fontFamily: "var(--font-poppins, 'Poppins', sans-serif)", 
+              fontWeight: 800, 
+              fontSize: 18, 
+              color: theme.text,
+              letterSpacing: "-0.01em",
+              lineHeight: 1.2
+            }}>
+              SNS <span style={{ color: "#FF7F50" }}>Academy</span>
+            </span>
+            <span style={{ 
+              fontSize: 10, 
+              fontWeight: 700, 
+              color: "#636E72", 
+              textTransform: "uppercase", 
+              letterSpacing: "0.05em"
+            }}>
+              Parent Portal
+            </span>
           </div>
         </div>
       </div>

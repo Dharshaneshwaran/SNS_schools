@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Gear, PencilSimple, Moon, Sun, Lock, Globe, CheckCircle, XCircle, SpinnerGap } from "@phosphor-icons/react";
+import { Gear, PencilSimple, Moon, Sun, Lock, Globe, CheckCircle, XCircle, SpinnerGap, GraduationCap } from "@phosphor-icons/react";
 import { DashboardTheme } from "../../../types/theme";
 import { apiRequest } from "../../../services/api-client";
 
@@ -200,22 +200,6 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
             <PencilSimple size={18} color="#FF7F50" weight="duotone" />
             <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Edit Profile</p>
           </div>
-          <button
-            onClick={handleSaveProfile}
-            disabled={saving}
-            style={{
-              padding: "8px 20px", borderRadius: 10,
-              background: "linear-gradient(90deg,#FF7F50,#e66a3e)", color: "white",
-              border: "none", cursor: saving ? "not-allowed" : "pointer",
-              fontWeight: 600, fontSize: 13, opacity: saving ? 0.7 : 1,
-              transition: "all 0.3s", fontFamily: "var(--font-poppins,'Poppins',sans-serif)",
-              boxShadow: "0 2px 10px rgba(255,127,80,0.25)",
-              display: "flex", alignItems: "center", gap: 6,
-            }}
-          >
-            {saving && <SpinnerGap size={14} className="animate-spin" />}
-            {saving ? "Saving..." : "Update Profile"}
-          </button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
           {[
@@ -336,6 +320,38 @@ export default function SettingsSection({ theme, isDarkMode, setIsDarkMode }: { 
         <button style={{ background: "none", border: "none", color: "#FF7F50", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", padding: 0, marginTop: 16 }}>
           Forgot Password?
         </button>
+      </div>
+
+      {/* Add Student */}
+      <div className="premium-card" style={{ padding: "32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+          <GraduationCap size={18} color="#FF7F50" weight="duotone" />
+          <p style={{ fontFamily: "var(--font-poppins,'Poppins',sans-serif)", fontWeight: 700, fontSize: 15, color: theme.text }}>Add Another Student</p>
+        </div>
+        <p style={{ color: theme.textMuted, fontSize: 13, marginBottom: 20 }}>Link another student profile to switch between them easily.</p>
+        
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, alignItems: "end" }}>
+          <div>
+            <label style={labelStyle2}>Student ID</label>
+            <input type="text" placeholder="SNS-2026-XXXX" style={inputStyle2} />
+          </div>
+          <div>
+            <label style={labelStyle2}>Password</label>
+            <input type="password" placeholder="••••••••" style={inputStyle2} />
+          </div>
+          <button
+            style={{
+              padding: "12px 24px", borderRadius: 10,
+              background: "linear-gradient(90deg,#FF7F50,#e66a3e)", color: "white",
+              border: "none", cursor: "pointer",
+              fontWeight: 700, fontSize: 14,
+              fontFamily: "var(--font-poppins,'Poppins',sans-serif)",
+              boxShadow: "0 4px 15px rgba(255,127,80,0.2)"
+            }}
+          >
+            Link Student
+          </button>
+        </div>
       </div>
     </div>
   );
