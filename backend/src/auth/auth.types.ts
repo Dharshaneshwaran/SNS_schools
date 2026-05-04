@@ -17,6 +17,8 @@ export interface AuthUser {
   role: AppRole;
   department: string;
   status: 'active' | 'away';
+  teacherProfile?: any;
+  studentProfile?: any;
 }
 
 export interface AuthTokenPayload {
@@ -40,5 +42,7 @@ export interface AuthSession {
     role: AppRole;
     department: string;
     status: 'active' | 'away';
+    teacherProfile?: any;
+    studentProfile?: any;
   };
 }
