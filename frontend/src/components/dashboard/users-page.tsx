@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   UserCircle, 
   PencilSimple, 
@@ -13,18 +13,36 @@ import {
   ToggleRight
 } from "@phosphor-icons/react";
 import { PageSection } from "./page-section";
-
-const initialUsers = [
-  { id: "S-001", name: "Arjun Sharma", role: "Student", status: "Active", email: "arjun@sns.edu", features: ["Transport", "Attendance", "Results"] },
-  { id: "T-102", name: "Dr. Sarah Connor", role: "Teacher", status: "Active", email: "sarah.c@sns.edu", features: ["Transport", "Attendance", "Results", "Reports"] },
-  { id: "S-045", name: "Rohan Gupta", role: "Student", status: "Inactive", email: "rohan@sns.edu", features: ["Attendance"] },
-  { id: "T-105", name: "Karan Singh", role: "Teacher", status: "Active", email: "karan.s@sns.edu", features: ["Attendance", "Reports"] },
-];
+import { getAllUsers } from "../../services/users-service";
 
 export function UsersPage() {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const data = await getAllUsers() as any[];
+        const mapped = data.map(u => ({
+          id: u.studentProfile?.studentId || u.teacherProfile?.employeeId || u.id.slice(0, 8),
+          dbId: u.id,
+          name: u.name,
+          role: u.role.charAt(0).toUpperCase() + u.role.slice(1),
+          status: u.status === 'active' ? 'Active' : 'Inactive',
+          email: u.email,
+          features: ["Transport", "Attendance", "Results", "Reports"].filter(() => Math.random() > 0.3) // Temporary random features
+        }));
+        setUsers(mapped);
+      } catch (err) {
+        console.error("Failed to fetch users", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const toggleFeature = (userId: string, feature: string) => {
     setUsers(users.map(u => {
@@ -33,7 +51,7 @@ export function UsersPage() {
         return {
           ...u,
           features: hasFeature 
-            ? u.features.filter(f => f !== feature) 
+            ? u.features.filter((f: string) => f !== feature) 
             : [...u.features, feature]
         };
       }
@@ -98,9 +116,18 @@ export function UsersPage() {
                        <th className="px-8 py-5 text-right">Actions</th>
                     </tr>
                  </thead>
-                 <tbody className="divide-y divide-slate-50">
-                    {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-slate-50/30 transition-colors group">
+                  <tbody className="divide-y divide-slate-50">
+                    {isLoading ? (
+                      <tr>
+                        <td colSpan={5} className="px-8 py-20 text-center">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="h-8 w-8 border-4 border-[#FF7F50] border-t-transparent rounded-full animate-spin" />
+                            <p className="text-sm font-bold text-slate-400">Loading directory...</p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredUsers.map((user) => (
+                      <tr key={user.dbId} className="hover:bg-slate-50/30 transition-colors group">
                          <td className="px-8 py-6">
                             <div className="flex items-center gap-4">
                                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">

@@ -32,6 +32,10 @@ export class UsersService implements OnModuleInit {
 
   async findAll() {
     const users = await this.prisma.user.findMany({
+      include: {
+        teacherProfile: true,
+        studentProfile: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
     return users.map(this.mapUser);
@@ -146,6 +150,8 @@ export class UsersService implements OnModuleInit {
       role: user.role.toLowerCase() as any,
       department: user.department,
       status: user.status.toLowerCase() as any,
+      studentProfile: user.studentProfile,
+      teacherProfile: user.teacherProfile,
     };
   }
 }
