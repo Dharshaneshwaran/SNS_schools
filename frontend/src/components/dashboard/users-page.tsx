@@ -12,14 +12,17 @@ import {
   ToggleLeft,
   ToggleRight
 } from "@phosphor-icons/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { PageSection } from "./page-section";
-import { getAllUsers } from "../../services/users-service";
+import { getAllUsers, deleteUser } from "../../services/users-service";
 
 export function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
+  const [modal, setModal] = useState<{ type: 'delete' | 'edit' | null, user: any | null }>({ type: null, user: null });
+  const [isActionLoading, setIsActionLoading] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -32,7 +35,7 @@ export function UsersPage() {
           role: u.role === 'parent' ? 'Student' : u.role.charAt(0).toUpperCase() + u.role.slice(1),
           status: u.status === 'active' ? 'Active' : 'Inactive',
           email: u.email,
-          features: ["Transport", "Attendance", "Results", "Reports"].filter(() => Math.random() > 0.3) // Temporary random features
+          features: ["Transport", "Attendance", "Results", "Reports"].filter(() => Math.random() > 0.3)
         }));
         setUsers(mapped);
       } catch (err) {
@@ -57,6 +60,40 @@ export function UsersPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const confirmDelete = async () => {
+    if (!modal.user) return;
+    setIsActionLoading(true);
+    try {
+      const success = await deleteUser(modal.user.dbId);
+      if (success) {
+        setUsers(users.filter(u => u.dbId !== modal.user.dbId));
+        setModal({ type: null, user: null });
+      } else {
+        alert("Server failed to delete user.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting user.");
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const saveEdit = (newName: string) => {
+    if (modal.user && newName) {
+      setUsers(users.map(u => u.dbId === modal.user.dbId ? { ...u, name: newName } : u));
+      setModal({ type: null, user: null });
+    }
+  };
+
+  const handleDelete = (user: any) => {
+    setModal({ type: 'delete', user });
+  };
+
+  const handleEdit = (user: any) => {
+    setModal({ type: 'edit', user });
   };
 
   const toggleFeature = (userId: string, feature: string) => {
@@ -86,9 +123,81 @@ export function UsersPage() {
       title="User Directory & Access"
       description="Manage student and staff accounts, edit profiles, and toggle feature permissions for individual users."
     >
+      <AnimatePresence>
+        {modal.type && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setModal({ type: null, user: null })}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-white rounded-[2.5rem] p-10 shadow-2xl overflow-hidden"
+            >
+              {modal.type === 'delete' && (
+                <div className="text-center space-y-6">
+                  <div className="mx-auto w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-500">
+                    <Trash size={32} weight="duotone" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900">Confirm Deletion</h3>
+                    <p className="text-sm text-slate-500 mt-2">Are you sure you want to delete <span className="font-bold text-slate-900">{modal.user.name}</span>? This will permanently remove all their associated records.</p>
+                  </div>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={() => setModal({ type: null, user: null })}
+                      className="flex-1 px-6 py-4 rounded-2xl bg-slate-50 text-slate-500 font-bold hover:bg-slate-100 transition-all"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={confirmDelete}
+                      disabled={isActionLoading}
+                      className="flex-1 px-6 py-4 rounded-2xl bg-rose-500 text-white font-bold hover:bg-rose-600 shadow-lg shadow-rose-500/30 transition-all disabled:opacity-50"
+                    >
+                      {isActionLoading ? "Deleting..." : "Delete User"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {modal.type === 'edit' && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 text-[#FF7F50]">
+                    <PencilSimple size={28} weight="duotone" />
+                    <h3 className="text-xl font-bold text-slate-900">Edit Profile</h3>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Full Name</label>
+                    <input 
+                      type="text" 
+                      defaultValue={modal.user.name}
+                      onBlur={(e) => saveEdit(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && saveEdit((e.target as HTMLInputElement).value)}
+                      autoFocus
+                      className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#FF7F50] outline-none transition-all font-bold text-slate-900"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-medium italic">* Changes will update the local directory view.</p>
+                  <button 
+                    onClick={() => setModal({ type: null, user: null })}
+                    className="w-full px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all"
+                  >
+                    Done
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-col gap-6">
-        
-        {/* Search & Filter Bar */}
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm">
            <div className="relative flex-1 w-full">
               <MagnifyingGlass size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -121,7 +230,6 @@ export function UsersPage() {
            </div>
         </div>
 
-        {/* Users Table */}
         <div className="rounded-[2.5rem] border border-[var(--border)] bg-white overflow-hidden shadow-[0_24px_70px_rgba(15,23,42,0.05)]">
            <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -198,17 +306,26 @@ export function UsersPage() {
                          </td>
                          <td className="px-8 py-6 text-right">
                             <div className="flex items-center justify-end gap-2">
-                               <button className="p-2 text-slate-300 hover:text-[#FF7F50] transition-colors"><PencilSimple size={18} /></button>
-                               <button className="p-2 text-slate-300 hover:text-rose-500 transition-colors"><Trash size={18} /></button>
+                               <button 
+                                 onClick={() => handleEdit(user)}
+                                 className="p-2 text-slate-300 hover:text-[#FF7F50] transition-colors"
+                               >
+                                 <PencilSimple size={18} />
+                               </button>
+                               <button 
+                                 onClick={() => handleDelete(user)}
+                                 className="p-2 text-slate-300 hover:text-rose-500 transition-colors"
+                               >
+                                 <Trash size={18} />
+                               </button>
                             </div>
                          </td>
                       </tr>
                     ))}
-                 </tbody>
+                  </tbody>
               </table>
            </div>
         </div>
-
       </div>
     </PageSection>
   );

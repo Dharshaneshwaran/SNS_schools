@@ -47,3 +47,13 @@ export function getAllUsers() {
     },
   });
 }
+
+export function deleteUser(id: string) {
+  const session = readSession();
+  return apiRequest(`/users/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${session?.accessToken}`,
+    },
+  });
+}
