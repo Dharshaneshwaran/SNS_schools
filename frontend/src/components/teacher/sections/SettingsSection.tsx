@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, 
   Palette, 
@@ -14,9 +14,22 @@ import {
   Camera,
   CheckCircle2
 } from "lucide-react";
+import { useAuth } from "../../../hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export default function SettingsSection() {
   const [activeSubTab, setActiveSubTab] = useState<"profile" | "preferences" | "security">("profile");
+  const { session, logout } = useAuth();
+  const router = useRouter();
+
+  const userName = session?.user?.name || "Teacher";
+  const userEmail = session?.user?.email || "teacher@snsacademy.org";
+  const userInitial = userName.charAt(0).toUpperCase();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-10">
@@ -42,7 +55,7 @@ export default function SettingsSection() {
         ))}
 
         <div className="pt-6 mt-6 border-t border-[var(--border)]">
-          <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500 hover:bg-red-500/10 transition-all font-black uppercase tracking-widest text-xs">
+          <button onClick={handleLogout} className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500 hover:bg-red-500/10 transition-all font-black uppercase tracking-widest text-xs">
             <LogOut size={20} />
             Sign Out
           </button>
@@ -64,7 +77,7 @@ export default function SettingsSection() {
                 <div className="relative z-10 flex flex-col md:flex-row gap-10">
                   <div className="relative group">
                     <div className="w-40 h-40 rounded-[48px] bg-zinc-800 flex items-center justify-center text-6xl font-black italic text-white shadow-2xl">
-                      Y
+                      {userInitial}
                     </div>
                     <button className="absolute -bottom-2 -right-2 p-4 rounded-3xl bg-[var(--accent)] text-white shadow-xl hover:scale-110 transition-transform">
                       <Camera size={20} strokeWidth={3} />
@@ -75,11 +88,11 @@ export default function SettingsSection() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-1">Full Display Name</label>
-                        <input type="text" defaultValue="Yukesh" className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-4 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all" />
+                        <input type="text" defaultValue={userName} className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-4 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-1">Email Address</label>
-                        <input type="email" defaultValue="yukesh.v@snsacademy.org" className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-4 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all" />
+                        <input type="email" defaultValue={userEmail} className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-4 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] ml-1">Phone Number</label>
