@@ -9,6 +9,7 @@ import AcademicSection from "../../components/parent/sections/AcademicSection";
 import TransportSection from "../../components/parent/sections/TransportSection";
 import SettingsSection from "../../components/parent/sections/SettingsSection";
 import MessagesSection from "../../components/parent/sections/MessagesSection";
+import NotificationsSection from "../../components/parent/sections/NotificationsSection";
 import DashboardHome from "../../components/parent/sections/DashboardHome";
 import { List, Bell, MagnifyingGlass, Sun, Moon } from "@phosphor-icons/react";
 
@@ -76,7 +77,7 @@ export default function ParentDashboard() {
       case "events":        return <EventsGallery theme={theme} />;
       case "profile":       return <ProfileSection student={activeStudent} theme={theme} />;
       case "diary":         return <DiarySection student={activeStudent} theme={theme} />;
-      case "notifications": return <DiarySection student={activeStudent} theme={theme} showOnlyNotifications={true} />; 
+      case "notifications": return <NotificationsSection theme={theme} />; 
       case "academic":      return <AcademicSection student={activeStudent} theme={theme} initialTab={academicTab} />;
       case "transport":     return <TransportSection theme={theme} />;
       case "settings":      return <SettingsSection theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
@@ -117,17 +118,9 @@ export default function ParentDashboard() {
       <main className="flex-1 h-screen lg:h-screen w-full min-w-0 relative z-10 flex flex-col overflow-hidden">
         {/* Global Dashboard Header */}
         <div 
-          className="flex items-center px-5 py-3 shrink-0 z-30 shadow-[0_2px_12px_rgba(0,0,0,0.03)]"
-          style={{ background: theme.isDark ? "rgba(18,18,18,0.7)" : "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${theme.border}` }}
+          className="flex items-center px-6 py-4 shrink-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
+          style={{ background: theme.isDark ? "rgba(18,18,18,0.8)" : "rgba(255,255,255,0.8)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${theme.border}` }}
         >
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 -ml-1.5 mr-3 text-[#FF7F50] rounded-xl hover:bg-orange-50 active:scale-95 transition-all"
-            title={isSidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
-          >
-            <List size={28} weight="bold" />
-          </button>
-          
           <div className="flex-1 flex flex-col items-center justify-center">
             <span className="font-extrabold text-[15px] tracking-tight font-poppins leading-none" style={{ color: theme.text }}>
               {activeStudent.name}
@@ -137,13 +130,42 @@ export default function ParentDashboard() {
             </span>
           </div>
 
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF7F50] to-[#e66a3e] text-white flex items-center justify-center font-bold text-xs shadow-[0_2px_8px_rgba(255,127,80,0.3)] ring-2 ring-white">
-            {activeStudent.avatar}
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginLeft: "auto" }}>
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 rounded-xl transition-all hover:bg-orange-50 active:scale-95"
+              style={{ color: "#FF7F50" }}
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDarkMode ? <Sun size={24} weight="duotone" /> : <Moon size={24} weight="duotone" />}
+            </button>
+
+            <button 
+              onClick={() => setActiveMenu("notifications")}
+              className="relative p-2 rounded-xl transition-all hover:bg-orange-50 active:scale-95"
+              style={{ color: "#FF7F50" }}
+              title="Notifications"
+            >
+              <Bell size={24} weight="duotone" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-[#EF4444] rounded-full border-2 border-white"></span>
+            </button>
+
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF7F50] to-[#e66a3e] text-white flex items-center justify-center font-bold text-xs shadow-[0_2px_8px_rgba(255,127,80,0.3)] ring-2 ring-white">
+              {activeStudent.avatar}
+            </div>
           </div>
         </div>
 
         {/* Content Area */}
-        <div className={`flex-1 min-h-0 overflow-y-auto flex flex-col ${activeMenu === 'messages' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
+        <div className={`flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col ${activeMenu === 'messages' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
+          {activeMenu !== 'dashboard' && activeMenu !== 'messages' && (
+            <div className="mb-8 md:mb-10 shrink-0">
+              <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
+                {activeStudent.name}
+              </h2>
+              <p style={{ color: theme.textMuted, fontWeight: 600, fontSize: 16 }}>Class {activeStudent.class}-{activeStudent.section} Student</p>
+            </div>
+          )}
           {renderContent()}
         </div>
       </main>

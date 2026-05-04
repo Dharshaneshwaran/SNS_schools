@@ -8,5 +8,6 @@ export function canAccessWebDashboard(role: UserRole) {
 
 export function getDashboardRoute(role: UserRole): string {
   if (role === "parent") return "/parent-dashboard";
+  if (role === "teacher") return "/teacher-dashboard";
   return "/dashboard";
 }

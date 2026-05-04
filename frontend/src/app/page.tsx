@@ -17,6 +17,13 @@ import {
   Check,
   ArrowRight,
   Star,
+  RocketLaunch,
+  Buildings,
+  Crown,
+  Heart,
+  Lightbulb,
+  UserGear,
+  Sparkle,
 } from "@phosphor-icons/react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -42,8 +49,8 @@ const aboutItems = [
   },
   {
     icon: <ChalkboardTeacher size={44} weight="duotone" />,
-    title: "Experienced Faculty",
-    desc: "Stanford-trained educators providing a 10:1 student-teacher ratio with personalised mentorship.",
+    title: "Experienced Teachers",
+    desc: "Well trained teachers providing a 10:1 student-teacher ratio with personalised mentorship.",
   },
   {
     icon: <Trophy size={44} weight="duotone" />,
@@ -60,7 +67,40 @@ const features = [
   { icon: <ChartLineUp size={30} weight="duotone" />,   title: "Academic Reports",   desc: "Detailed performance analytics and exam results." },
   { icon: <BellRinging size={30} weight="duotone" />,   title: "Notifications",      desc: "Instant alerts for school events and emergencies." },
   { icon: <Clock size={30} weight="duotone" />,         title: "Timetable",          desc: "Easy access to class schedules and substitutions." },
-  { icon: <UsersThree size={30} weight="duotone" />,    title: "Multi-Student",      desc: "Manage multiple children from a single parent login." },
+  { icon: <UsersThree size={30} weight="duotone" />,    title: "Family Access",       desc: "Manage multiple children from a single parent login." },
+];
+
+const schoolHighlights = [
+  {
+    icon: <RocketLaunch size={44} weight="duotone" color="#FF7F50" />,
+    title: "SNS Innovation Hub",
+    desc: "Access to SNS iHub—India's Y-Combinator equivalent. Students work with AI, IoT, Robotics, AR/VR labs preparing them for future careers.",
+  },
+  {
+    icon: <Buildings size={44} weight="duotone" color="#4F46E5" />,
+    title: "World-Class SPINE Center",
+    desc: "5-level activity center with swimming pool, indoor cricket, gym, music studio, dance studio, theater, and more—everything under one roof.",
+  },
+  {
+    icon: <Crown size={44} weight="duotone" color="#F59E0B" />,
+    title: "5 Pillars Development",
+    desc: "Learning, Upskilling, Innovation, Networking, Character Building—comprehensive development for future leaders.",
+  },
+  {
+    icon: <Heart size={44} weight="duotone" color="#EF4444" />,
+    title: "3P Culture Framework",
+    desc: "Purpose, Process, People—our holistic approach ensures every child develops academically, socially, emotionally, and ethically.",
+  },
+  {
+    icon: <Lightbulb size={44} weight="duotone" color="#0EA5E9" />,
+    title: "Design Thinking Education",
+    desc: "India's first school with GenAI-Powered Design Thinking Framework (Patented). Built on Empathy, every child learns to solve problems creatively using AI-enhanced methodologies from an early age.",
+  },
+  {
+    icon: <UserGear size={44} weight="duotone" color="#8B5CF6" />,
+    title: "10:1 Personalized Care",
+    desc: "Ultra-low student-teacher ratio ensures every child receives individual attention. Over 60% of our faculty have 10+ years of teaching experience.",
+  },
 ];
 
 export default function Home() {
@@ -85,19 +125,35 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <div className="hero-badge">
-                <Star size={14} weight="fill" />
-                CBSE Curriculum · Design Thinking
+              <div className="hero-badge" style={{ 
+                background: "linear-gradient(90deg, rgba(255,127,80,0.15) 0%, rgba(230,106,62,0.05) 100%)",
+                border: "1px solid rgba(255,127,80,0.2)",
+                padding: "8px 20px",
+                fontSize: "13px",
+                backdropFilter: "blur(4px)"
+              }}>
+                <Sparkle size={16} weight="fill" />
+                SNS ACADEMY ERP · Innovation Focused
               </div>
 
-              <h1 className="hero-title">
-                Smart School<br />Management with{" "}
+              <h1 className="hero-title" style={{ 
+                fontSize: "clamp(2.8rem, 5vw, 4.5rem)", 
+                lineHeight: 1.05,
+                letterSpacing: "-0.04em",
+                marginBottom: "1.5rem"
+              }}>
+                Smart School<br />Management with<br />
                 <span className="text-gradient">SNS&nbsp;ERP</span>
               </h1>
 
-              <p className="hero-desc">
+              <p className="hero-desc" style={{ 
+                fontSize: "1.15rem", 
+                maxWidth: 520,
+                lineHeight: 1.6,
+                color: "#4A5568"
+              }}>
                 Simplifying communication between parents, teachers, and administration
-                through innovation and design thinking — all in one powerful platform.
+                through innovation and design thinking — all in one powerful, unified platform.
               </p>
 
               <div className="hero-btns">
@@ -141,6 +197,41 @@ export default function Home() {
               </div>
             </motion.div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════
+          SCHOOL HIGHLIGHTS
+      ════════════════════════════════ */}
+      <section className="highlights-section" style={{ padding: "4rem 0 4rem", background: "white" }}>
+        <div className="page-container">
+          <motion.div className="section-header" {...fadeUp} style={{ marginBottom: "3rem" }}>
+            <h2 className="section-title" style={{ fontSize: "3rem", fontWeight: 900 }}>Why Parents Choose SNS Academy</h2>
+            <p className="section-desc">
+              We don&apos;t just teach subjects—we redesign common minds through design thinking, preparing your child for tomorrow&apos;s challenges.
+            </p>
+          </motion.div>
+
+          <div className="about-grid" style={{ 
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", 
+          }}>
+            {schoolHighlights.map((item, i) => (
+              <motion.div
+                key={i}
+                className="about-card"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+              >
+                <div className="about-card-icon" style={{ marginBottom: "1.5rem" }}>
+                  {item.icon}
+                </div>
+                <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -253,7 +344,7 @@ export default function Home() {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
                 {[
-                  { role: "Parents", items: ["Track Academic Progress", "View Fees & Attendance", "Instant Notifications"] },
+                  { role: "Parents", items: ["Track Academic Progress", "Track Attendance", "Instant Notifications"] },
                   { role: "Teachers", items: ["Manage Classes Easily", "Upload Homework & Notes", "Digital Attendance"] },
                 ].map((col, ci) => (
                   <div key={ci}>

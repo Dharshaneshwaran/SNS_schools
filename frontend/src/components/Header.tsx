@@ -38,17 +38,15 @@ export default function Header() {
             textDecoration: "none",
             color: "#121212",
             fontWeight: 800,
-            fontSize: 22,
-            letterSpacing: "-0.02em",
             fontFamily: "var(--font-poppins, 'Poppins', sans-serif)"
           }}>
             <div style={{ 
-              width: 40, height: 40, 
+              width: 44, height: 44, 
               display: "flex", alignItems: "center", justifyContent: "center",
               background: "#fff",
-              borderRadius: 12,
-              boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
-              padding: 6,
+              borderRadius: 14,
+              boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
+              padding: 7,
               border: "1px solid rgba(0,0,0,0.04)"
             }}>
               <img 
@@ -57,7 +55,17 @@ export default function Header() {
                 style={{ width: "100%", height: "auto", objectFit: "contain" }} 
               />
             </div>
-            <span>SNS <span style={{ color: "#FF7F50" }}>Academy</span></span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <span style={{ fontSize: 24, lineHeight: 1.1 }}><span style={{ color: "#FF7F50" }}>SNS</span> <span style={{ color: "#000000" }}>Academy</span></span>
+              <span style={{ 
+                fontSize: 10, 
+                fontWeight: 600, 
+                color: "#636E72", 
+                textTransform: "uppercase", 
+                letterSpacing: "0.1em",
+                lineHeight: 1
+              }}>A Fingerprint School</span>
+            </div>
           </Link>
 
           <ul className="header-nav" style={{ 
@@ -92,19 +100,28 @@ export default function Header() {
             href="/login" 
             className="btn btn-primary" 
             style={{ 
-              padding: "12px 28px", 
-              fontSize: "14px", 
+              padding: "12px 32px", 
+              fontSize: "15px", 
               fontWeight: 800,
-              borderRadius: 16,
-              boxShadow: "0 10px 25px rgba(255,127,80,0.25)",
-              background: "linear-gradient(135deg, #FF7F50, #e66a3e)",
-              border: "none",
+              borderRadius: "14px",
+              boxShadow: scrolled ? "0 10px 30px rgba(255,127,80,0.3)" : "0 10px 30px rgba(255,127,80,0.2)",
+              background: "linear-gradient(135deg, #FF7F50 0%, #e66a3e 100%)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
               color: "white",
               textDecoration: "none",
-              transition: "all 0.3s"
+              transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+              letterSpacing: "0.02em",
+              position: "relative",
+              overflow: "hidden"
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 15px 30px rgba(255,127,80,0.35)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 25px rgba(255,127,80,0.25)"; }}
+            onMouseEnter={(e) => { 
+              e.currentTarget.style.transform = "translateY(-4px) scale(1.02)"; 
+              e.currentTarget.style.boxShadow = "0 15px 35px rgba(255,127,80,0.45)"; 
+            }}
+            onMouseLeave={(e) => { 
+              e.currentTarget.style.transform = "translateY(0) scale(1)"; 
+              e.currentTarget.style.boxShadow = scrolled ? "0 10px 30px rgba(255,127,80,0.3)" : "0 10px 30px rgba(255,127,80,0.2)"; 
+            }}
           >
             Login
           </Link>
