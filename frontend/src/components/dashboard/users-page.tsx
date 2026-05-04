@@ -29,7 +29,7 @@ export function UsersPage() {
           id: u.studentProfile?.studentId || u.teacherProfile?.employeeId || u.id.slice(0, 8),
           dbId: u.id,
           name: u.name,
-          role: u.role.charAt(0).toUpperCase() + u.role.slice(1),
+          role: u.role === 'parent' ? 'Student' : u.role.charAt(0).toUpperCase() + u.role.slice(1),
           status: u.status === 'active' ? 'Active' : 'Inactive',
           email: u.email,
           features: ["Transport", "Attendance", "Results", "Reports"].filter(() => Math.random() > 0.3) // Temporary random features
@@ -43,6 +43,21 @@ export function UsersPage() {
     };
     fetchUsers();
   }, []);
+
+  const handleDownload = () => {
+    const headers = ["ID", "Name", "Role", "Email", "Status"];
+    const rows = filteredUsers.map(u => [u.id, u.name, u.role, u.email, u.status]);
+    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `sns_users_directory_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const toggleFeature = (userId: string, feature: string) => {
     setUsers(users.map(u => {
@@ -97,7 +112,10 @@ export function UsersPage() {
                   {f}
                 </button>
               ))}
-              <button className="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all">
+              <button 
+                onClick={handleDownload}
+                className="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all"
+              >
                  <DownloadSimple size={20} />
               </button>
            </div>
