@@ -110,57 +110,57 @@ export default function StudentsSection() {
       {/* Student Details Modal */}
       <AnimatePresence>
         {selectedStudent && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedStudent(null)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-[2px]" // Reduced blur to keep foreground sharp
+              className="absolute inset-0 bg-black/90 backdrop-blur-md"
             />
             
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-5xl bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[40px] shadow-[0_0_50px_rgba(0,0,0,0.3)] relative overflow-hidden flex flex-col lg:flex-row z-10"
+              className="w-full max-w-5xl bg-zinc-900 border border-zinc-800 rounded-[40px] shadow-[0_0_80px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col lg:flex-row z-10"
               onClick={e => e.stopPropagation()}
             >
               {/* Profile Sidebar */}
-              <div className="w-full lg:w-96 bg-[var(--bg-primary)] p-8 lg:p-12 border-r border-[var(--border)] flex flex-col items-center text-center">
+              <div className="w-full lg:w-96 bg-zinc-950 p-8 lg:p-12 border-r border-zinc-800 flex flex-col items-center text-center">
                 <div className="w-40 h-40 rounded-[48px] bg-zinc-800 flex items-center justify-center text-6xl font-black italic text-white shadow-2xl mb-8">
                   {selectedStudent.name.charAt(0)}
                 </div>
-                <h3 className="text-3xl font-black text-[var(--text-primary)] leading-tight mb-3 italic uppercase tracking-tighter">{selectedStudent.name}</h3>
-                <p className="text-[var(--accent)] text-sm font-black uppercase tracking-[0.2em] mb-10">Roll ID: {selectedStudent.roll}</p>
+                <h3 className="text-3xl font-black text-white leading-tight mb-3 italic uppercase tracking-tighter">{selectedStudent.name}</h3>
+                <p className="text-orange-500 text-sm font-black uppercase tracking-[0.2em] mb-10">Roll ID: {selectedStudent.roll}</p>
                 
                 <div className="w-full space-y-4">
-                  <div className="p-5 rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)]">
-                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-1.5">Academic Standing</p>
-                    <p className="text-lg font-black text-[var(--text-primary)] italic uppercase">{selectedStudent.performance}</p>
+                  <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-inner">
+                    <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Academic Standing</p>
+                    <p className="text-xl font-black text-white italic uppercase">{selectedStudent.performance}</p>
                   </div>
-                  <div className="p-5 rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)]">
-                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-1.5">Class Attendance</p>
-                    <p className="text-2xl font-black text-green-500">94.5%</p>
+                  <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-inner">
+                    <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Class Attendance</p>
+                    <p className="text-3xl font-black text-green-400">94.5%</p>
                   </div>
                 </div>
               </div>
 
               {/* Details Content */}
-              <div className="flex-1 p-8 lg:p-12 relative overflow-y-auto">
+              <div className="flex-1 p-8 lg:p-12 relative overflow-y-auto bg-zinc-900">
                 <button 
                   onClick={() => setSelectedStudent(null)}
-                  className="absolute top-8 right-8 p-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-red-500 hover:border-red-500/30 transition-all z-20"
+                  className="absolute top-8 right-8 p-3 rounded-2xl bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white hover:border-white transition-all z-20"
                 >
                   <X size={20} strokeWidth={3} />
                 </button>
 
-                <div className="mb-10">
-                  <h4 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--accent)] mb-2">Student Profile</h4>
-                  <h2 className="text-2xl font-black text-[var(--text-primary)] italic uppercase">Complete Dossier</h2>
+                <div className="mb-12">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-orange-500 mb-2">Student Profile</h4>
+                  <h2 className="text-4xl font-black text-white italic uppercase tracking-tight">Complete Dossier</h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
                   {[
                     { label: "Parent / Guardian", value: selectedStudent.parent, icon: User },
                     { label: "Emergency Contact", value: selectedStudent.phone, icon: Phone },
@@ -169,30 +169,30 @@ export default function StudentsSection() {
                     { label: "Gender & Blood Group", value: `${selectedStudent.gender} / ${selectedStudent.blood}`, icon: User },
                     { label: "Residential Address", value: selectedStudent.address, icon: MapPin },
                   ].map((info, i) => (
-                    <div key={i} className="flex gap-5 group">
-                      <div className="w-12 h-12 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] shrink-0 group-hover:border-[var(--accent)] transition-all">
-                        <info.icon size={22} strokeWidth={2.5} />
+                    <div key={i} className="flex gap-6 group">
+                      <div className="w-14 h-14 rounded-2xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-orange-500 shrink-0 group-hover:border-orange-500/50 transition-all shadow-lg">
+                        <info.icon size={24} strokeWidth={2.5} />
                       </div>
-                      <div>
-                        <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-1">{info.label}</p>
-                        <p className="text-base font-bold text-[var(--text-primary)]">{info.value}</p>
+                      <div className="flex flex-col justify-center">
+                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">{info.label}</p>
+                        <p className="text-base font-bold text-zinc-200">{info.value}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-16 pt-10 border-t border-[var(--border)] flex flex-wrap gap-4">
-                  <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-primary)] font-black uppercase tracking-[0.2em] text-[10px] hover:border-[var(--accent)] transition-all">
+                <div className="mt-16 pt-10 border-t border-zinc-800 flex flex-wrap gap-4">
+                  <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-zinc-800 border border-zinc-700 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-zinc-700 transition-all">
                     <FileText size={18} /> Detailed Reports
                   </button>
-                  <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-[var(--accent)] text-white font-black uppercase tracking-[0.2em] text-[10px] hover:shadow-2xl hover:shadow-[var(--accent-glow)] transition-all">
+                  <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-orange-500 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-orange-600 shadow-xl shadow-orange-500/20 transition-all">
                     <Award size={18} /> View Certificates
                   </button>
                 </div>
               </div>
 
               {/* Decorative background glow */}
-              <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-[var(--accent-glow)] rounded-full blur-[100px] opacity-10 pointer-events-none" />
+              <div className="absolute -right-20 -top-20 w-96 h-96 bg-orange-500 rounded-full blur-[120px] opacity-10 pointer-events-none" />
             </motion.div>
           </div>
         )}
