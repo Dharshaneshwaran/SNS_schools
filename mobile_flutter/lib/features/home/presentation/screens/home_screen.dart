@@ -12,6 +12,8 @@ import 'academic_screen.dart';
 import 'transport_screen.dart';
 import 'messages_screen.dart';
 import 'settings_screen.dart';
+import 'notifications_screen.dart';
+import 'chat_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -42,6 +44,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       const TransportScreen(),
       const SettingsScreen(),
       ProfileScreen(user: user),
+      const NotificationsScreen(),
+      const ChatScreen(),
     ];
 
     final menuItems = [
@@ -49,6 +53,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _MenuItem(Icons.home_filled, 'Dashboard', 1),
       _MenuItem(Icons.book, 'Diary & Homework', 2, badge: 3),
       _MenuItem(Icons.mail, 'Messages', 3),
+      _MenuItem(Icons.notifications_outlined, 'Notifications', 8),
+      _MenuItem(Icons.chat_bubble_outline, 'Chat', 9),
     ];
 
     final toolItems = [
@@ -263,8 +269,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildHeader(UserModel user, bool isDark) {
-    final textColor = isDark ? DarkAppColors.textPrimary : AppColors.textPrimary;
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 12, 16, 8),
       child: Row(

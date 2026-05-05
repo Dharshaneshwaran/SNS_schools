@@ -63,6 +63,14 @@ class ApiService {
     }
   }
 
+  Future<Response> patch(String path, {dynamic data}) async {
+    try {
+      return await _dio.patch(path, data: data);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   String _handleError(DioException e) {
     if (e.response != null) {
       return e.response?.data['message'] ?? 'Something went wrong';
