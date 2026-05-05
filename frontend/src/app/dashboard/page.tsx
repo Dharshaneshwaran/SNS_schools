@@ -2,7 +2,6 @@
 
 import { useAuth } from "../../hooks/use-auth";
 import { AdminDashboard } from "../../components/dashboard/admin-dashboard";
-import { TeacherDashboard } from "../../components/dashboard/teacher-dashboard";
 import { DashboardOverview } from "../../components/dashboard/dashboard-overview";
 
 import { useRouter } from "next/navigation";
@@ -24,9 +23,5 @@ export default function DashboardPage() {
     return <AdminDashboard />;
   }
 
-  if (session?.user.role === "teacher") {
-    return <TeacherDashboard />;
-  }
-  
   return <div className="flex items-center justify-center min-h-screen">Redirecting...</div>;
 }
