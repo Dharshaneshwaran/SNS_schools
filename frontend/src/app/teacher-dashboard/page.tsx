@@ -10,32 +10,12 @@ import ScheduleManager from "../../components/teacher/ScheduleManager";
 import AssignmentsExams from "../../components/teacher/AssignmentsExams";
 import { ChatPage } from "../../components/dashboard/chat-page";
 import LearningResources from "../../components/teacher/LearningResources";
-
-// New Sections
-import NotificationsSection from "../../components/teacher/sections/NotificationsSection";
-import AttendanceSection from "../../components/teacher/sections/AttendanceSection";
-import TimeTableSection from "../../components/teacher/sections/TimeTableSection";
-import CalendarSection from "../../components/teacher/sections/CalendarSection";
-import StudentsSection from "../../components/teacher/sections/StudentsSection";
-import ResultsSection from "../../components/teacher/sections/ResultsSection";
-import TransportSection from "../../components/teacher/sections/TransportSection";
-import ReportsSection from "../../components/teacher/sections/ReportsSection";
-import SettingsSection from "../../components/teacher/sections/SettingsSection";
-import TeacherChatSection from "../../components/teacher/sections/TeacherChatSection";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings, BarChart3, HelpCircle } from "lucide-react";
-import { useAuth } from "../../hooks/use-auth";
 
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const { session } = useAuth();
-
-  const teacherName = session?.user?.name || "Teacher";
-  const teacherEmail = session?.user?.email || "teacher@snsacademy.org";
-  const teacherDept = session?.user?.department || "Department";
-  const teacherInitial = teacherName.charAt(0).toUpperCase();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -46,16 +26,36 @@ export default function TeacherDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case "overview": return <DashboardOverview />;
-      case "notifications": return <NotificationsSection />;
-      case "attendance": return <AttendanceSection />;
-      case "schedule": return <TimeTableSection />;
-      case "calendar": return <CalendarSection />;
-      case "classes": return <StudentsSection />;
-      case "results": return <ResultsSection />;
-      case "transport": return <TransportSection />;
-      case "tasks": return <ReportsSection />;
-      case "communication": return <TeacherChatSection />;
-      case "settings": return <SettingsSection />;
+      case "notifications": return <DashboardOverview />; // Replace with Notifications component if available
+      case "attendance": return <DashboardOverview />; // Replace with Attendance component
+      case "schedule": return <ScheduleManager />;
+      case "calendar": return <DashboardOverview />;
+      case "classes": return <ClassesSubjects />;
+      case "results": return <DashboardOverview />;
+      case "transport": return <DashboardOverview />;
+      case "tasks": return <AssignmentsExams />;
+      case "communication": return <div className="h-[calc(100vh-160px)] -mx-6 lg:-mx-10 -mt-8"><ChatPage /></div>;
+      case "settings": return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { label: "Performance Reports", icon: BarChart3, desc: "Detailed student analytics" },
+            { label: "System Settings", icon: Settings, desc: "Notification & Privacy preferences" },
+            { label: "Help & Support", icon: HelpCircle, desc: "Contact IT or administration" },
+          ].map((tool, i) => (
+            <motion.div 
+              key={i}
+              whileHover={{ y: -5 }}
+              className="p-6 rounded-[32px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--card-shadow)] hover:border-[var(--accent)] transition-all cursor-pointer group"
+            >
+              <div className="p-4 rounded-2xl bg-[var(--bg-primary)] text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-all mb-4 w-fit">
+                <tool.icon size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">{tool.label}</h3>
+              <p className="text-sm text-[var(--text-secondary)]">{tool.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      );
       case "profile": return (
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
@@ -65,20 +65,20 @@ export default function TeacherDashboard() {
           <div className="relative z-10">
             <div className="flex items-center gap-6 mb-10">
               <div className="w-24 h-24 rounded-[32px] bg-zinc-800 text-white flex items-center justify-center text-4xl font-black italic shadow-xl">
-                {teacherInitial}
+                Y
               </div>
               <div>
-                <h2 className="text-4xl font-black italic text-[var(--text-primary)] tracking-tight">{teacherName}</h2>
-                <p className="text-[var(--accent)] font-black uppercase tracking-[0.2em] text-xs mt-1">Senior Teacher · {teacherDept}</p>
+                <h2 className="text-4xl font-black italic text-[var(--text-primary)] tracking-tight">Yukesh</h2>
+                <p className="text-[var(--accent)] font-black uppercase tracking-[0.2em] text-xs mt-1">Senior Teacher · Computer Science</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
                 { label: "Mobile Number", value: "+91 98765 43210" },
-                { label: "Email Address", value: teacherEmail },
+                { label: "Email Address", value: "yukesh.v@snsacademy.org" },
                 { label: "Employee ID", value: "SNS-T-2026-001" },
-                { label: "Department", value: teacherDept },
+                { label: "Department", value: "Science & Engineering" },
                 { label: "Address", value: "SNS Academy Campus, Coimbatore" },
                 { label: "Joining Date", value: "15th August 2026" },
               ].map((info, i) => (
@@ -110,6 +110,15 @@ export default function TeacherDashboard() {
         <TeacherHeader theme={theme} toggleTheme={toggleTheme} />
         
         <div className="p-6 lg:p-10 flex-1 max-w-[1600px] mx-auto w-full">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-black italic tracking-tight uppercase">
+                {activeTab} <span className="text-[var(--accent)]">Dashboard</span>
+              </h1>
+              <p className="text-[var(--text-secondary)] text-sm font-medium mt-1 uppercase tracking-widest">Academic Year 2026-27</p>
+            </div>
+          </div>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
