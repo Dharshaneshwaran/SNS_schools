@@ -82,7 +82,7 @@ export default function SettingsSection({ theme, toggleTheme }: { theme?: 'light
                 
                 <div className="relative z-10 flex flex-col md:flex-row gap-12 items-start">
                   <div className="relative">
-                    <div className="w-48 h-48 rounded-[64px] bg-gradient-to-br from-zinc-800 to-black flex items-center justify-center text-[var(--accent)]xl font-black italic text-white shadow-2xl relative overflow-hidden">
+                    <div className="w-48 h-48 rounded-[64px] bg-gradient-to-br from-zinc-800 to-black flex items-center justify-center text-6xl font-black italic text-white shadow-2xl relative overflow-hidden">
                       {userInitial}
                       <div className="absolute inset-0 bg-gradient-to-tr from-[var(--accent)]/20 to-transparent" />
                     </div>
@@ -152,8 +152,9 @@ export default function SettingsSection({ theme, toggleTheme }: { theme?: 'light
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            )}
+              </div>
+            </motion.div>
+          )}
 
           {activeSubTab === "preferences" && (
             <motion.div

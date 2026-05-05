@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { Heart, ChatCircle, ShareNetwork, BookmarkSimple } from "@phosphor-icons/react";
 
+import { DashboardTheme } from "../../types/theme";
+
 const events = [
   {
     id: 1,
@@ -24,7 +26,7 @@ const events = [
   },
 ];
 
-export function EventsGallery() {
+export function EventsGallery({ theme }: { theme?: DashboardTheme }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
