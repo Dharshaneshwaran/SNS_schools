@@ -154,10 +154,10 @@ export default function TeacherChatSection() {
               className={`flex flex-col ${msg.isMe ? "items-end" : "items-start"}`}
             >
               <div 
-                className={`max-w-[80%] md:max-w-[60%] p-4 rounded-3xl relative shadow-sm ${
+                className={`max-w-[80%] md:max-w-[60%] p-4 rounded-3xl relative shadow-[var(--card-shadow)] ${
                   msg.isMe 
                     ? "bg-[#DCF8C6] dark:bg-[#056162] text-black dark:text-white rounded-tr-none border border-black/5" 
-                    : "bg-white dark:bg-[#202c33] text-[var(--text-primary)] rounded-tl-none border border-[var(--border)]"
+                    : "bg-[var(--bg-secondary)] dark:bg-[#202c33] text-[var(--text-primary)] rounded-tl-none border border-[var(--border)]"
                 }`}
               >
                 {!msg.isMe && selectedContact.isGroup && (
@@ -175,7 +175,7 @@ export default function TeacherChatSection() {
                 <div className={`absolute top-0 w-3 h-3 ${
                   msg.isMe 
                     ? "-right-2 bg-[#DCF8C6] dark:bg-[#056162]" 
-                    : "-left-2 bg-white dark:bg-[#202c33]"
+                    : "-left-2 bg-[var(--bg-secondary)] dark:bg-[#202c33]"
                 } clip-path-bubble`} />
               </div>
             </motion.div>

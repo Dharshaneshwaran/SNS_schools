@@ -73,10 +73,14 @@ export default function CalendarSection() {
               {monthName} <span className="text-[var(--accent)]">{year}</span>
             </h3>
             <div className="flex gap-1">
-              <button className="p-1 rounded-md bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] transition-all">
+              <button 
+                onClick={() => setCurrentDate(new Date(year, currentDate.getMonth() - 1, 1))}
+                className="p-1 rounded-md bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] transition-all">
                 <ChevronLeft size={12} />
               </button>
-              <button className="p-1 rounded-md bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] transition-all">
+              <button 
+                onClick={() => setCurrentDate(new Date(year, currentDate.getMonth() + 1, 1))}
+                className="p-1 rounded-md bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] transition-all">
                 <ChevronRight size={12} />
               </button>
             </div>
@@ -94,16 +98,20 @@ export default function CalendarSection() {
             ))}
             {[...Array(daysInMonth)].map((_, i) => {
               const day = i + 1;
-              const dateStr = `2026-05-${day.toString().padStart(2, '0')}`;
+              const m = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+              const dateStr = `${year}-${m}-${day.toString().padStart(2, '0')}`;
               const event = academicEvents.find(e => e.date === dateStr);
-              const attendanceStatus = teacherAttendance[dateStr];
+              const attendanceStatus = (teacherAttendance as Record<string, string>)[dateStr];
+              
+              const today = new Date();
+              const isToday = today.getFullYear() === year && today.getMonth() === currentDate.getMonth() && today.getDate() === day;
 
               return (
                 <div
                   key={day}
                   className={`h-10 md:h-12 lg:h-14 rounded-lg border flex flex-col items-center justify-center relative cursor-pointer transition-all ${
-                    day === 4 
-                      ? "bg-[var(--accent)] border-[var(--accent)] text-white shadow-sm" 
+                    isToday 
+                      ? "bg-[var(--accent)] border-[var(--accent)] text-white shadow-[var(--card-shadow)]" 
                       : "bg-[var(--bg-primary)] border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--accent)]"
                   }`}
                 >

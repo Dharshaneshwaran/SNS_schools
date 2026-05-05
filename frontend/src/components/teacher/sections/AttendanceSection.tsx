@@ -57,13 +57,7 @@ export default function AttendanceSection() {
   return (
     <div className="space-y-6">
       {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h2 className="text-3xl font-black italic uppercase tracking-tight text-[var(--text-primary)]">
-            Attendance <span className="text-[var(--accent)]">Manager</span>
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)] font-medium">Select class and mark student presence</p>
-        </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-6">
 
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 bg-[var(--bg-secondary)] p-1.5 rounded-2xl border border-[var(--border)]">
@@ -92,7 +86,7 @@ export default function AttendanceSection() {
           {!isMarkingMode ? (
             <button 
               onClick={() => setIsMarkingMode(true)}
-              className="px-8 py-3.5 rounded-2xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-xs hover:shadow-xl hover:shadow-[var(--accent-glow)] transition-all active:scale-95"
+              className="px-8 py-3.5 rounded-2xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-xs hover:shadow-2xl hover:shadow-[var(--accent-glow)] transition-all active:scale-95"
             >
               Start Marking
             </button>
@@ -126,7 +120,7 @@ export default function AttendanceSection() {
           { label: "Present", value: Object.values(attendance).filter(v => v).length, color: "#10B981" },
           { label: "Absent", value: isMarkingMode ? students.length - Object.values(attendance).filter(v => v).length : 0, color: "#EF4444" },
         ].map((stat, i) => (
-          <div key={i} className="p-5 rounded-[24px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-sm">
+          <div key={i} className="p-5 rounded-[24px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--card-shadow)]">
             <p className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-1">{stat.label}</p>
             <p className="text-2xl font-black italic" style={{ color: stat.color }}>{stat.value.toString().padStart(2, '0')}</p>
           </div>
@@ -165,7 +159,7 @@ export default function AttendanceSection() {
                     exit={{ opacity: 0, scale: 0.5 }}
                     className="absolute inset-0 bg-green-500/40 backdrop-blur-[1px] flex items-center justify-center"
                   >
-                    <div className="w-10 h-10 rounded-full bg-white text-green-500 flex items-center justify-center shadow-lg">
+                    <div className="w-10 h-10 rounded-full bg-[var(--bg-secondary)] text-green-500 flex items-center justify-center shadow-lg">
                       <Check size={24} strokeWidth={4} />
                     </div>
                   </motion.div>
@@ -198,7 +192,7 @@ export default function AttendanceSection() {
           <p className="text-[var(--text-secondary)] text-xs font-medium mb-6">Click 'Start Marking' to record presence for today.</p>
           <button 
             onClick={() => setIsMarkingMode(true)}
-            className="px-8 py-3 rounded-xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-[10px] hover:shadow-xl hover:shadow-[var(--accent-glow)] transition-all"
+            className="px-8 py-3 rounded-xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-[10px] hover:shadow-2xl hover:shadow-[var(--accent-glow)] transition-all"
           >
             Enable Marking Mode
           </button>

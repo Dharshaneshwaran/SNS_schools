@@ -19,10 +19,6 @@ export default function NotificationsSection({ theme }: { theme: DashboardTheme 
       animate={{ opacity: 1, y: 0 }} 
       style={{ width: "100%", display: "flex", flexDirection: "column", gap: 20 }}
     >
-      <div style={{ marginBottom: 8 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 800, color: theme.text, marginBottom: 4 }}>Recent Notifications</h3>
-        <p style={{ fontSize: 14, color: theme.textMuted }}>Stay updated with the latest school announcements and alerts.</p>
-      </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {notifications.map((n, i) => (

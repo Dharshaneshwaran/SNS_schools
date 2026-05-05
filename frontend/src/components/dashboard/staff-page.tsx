@@ -69,16 +69,16 @@ export function StaffPage() {
       description="Onboard new faculty members and configure their system access levels and responsibilities."
     >
       <div className="max-w-4xl mx-auto">
-        <div className="rounded-[2.5rem] border border-[var(--border)] bg-white overflow-hidden shadow-[0_24px_70px_rgba(15,23,42,0.05)]">
+        <div className="rounded-[2.5rem] border border-[var(--border)] bg-[var(--bg-secondary)] overflow-hidden shadow-[var(--card-shadow)]">
           
-          <div className="bg-slate-50 border-b border-slate-100 px-10 py-8 flex items-center justify-between">
+          <div className="bg-[var(--bg-primary)] border-b border-[var(--border)] px-10 py-8 flex items-center justify-between">
              <div>
-                <h3 className="text-xl font-bold text-slate-900">Faculty Registration</h3>
-                <p className="text-sm text-slate-500 font-medium">Configure roles and permissions</p>
+                <h3 className="text-xl font-bold text-[var(--text-primary)]">Faculty Registration</h3>
+                <p className="text-sm text-[var(--text-secondary)] font-medium">Configure roles and permissions</p>
              </div>
              <div className="flex gap-2">
                 {[1, 2, 3].map((s) => (
-                   <div key={s} className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step >= s ? "bg-[#FF7F50]" : "bg-slate-200"}`} />
+                   <div key={s} className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step >= s ? "bg-[var(--accent)]" : "bg-[var(--border)]"}`} />
                 ))}
              </div>
           </div>
@@ -93,7 +93,7 @@ export function StaffPage() {
                    exit={{ opacity: 0, y: -10 }}
                    className="space-y-8"
                 >
-                  <div className="flex items-center gap-3 text-[#FF7F50] mb-2">
+                  <div className="flex items-center gap-3 text-[var(--accent)] mb-2">
                      <IdentificationCard size={24} weight="duotone" />
                      <h4 className="font-bold text-lg">Employee Details</h4>
                   </div>
@@ -131,9 +131,9 @@ export function StaffPage() {
                       onChange={(val) => setFormData({...formData, phone: val})}
                     />
                     <div>
-                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Department</label>
+                      <label className="block text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2">Department</label>
                       <select 
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 outline-none focus:border-[#FF7F50] transition-colors appearance-none"
+                        className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl px-5 py-4 text-[var(--text-primary)] outline-none focus:border-[var(--accent)] transition-colors appearance-none"
                         value={formData.department}
                         onChange={(e) => setFormData({...formData, department: e.target.value})}
                       >
@@ -150,7 +150,7 @@ export function StaffPage() {
                     <button 
                       onClick={nextStep}
                       disabled={!formData.fullName || !formData.email || !formData.employeeId || !formData.password}
-                      className="flex items-center gap-2 px-10 py-4 bg-[#FF7F50] text-white rounded-2xl font-bold shadow-lg shadow-[#FF7F50]/30 hover:bg-[#e66a3e] transition-all disabled:opacity-50"
+                      className="flex items-center gap-2 px-10 py-4 bg-[var(--accent)] text-white rounded-2xl font-bold shadow-lg shadow-[var(--accent)]/30 hover:bg-[#e66a3e] transition-all disabled:opacity-50"
                     >
                       Set Permissions <CaretRight size={20} />
                     </button>
@@ -166,14 +166,14 @@ export function StaffPage() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-8"
                 >
-                  <div className="flex items-center gap-3 text-[#FF7F50] mb-2">
+                  <div className="flex items-center gap-3 text-[var(--accent)] mb-2">
                      <ShieldCheck size={24} weight="duotone" />
                      <h4 className="font-bold text-lg">Role & Access Control</h4>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      <div className="space-y-4">
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Select Primary Role</label>
+                        <label className="block text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">Select Primary Role</label>
                         <div className="flex flex-col gap-3">
                            {[
                              { id: "teacher", label: "Teacher", desc: "Access to classes & grading" },
@@ -183,22 +183,22 @@ export function StaffPage() {
                              <button 
                                key={r.id}
                                onClick={() => setFormData({...formData, role: r.id})}
-                               className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${formData.role === r.id ? "border-[#FF7F50] bg-[#FF7F50]/5" : "border-slate-50 hover:border-slate-100"}`}
+                               className={`flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all ${formData.role === r.id ? "border-[var(--accent)] bg-[var(--accent)]/5" : "border-[var(--border)] hover:border-[var(--border)]"}`}
                              >
-                               <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.role === r.id ? "bg-[#FF7F50] text-white" : "bg-slate-100 text-slate-400"}`}>
+                               <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.role === r.id ? "bg-[var(--accent)] text-white" : "bg-[var(--bg-muted)] text-[var(--text-muted)]"}`}>
                                   <UserGear size={24} />
                                </div>
                                <div>
-                                  <div className="text-sm font-bold text-slate-900">{r.label}</div>
-                                  <p className="text-[10px] text-slate-500 font-medium">{r.desc}</p>
+                                  <div className="text-sm font-bold text-[var(--text-primary)]">{r.label}</div>
+                                  <p className="text-[10px] text-[var(--text-secondary)] font-medium">{r.desc}</p>
                                </div>
                              </button>
                            ))}
                         </div>
                      </div>
                      <div className="space-y-4">
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Advanced Permissions</label>
-                        <div className="grid grid-cols-1 gap-2">
+                        <label className="block text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">Advanced Permissions</label>
+                         <div className="grid grid-cols-1 gap-2">
                            {[
                              { id: "view_attendance", label: "Attendance Tracking" },
                              { id: "view_reports", label: "Generate Academic Reports" },
@@ -208,7 +208,7 @@ export function StaffPage() {
                              <button 
                                key={p.id}
                                onClick={() => togglePermission(p.id)}
-                               className={`flex items-center justify-between p-3 rounded-xl border font-bold text-xs transition-all ${formData.permissions.includes(p.id) ? "border-[#FF7F50] bg-[#FF7F50]/5 text-[#FF7F50]" : "border-slate-100 text-slate-400"}`}
+                               className={`flex items-center justify-between p-3 rounded-xl border font-bold text-xs transition-all ${formData.permissions.includes(p.id) ? "border-[var(--accent)] bg-[var(--accent)]/5 text-[var(--accent)]" : "border-[var(--border)] text-[var(--text-muted)]"}`}
                              >
                                {p.label}
                                {formData.permissions.includes(p.id) ? <CheckCircle size={16} weight="fill" /> : <Plus size={16} />}
@@ -218,14 +218,14 @@ export function StaffPage() {
                      </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-6 border-t border-slate-100">
-                    <button onClick={prevStep} className="flex items-center gap-2 text-slate-500 font-bold hover:text-slate-900 transition-colors">
+                  <div className="flex items-center justify-between pt-6 border-t border-[var(--border)]">
+                    <button onClick={prevStep} className="flex items-center gap-2 text-[var(--text-secondary)] font-bold hover:text-[var(--text-primary)] transition-colors">
                       <CaretLeft size={20} /> Back
                     </button>
                     <button 
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="flex items-center gap-2 px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl hover:bg-slate-800 transition-all disabled:opacity-50"
+                      className="flex items-center gap-2 px-10 py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-2xl hover:bg-slate-800 transition-all disabled:opacity-50"
                     >
                       {isSaving ? "Creating Account..." : "Finalize Staff Record"}
                       <CheckCircle size={20} weight="fill" />
@@ -244,19 +244,19 @@ export function StaffPage() {
                   <div className="inline-flex h-24 w-24 items-center justify-center rounded-full bg-emerald-50 text-emerald-500 mb-8">
                     <CheckCircle size={64} weight="fill" />
                   </div>
-                  <h3 className="text-3xl font-bold text-slate-900 mb-4">Onboarding Complete</h3>
-                  <p className="text-slate-500 max-w-sm mx-auto mb-10 leading-relaxed">
-                    Account for <span className="font-bold text-slate-900">{formData.fullName}</span> has been created. Credentials have been sent to their email.
+                  <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-4">Onboarding Complete</h3>
+                  <p className="text-[var(--text-secondary)] max-w-sm mx-auto mb-10 leading-relaxed">
+                    Account for <span className="font-bold text-[var(--text-primary)]">{formData.fullName}</span> has been created. Credentials have been sent to their email.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button 
                       onClick={() => { setStep(1); setFormData({fullName: "", email: "", phone: "", department: "", employeeId: "", password: "", role: "teacher", permissions: ["view_attendance", "view_reports"]}); }}
-                      className="px-8 py-4 bg-[#FF7F50] text-white rounded-2xl font-bold shadow-lg shadow-[#FF7F50]/30 hover:bg-[#e66a3e] transition-all"
+                      className="px-8 py-4 bg-[var(--accent)] text-white rounded-2xl font-bold shadow-lg shadow-[var(--accent)]/30 hover:bg-[#e66a3e] transition-all"
                     >
                       Add Another Member
                     </button>
-                    <button className="px-8 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold hover:bg-slate-50 transition-all">
+                    <button className="px-8 py-4 bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] rounded-2xl font-bold hover:bg-[var(--bg-primary)] transition-all">
                       View Staff Directory
                     </button>
                   </div>
@@ -273,13 +273,13 @@ export function StaffPage() {
 function InputField({ label, placeholder, value, onChange, type = "text" }: { label: string, placeholder: string, value: string, onChange: (v: string) => void, type?: string }) {
   return (
     <div className="space-y-2">
-      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">{label}</label>
+      <label className="block text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">{label}</label>
       <input 
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 placeholder:text-slate-300 outline-none focus:border-[#FF7F50] transition-colors"
+        className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl px-5 py-4 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)] transition-colors"
       />
     </div>
   );

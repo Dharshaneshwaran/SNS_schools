@@ -232,7 +232,7 @@ export function ChatPage() {
 
   const MessageStatusIcon = ({ status }: { status?: string }) => {
     if (!status) return null;
-    return <Checks size={14} weight="bold" className={status === 'read' ? 'text-orange-500' : 'text-slate-400'} />;
+    return <Checks size={14} weight="bold" className={status === 'read' ? 'text-orange-500' : 'text-[var(--text-muted)]'} />;
   };
 
   const groupMessagesByDate = (msgs: any[]) => {
@@ -247,34 +247,34 @@ export function ChatPage() {
   const groupedMessages = groupMessagesByDate(messages);
 
   return (
-    <div className="flex h-[calc(100vh-90px)] w-full overflow-hidden bg-slate-50">
+    <div className="flex h-[calc(100vh-90px)] w-full overflow-hidden bg-[var(--bg-primary)]">
       {/* Sidebar: Contacts */}
-      <div className="w-80 border-r border-slate-200 flex flex-col bg-white">
+      <div className="w-80 border-r border-[var(--border)] flex flex-col bg-[var(--bg-secondary)]">
         {/* Sidebar Header */}
-        <div className="h-16 bg-white px-4 flex items-center justify-between border-b border-slate-200">
-          <h2 className="text-lg font-semibold text-slate-800">Messages</h2>
+        <div className="h-16 bg-[var(--bg-secondary)] px-4 flex items-center justify-between border-b border-[var(--border)]">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Messages</h2>
           <div className="flex items-center gap-3">
             {!isParent && (
               <button title="New Group" onClick={handleNewGroup} className="p-2 hover:bg-orange-50 rounded-lg transition-colors group">
-                <UsersThree size={20} weight="bold" className="text-slate-600 group-hover:text-orange-500" />
+                <UsersThree size={20} weight="bold" className="text-[var(--text-secondary)] group-hover:text-orange-500" />
               </button>
             )}
-            <button title="Menu" onClick={() => {}} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-              <DotsThreeVertical size={20} weight="bold" className="text-slate-600" />
+            <button title="Menu" onClick={() => {}} className="p-2 hover:bg-[var(--bg-muted)] rounded-lg transition-colors">
+              <DotsThreeVertical size={20} weight="bold" className="text-[var(--text-secondary)]" />
             </button>
           </div>
         </div>
 
         {/* Search */}
-        <div className="p-3 bg-white border-b border-slate-200">
+        <div className="p-3 bg-[var(--bg-secondary)] border-b border-[var(--border)]">
           <div className="relative">
-            <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..." 
-              className="w-full bg-slate-50 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500 placeholder:text-slate-400"
+              className="w-full bg-[var(--bg-primary)] rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500 placeholder:text-[var(--text-muted)]"
             />
           </div>
         </div>
@@ -286,11 +286,11 @@ export function ChatPage() {
               key={contact.id}
               onClick={() => setSelectedContact(contact)}
               className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
-                selectedContact?.id === contact.id ? "bg-orange-50 border-l-4 border-orange-500" : "hover:bg-slate-50"
+                selectedContact?.id === contact.id ? "bg-orange-50 border-l-4 border-orange-500" : "hover:bg-[var(--bg-primary)]"
               }`}
             >
               <div className="relative flex-shrink-0">
-                <div className="h-11 w-11 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+                <div className="h-11 w-11 rounded-full bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)]">
                   {contact.type === 'Group' ? <UsersThree size={24} weight="duotone" /> : <Checks size={24} weight="duotone" />}
                 </div>
                 {contact.online && contact.type !== 'Group' && (
@@ -299,11 +299,11 @@ export function ChatPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline mb-1">
-                  <div className="text-sm font-medium text-slate-900 truncate">{contact.name}</div>
-                  <div className={`text-xs ${contact.unread > 0 ? "text-orange-600 font-medium" : "text-slate-500"}`}>{contact.time}</div>
+                  <div className="text-sm font-medium text-[var(--text-primary)] truncate">{contact.name}</div>
+                  <div className={`text-xs ${contact.unread > 0 ? "text-orange-600 font-medium" : "text-[var(--text-secondary)]"}`}>{contact.time}</div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <div className="text-xs text-slate-500 truncate pr-2">{contact.lastMsg}</div>
+                  <div className="text-xs text-[var(--text-secondary)] truncate pr-2">{contact.lastMsg}</div>
                   {contact.unread > 0 && (
                     <div className="h-5 min-w-[20px] px-1.5 rounded-full bg-orange-600 text-white text-[10px] font-semibold flex items-center justify-center">
                       {contact.unread}
@@ -313,7 +313,7 @@ export function ChatPage() {
               </div>
             </button>
           )) : (
-             <div className="p-8 text-center text-sm text-slate-500">
+             <div className="p-8 text-center text-sm text-[var(--text-secondary)]">
                 No conversations found
              </div>
           )}
@@ -321,21 +321,21 @@ export function ChatPage() {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="flex-1 flex flex-col bg-[var(--bg-secondary)]">
         {selectedContact ? (
           <>
             {/* Chat Header */}
-            <div className="h-16 bg-white px-6 flex items-center justify-between border-b border-slate-200">
+            <div className="h-16 bg-[var(--bg-secondary)] px-6 flex items-center justify-between border-b border-[var(--border)]">
               <div className="flex items-center gap-3">
-                <div className="relative h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+                <div className="relative h-10 w-10 rounded-full bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)]">
                    <UsersThree size={22} weight="duotone" className="text-orange-500" />
                 </div>
                 <button 
                   onClick={() => setIsViewingGroupInfo(true)}
                   className="text-left hover:opacity-80 transition-opacity"
                 >
-                  <div className="text-sm font-semibold text-slate-900">{selectedContact.name}</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-sm font-semibold text-[var(--text-primary)]">{selectedContact.name}</div>
+                  <div className="text-xs text-[var(--text-secondary)]">
                     {selectedContact.members?.length || 0} members
                   </div>
                 </button>
@@ -351,22 +351,22 @@ export function ChatPage() {
                     Add Members
                   </button>
                 )}
-                <button onClick={() => {}} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                  <MagnifyingGlass size={18} weight="bold" className="text-slate-600" />
+                <button onClick={() => {}} className="p-2 hover:bg-[var(--bg-muted)] rounded-lg transition-colors">
+                  <MagnifyingGlass size={18} weight="bold" className="text-[var(--text-secondary)]" />
                 </button>
-                <button onClick={() => setIsViewingGroupInfo(true)} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                  <DotsThreeVertical size={18} weight="bold" className="text-slate-600" />
+                <button onClick={() => setIsViewingGroupInfo(true)} className="p-2 hover:bg-[var(--bg-muted)] rounded-lg transition-colors">
+                  <DotsThreeVertical size={18} weight="bold" className="text-[var(--text-secondary)]" />
                 </button>
               </div>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
+            <div className="flex-1 overflow-y-auto p-6 bg-[var(--bg-primary)]">
               {Object.entries(groupedMessages).map(([date, msgs]) => (
                 <div key={date}>
                   {/* Date Separator */}
                   <div className="flex items-center justify-center my-4">
-                    <div className="bg-white px-3 py-1 rounded-full text-xs text-slate-600 shadow-sm border border-slate-200">
+                    <div className="bg-[var(--bg-secondary)] px-3 py-1 rounded-full text-xs text-[var(--text-secondary)] shadow-[var(--card-shadow)] border border-[var(--border)]">
                       {date}
                     </div>
                   </div>
@@ -382,24 +382,24 @@ export function ChatPage() {
                           {/* Reply button on hover */}
                           <button 
                             onClick={() => handleReply(msg)}
-                            className="absolute -top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white hover:bg-slate-100 rounded-full p-1.5 shadow-md z-10"
+                            className="absolute -top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--bg-secondary)] hover:bg-[var(--bg-muted)] rounded-full p-1.5 shadow-md z-10"
                             title="Reply"
                           >
-                            <ArrowBendUpLeft size={12} weight="bold" className="text-slate-600" />
+                            <ArrowBendUpLeft size={12} weight="bold" className="text-[var(--text-secondary)]" />
                           </button>
 
                           <div 
-                            className={`px-4 py-2 rounded-2xl shadow-sm ${
+                            className={`px-4 py-2 rounded-2xl shadow-[var(--card-shadow)] ${
                               msg.isMe 
                                 ? 'bg-orange-600 text-white' 
-                                : 'bg-white text-slate-900 border border-slate-200'
+                                : 'bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border)]'
                             }`}
                           >
                             {/* Reply Preview */}
                             {msg.replyTo && (
-                              <div className={`mb-2 pl-3 py-1.5 border-l-3 rounded ${msg.isMe ? 'border-orange-300 bg-orange-500/20' : 'border-slate-300 bg-slate-50'}`}>
-                                <div className={`text-xs font-semibold ${msg.isMe ? 'text-orange-100' : 'text-slate-700'}`}>{msg.replyTo.sender}</div>
-                                <div className={`text-xs ${msg.isMe ? 'text-orange-100' : 'text-slate-600'} truncate`}>{msg.replyTo.text}</div>
+                              <div className={`mb-2 pl-3 py-1.5 border-l-3 rounded ${msg.isMe ? 'border-orange-300 bg-orange-500/20' : 'border-slate-300 bg-[var(--bg-primary)]'}`}>
+                                <div className={`text-xs font-semibold ${msg.isMe ? 'text-orange-100' : 'text-[var(--text-primary)]'}`}>{msg.replyTo.sender}</div>
+                                <div className={`text-xs ${msg.isMe ? 'text-orange-100' : 'text-[var(--text-secondary)]'} truncate`}>{msg.replyTo.text}</div>
                               </div>
                             )}
 
@@ -411,7 +411,7 @@ export function ChatPage() {
                               {msg.text}
                             </div>
                             
-                            <div className={`flex items-center justify-end gap-1 mt-1 text-[10px] ${msg.isMe ? 'text-orange-100' : 'text-slate-500'}`}>
+                            <div className={`flex items-center justify-end gap-1 mt-1 text-[10px] ${msg.isMe ? 'text-orange-100' : 'text-[var(--text-secondary)]'}`}>
                               <span>{msg.time}</span>
                               {msg.isMe && <MessageStatusIcon status={msg.status} />}
                             </div>
@@ -432,23 +432,23 @@ export function ChatPage() {
                   <ArrowBendUpLeft size={16} className="text-orange-600" />
                   <div className="flex-1">
                     <div className="text-xs font-semibold text-orange-600">Replying to {replyingTo.sender}</div>
-                    <div className="text-xs text-slate-600 truncate">{replyingTo.text}</div>
+                    <div className="text-xs text-[var(--text-secondary)] truncate">{replyingTo.text}</div>
                   </div>
                 </div>
                 <button onClick={() => setReplyingTo(null)} className="p-1 hover:bg-orange-100 rounded transition-colors">
-                  <X size={18} weight="bold" className="text-slate-600" />
+                  <X size={18} weight="bold" className="text-[var(--text-secondary)]" />
                 </button>
               </div>
             )}
 
             {/* Input Bar */}
-            <div className="bg-white px-6 py-4 flex items-center gap-3 border-t border-slate-200">
-              <label className="p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
-                <Paperclip size={20} className="text-slate-600" />
+            <div className="bg-[var(--bg-secondary)] px-6 py-4 flex items-center gap-3 border-t border-[var(--border)]">
+              <label className="p-2 hover:bg-[var(--bg-muted)] rounded-lg transition-colors cursor-pointer">
+                <Paperclip size={20} className="text-[var(--text-secondary)]" />
                 <input type="file" className="hidden" onChange={handleFileUpload} />
               </label>
               
-              <div className="flex-1 bg-slate-50 rounded-lg px-4 py-2.5 border border-slate-200 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20">
+              <div className="flex-1 bg-[var(--bg-primary)] rounded-lg px-4 py-2.5 border border-[var(--border)] focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20">
                 <input 
                   ref={inputRef}
                   type="text" 
@@ -456,7 +456,7 @@ export function ChatPage() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Type a message..."
-                  className="w-full bg-transparent border-none outline-none text-sm text-slate-900 placeholder:text-slate-400"
+                  className="w-full bg-transparent border-none outline-none text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
                 />
               </div>
               
@@ -470,12 +470,12 @@ export function ChatPage() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-slate-500 bg-slate-50/50">
-            <div className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-4">
+          <div className="flex-1 flex flex-col items-center justify-center text-[var(--text-secondary)] bg-[var(--bg-primary)]/50">
+            <div className="w-20 h-20 rounded-full bg-[var(--bg-secondary)] shadow-[var(--card-shadow)] flex items-center justify-center mb-4">
                <ChatCircle size={40} weight="duotone" className="text-orange-500" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-800">Your Messages</h3>
-            <p className="text-sm text-slate-500 max-w-[280px] text-center mt-2">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Your Messages</h3>
+            <p className="text-sm text-[var(--text-secondary)] max-w-[280px] text-center mt-2">
               Select a conversation from the sidebar to start messaging.
             </p>
           </div>
@@ -486,60 +486,60 @@ export function ChatPage() {
       {isViewingGroupInfo && (
         <div className="fixed inset-0 z-[110] flex justify-end">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" onClick={() => setIsViewingGroupInfo(false)} />
-          <div className="relative w-full max-w-md bg-slate-50 shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-300">
+          <div className="relative w-full max-w-md bg-[var(--bg-primary)] shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-300">
             {/* Header */}
-            <div className="h-16 bg-white px-6 flex items-center gap-6 border-b border-slate-200">
-              <button onClick={() => setIsViewingGroupInfo(false)} className="p-1 hover:bg-slate-100 rounded-full transition-colors">
-                <X size={24} weight="bold" className="text-slate-600" />
+            <div className="h-16 bg-[var(--bg-secondary)] px-6 flex items-center gap-6 border-b border-[var(--border)]">
+              <button onClick={() => setIsViewingGroupInfo(false)} className="p-1 hover:bg-[var(--bg-muted)] rounded-full transition-colors">
+                <X size={24} weight="bold" className="text-[var(--text-secondary)]" />
               </button>
-              <h3 className="text-lg font-bold text-slate-800">Group info</h3>
+              <h3 className="text-lg font-bold text-[var(--text-primary)]">Group info</h3>
             </div>
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto">
-              <div className="bg-white p-8 flex flex-col items-center border-b border-slate-100 mb-2">
-                <div className="h-40 w-40 rounded-full bg-slate-100 flex items-center justify-center mb-6 relative group cursor-pointer shadow-inner">
+              <div className="bg-[var(--bg-secondary)] p-8 flex flex-col items-center border-b border-[var(--border)] mb-2">
+                <div className="h-40 w-40 rounded-full bg-[var(--bg-muted)] flex items-center justify-center mb-6 relative group cursor-pointer shadow-inner">
                   <UsersThree size={80} weight="duotone" className="text-orange-500" />
                 </div>
                 <div className="flex items-center gap-3 mb-1">
-                  <h2 className="text-2xl font-bold text-slate-900">{selectedContact?.name}</h2>
-                  <button onClick={handleEditGroup} className="p-1.5 hover:bg-orange-50 rounded-lg text-slate-400 hover:text-orange-500 transition-all">
+                  <h2 className="text-2xl font-bold text-[var(--text-primary)]">{selectedContact?.name}</h2>
+                  <button onClick={handleEditGroup} className="p-1.5 hover:bg-orange-50 rounded-lg text-[var(--text-muted)] hover:text-orange-500 transition-all">
                     <PencilSimple size={20} weight="bold" />
                   </button>
                 </div>
-                <p className="text-sm font-medium text-slate-500">Group · {selectedContact?.members?.length || 0} members</p>
+                <p className="text-sm font-medium text-[var(--text-secondary)]">Group · {selectedContact?.members?.length || 0} members</p>
               </div>
 
               {/* Action Buttons */}
-              <div className="bg-white p-4 flex justify-center gap-4 border-b border-slate-100 mb-2">
-                <button onClick={handleOpenAddMembers} className="flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl hover:bg-orange-50 transition-all border border-slate-100 group">
+              <div className="bg-[var(--bg-secondary)] p-4 flex justify-center gap-4 border-b border-[var(--border)] mb-2">
+                <button onClick={handleOpenAddMembers} className="flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl hover:bg-orange-50 transition-all border border-[var(--border)] group">
                   <div className="h-12 w-12 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <UserPlus size={24} weight="bold" />
                   </div>
                   <span className="text-xs font-bold text-orange-600">Add</span>
                 </button>
-                <button onClick={() => {}} className="flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl hover:bg-slate-50 transition-all border border-slate-100 group">
-                  <div className="h-12 w-12 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <button onClick={() => {}} className="flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl hover:bg-[var(--bg-primary)] transition-all border border-[var(--border)] group">
+                  <div className="h-12 w-12 rounded-full bg-[var(--bg-muted)] text-[var(--text-secondary)] flex items-center justify-center group-hover:scale-110 transition-transform">
                     <MagnifyingGlass size={24} weight="bold" />
                   </div>
-                  <span className="text-xs font-bold text-slate-600">Search</span>
+                  <span className="text-xs font-bold text-[var(--text-secondary)]">Search</span>
                 </button>
               </div>
 
               {/* Description Section */}
-              <div className="bg-white px-6 py-5 border-b border-slate-100 mb-2 group">
+              <div className="bg-[var(--bg-secondary)] px-6 py-5 border-b border-[var(--border)] mb-2 group">
                  <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-extrabold text-orange-600 uppercase tracking-widest">Description</span>
                  </div>
-                 <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
                    {selectedContact?.description || "Welcome to the group."}
                  </p>
               </div>
 
               {/* Members Section */}
-              <div className="bg-white p-6 border-t border-slate-100">
+              <div className="bg-[var(--bg-secondary)] p-6 border-t border-[var(--border)]">
                 <div className="flex items-center justify-between mb-4">
-                   <h4 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest">{selectedContact?.members?.length || 0} members</h4>
+                   <h4 className="text-sm font-extrabold text-[var(--text-primary)] uppercase tracking-widest">{selectedContact?.members?.length || 0} members</h4>
                 </div>
                 <div className="space-y-4">
                    <button onClick={handleOpenAddMembers} className="w-full flex items-center gap-4 group">
@@ -552,15 +552,15 @@ export function ChatPage() {
                    {(selectedContact?.members || []).map((member: any) => (
                       <div key={member.user.id} className="flex items-center justify-between group">
                          <div className="flex items-center gap-4">
-                            <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                            <div className="h-10 w-10 rounded-full bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-muted)]">
                                <Checks size={20} weight="duotone" />
                             </div>
                             <div>
-                               <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                               <div className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
                                  {member.user.name}
                                  {member.user.id === session?.user?.id && <span className="text-[10px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded font-black">YOU</span>}
                                </div>
-                               <div className="text-[10px] font-extrabold text-slate-400 uppercase">{member.user.role}</div>
+                               <div className="text-[10px] font-extrabold text-[var(--text-muted)] uppercase">{member.user.role}</div>
                             </div>
                          </div>
                       </div>
@@ -575,14 +575,14 @@ export function ChatPage() {
       {/* Create Group Modal */}
       {isCreatingGroup && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden flex flex-col p-8 animate-in zoom-in-95 duration-200">
+          <div className="bg-[var(--bg-secondary)] rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden flex flex-col p-8 animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Create Group</h3>
-                <p className="text-sm text-slate-500 mt-1">Setup a new communication channel</p>
+                <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Create Group</h3>
+                <p className="text-sm text-[var(--text-secondary)] mt-1">Setup a new communication channel</p>
               </div>
-              <button onClick={() => setIsCreatingGroup(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                <X size={20} weight="bold" className="text-slate-400" />
+              <button onClick={() => setIsCreatingGroup(false)} className="p-2 hover:bg-[var(--bg-muted)] rounded-full transition-colors">
+                <X size={20} weight="bold" className="text-[var(--text-muted)]" />
               </button>
             </div>
 
@@ -594,7 +594,7 @@ export function ChatPage() {
                   value={newGroupName}
                   onChange={(e) => setNewGroupName(e.target.value)}
                   placeholder="Enter group name..."
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all placeholder:text-slate-300"
+                  className="w-full bg-[var(--bg-primary)] border-2 border-[var(--border)] rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all placeholder:text-[var(--text-muted)]"
                 />
               </div>
 
@@ -605,7 +605,7 @@ export function ChatPage() {
                   onChange={(e) => setNewGroupDescription(e.target.value)}
                   placeholder="What's this group about?"
                   rows={3}
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all placeholder:text-slate-300 resize-none"
+                  className="w-full bg-[var(--bg-primary)] border-2 border-[var(--border)] rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all placeholder:text-[var(--text-muted)] resize-none"
                 />
               </div>
             </div>
@@ -613,14 +613,14 @@ export function ChatPage() {
             <div className="flex gap-3 mt-8">
               <button 
                 onClick={() => setIsCreatingGroup(false)}
-                className="flex-1 py-4 px-6 rounded-2xl text-slate-600 font-bold hover:bg-slate-50 transition-all"
+                className="flex-1 py-4 px-6 rounded-2xl text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-primary)] transition-all"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleConfirmCreateGroup}
                 disabled={!newGroupName.trim()}
-                className="flex-[2] py-4 px-6 bg-orange-600 text-white rounded-2xl font-black shadow-xl shadow-orange-600/20 hover:bg-orange-700 disabled:bg-slate-200 disabled:shadow-none transition-all"
+                className="flex-[2] py-4 px-6 bg-orange-600 text-white rounded-2xl font-black shadow-2xl shadow-orange-600/20 hover:bg-orange-700 disabled:bg-[var(--border)] disabled:shadow-none transition-all"
               >
                 Create Group
               </button>
@@ -632,13 +632,13 @@ export function ChatPage() {
       {/* Add Members Modal */}
       {isAddingMembers && (
         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh] p-2">
+          <div className="bg-[var(--bg-secondary)] rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh] p-2">
             <div className="px-6 py-6 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-black text-slate-900">Add Members</h3>
-                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">To {selectedContact?.name}</p>
+                <h3 className="text-xl font-black text-[var(--text-primary)]">Add Members</h3>
+                <p className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-wider mt-1">To {selectedContact?.name}</p>
               </div>
-              <button onClick={() => setIsAddingMembers(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+              <button onClick={() => setIsAddingMembers(false)} className="p-2 hover:bg-[var(--bg-muted)] rounded-full transition-colors text-[var(--text-muted)]">
                 <X size={20} weight="bold" />
               </button>
             </div>
@@ -650,14 +650,14 @@ export function ChatPage() {
                   onClick={() => handleAddMember(user.id)}
                   className="w-full flex items-center gap-4 p-4 rounded-3xl hover:bg-orange-50 transition-all group text-left border border-transparent hover:border-orange-100"
                 >
-                  <div className="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:text-orange-500 group-hover:shadow-sm transition-all">
+                  <div className="h-12 w-12 rounded-2xl bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-muted)] group-hover:bg-[var(--bg-secondary)] group-hover:text-orange-500 group-hover:shadow-[var(--card-shadow)] transition-all">
                     <User size={24} weight="duotone" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-slate-900">{user.name}</div>
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{user.role}</div>
+                    <div className="text-sm font-bold text-[var(--text-primary)]">{user.name}</div>
+                    <div className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">{user.role}</div>
                   </div>
-                  <div className="h-6 w-6 rounded-full border-2 border-slate-200 flex items-center justify-center group-hover:border-orange-500 transition-all">
+                  <div className="h-6 w-6 rounded-full border-2 border-[var(--border)] flex items-center justify-center group-hover:border-orange-500 transition-all">
                     <div className="h-3 w-3 rounded-full bg-orange-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </button>
@@ -667,7 +667,7 @@ export function ChatPage() {
             <div className="p-4">
                <button 
                  onClick={() => setIsAddingMembers(false)}
-                 className="w-full py-4 bg-slate-900 text-white rounded-3xl font-black shadow-xl hover:bg-slate-800 transition-all"
+                 className="w-full py-4 bg-slate-900 text-white rounded-3xl font-black shadow-2xl hover:bg-slate-800 transition-all"
                >
                  Done
                </button>

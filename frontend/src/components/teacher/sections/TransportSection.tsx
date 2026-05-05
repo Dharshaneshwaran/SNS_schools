@@ -16,12 +16,7 @@ const busInfo = {
 export default function TransportSection() {
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-black italic uppercase tracking-tight text-[var(--text-primary)]">
-          Transport <span className="text-[var(--accent)]">Hub</span>
-        </h2>
-        <p className="text-sm text-[var(--text-secondary)] font-medium">Real-time school bus tracking and route information</p>
-      </div>
+
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Main Route Card */}
@@ -94,7 +89,7 @@ export default function TransportSection() {
           >
             <h4 className="text-sm font-black text-[var(--text-primary)] uppercase italic tracking-tight mb-6">Staff in Charge</h4>
             <div className="flex items-center gap-5 mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-zinc-800 text-white flex items-center justify-center text-2xl font-black italic shadow-xl">
+              <div className="w-16 h-16 rounded-2xl bg-zinc-800 text-white flex items-center justify-center text-2xl font-black italic shadow-2xl">
                 {busInfo.driver.name.charAt(0)}
               </div>
               <div>

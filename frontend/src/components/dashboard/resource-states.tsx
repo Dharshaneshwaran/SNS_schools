@@ -1,6 +1,6 @@
 export function ResourceLoading({ label }: { label: string }) {
   return (
-    <div className="rounded-[1.6rem] border border-[var(--border)] bg-white p-6 text-sm text-slate-600 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+    <div className="rounded-[1.6rem] border border-[var(--border)] bg-[var(--bg-secondary)] p-6 text-sm text-[var(--text-secondary)] shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
       Loading {label}...
     </div>
   );

@@ -17,7 +17,9 @@ import {
   Bus,
   BarChart3,
   User,
-  CalendarDays
+  CalendarDays,
+  Image as ImageIcon,
+  UserCheck
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../hooks/use-auth";
@@ -32,15 +34,17 @@ const menuItems = [
     { id: "overview", label: "Dashboard", icon: LayoutDashboard },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "attendance", label: "Attendance", icon: Users },
+    { id: "communication", label: "Chat", icon: MessageCircle },
     { id: "schedule", label: "Timetable", icon: Clock },
     { id: "calendar", label: "Calendar", icon: CalendarDays },
+    { id: "gallery", label: "Gallery", icon: ImageIcon },
   ]},
   { group: "MANAGEMENT TOOLS", items: [
     { id: "classes", label: "Students", icon: GraduationCap },
+    { id: "substitution", label: "Substitution", icon: UserCheck },
     { id: "results", label: "Results", icon: BarChart3 },
     { id: "transport", label: "Transport", icon: Bus },
     { id: "tasks", label: "Reports", icon: FileText },
-    { id: "communication", label: "Chat", icon: MessageCircle },
     { id: "settings", label: "Settings", icon: Settings },
   ]}
 ];

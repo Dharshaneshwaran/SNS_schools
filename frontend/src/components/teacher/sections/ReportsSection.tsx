@@ -102,7 +102,7 @@ export default function ReportsSection() {
               </p>
 
               <div className="space-y-3">
-                <button className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-xs hover:shadow-xl hover:shadow-[var(--accent-glow)] transition-all active:scale-95">
+                <button className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-[var(--accent)] text-white font-black uppercase tracking-widest text-xs hover:shadow-2xl hover:shadow-[var(--accent-glow)] transition-all active:scale-95">
                   <Download size={16} strokeWidth={3} /> Download PDF
                 </button>
                 <button className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-primary)] font-black uppercase tracking-widest text-xs hover:border-[var(--accent)] transition-all active:scale-95">

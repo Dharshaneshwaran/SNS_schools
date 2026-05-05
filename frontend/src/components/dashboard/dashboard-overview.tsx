@@ -25,7 +25,7 @@ export function DashboardOverview() {
       {error ? <ResourceError label="dashboard overview" message={error} /> : null}
       {data ? (
         <>
-          <div className="rounded-[2rem] border border-[var(--border)] bg-white/95 px-6 py-7 shadow-[0_24px_70px_rgba(15,23,42,0.05)] sm:px-8">
+          <div className="rounded-[2rem] border border-[var(--border)] bg-[var(--bg-secondary)]/95 px-6 py-7 shadow-[0_24px_70px_rgba(15,23,42,0.05)] sm:px-8">
             <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
               <div className="max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
@@ -34,7 +34,7 @@ export function DashboardOverview() {
                 <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-950 sm:text-6xl">
                   Staffing Overview
                 </h2>
-                <p className="mt-4 text-lg leading-8 text-slate-500">
+                <p className="mt-4 text-lg leading-8 text-[var(--text-secondary)]">
                   A denser control room for staffing, subject readiness, and
                   teacher workload coordination across the week.
                 </p>

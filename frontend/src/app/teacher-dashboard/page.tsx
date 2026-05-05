@@ -22,6 +22,8 @@ import TransportSection from "../../components/teacher/sections/TransportSection
 import ReportsSection from "../../components/teacher/sections/ReportsSection";
 import SettingsSection from "../../components/teacher/sections/SettingsSection";
 import TeacherChatSection from "../../components/teacher/sections/TeacherChatSection";
+import EventsGallery from "../../components/parent/sections/EventsGallery";
+import SubstitutionSection from "../../components/teacher/sections/SubstitutionSection";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings, BarChart3, HelpCircle } from "lucide-react";
@@ -30,6 +32,11 @@ import { useAuth } from "../../hooks/use-auth";
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) setTheme(savedTheme);
+  }, []);
   const { session } = useAuth();
 
   const teacherName = session?.user?.name || "Teacher";
@@ -41,11 +48,15 @@ export default function TeacherDashboard() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  const toggleTheme = () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    localStorage.setItem('theme', next);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
-      case "overview": return <DashboardOverview />;
+      case "overview": return <DashboardOverview setActiveTab={setActiveTab} />;
       case "notifications": return <NotificationsSection />;
       case "attendance": return <AttendanceSection />;
       case "schedule": return <TimeTableSection />;
@@ -55,7 +66,37 @@ export default function TeacherDashboard() {
       case "transport": return <TransportSection />;
       case "tasks": return <ReportsSection />;
       case "communication": return <TeacherChatSection />;
-      case "settings": return <SettingsSection />;
+      case "substitution": return <SubstitutionSection />;
+      case "gallery": return <EventsGallery theme={theme === 'dark' ? { 
+        isDark: true,
+        bg: '#18181b', 
+        bgMuted: '#27272a', 
+        sidebarBg: '#18181b',
+        cardBg: '#27272a',
+        text: '#ffffff', 
+        textMuted: '#a1a1aa', 
+        border: '#3f3f46', 
+        primary: '#f97316', 
+        primaryLight: '#ffedd5', 
+        accent: '#3b82f6',
+        success: '#10b981',
+        danger: '#ef4444'
+      } : { 
+        isDark: false,
+        bg: '#ffffff', 
+        bgMuted: '#f4f4f5', 
+        sidebarBg: '#ffffff',
+        cardBg: '#ffffff',
+        text: '#18181b', 
+        textMuted: '#71717a', 
+        border: '#e4e4e7', 
+        primary: '#f97316', 
+        primaryLight: '#ffedd5', 
+        accent: '#3b82f6',
+        success: '#10b981',
+        danger: '#ef4444'
+      }} />;
+      case "settings": return <SettingsSection theme={theme} toggleTheme={toggleTheme} />;
       case "profile": return (
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
@@ -93,7 +134,7 @@ export default function TeacherDashboard() {
           <div className="absolute -right-20 -top-20 w-80 h-80 bg-[var(--accent-glow)] rounded-full blur-3xl opacity-30" />
         </motion.div>
       );
-      default: return <DashboardOverview />;
+      default: return <DashboardOverview setActiveTab={setActiveTab} />;
     }
   };
 

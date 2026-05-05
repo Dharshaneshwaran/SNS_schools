@@ -137,7 +137,7 @@ export function UsersPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-white rounded-[2.5rem] p-10 shadow-2xl overflow-hidden"
+              className="relative w-full max-w-md bg-[var(--bg-secondary)] rounded-[2.5rem] p-10 shadow-2xl overflow-hidden border border-[var(--border)]"
             >
               {modal.type === 'delete' && (
                 <div className="text-center space-y-6">
@@ -145,13 +145,13 @@ export function UsersPage() {
                     <Trash size={32} weight="duotone" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">Confirm Deletion</h3>
-                    <p className="text-sm text-slate-500 mt-2">Are you sure you want to delete <span className="font-bold text-slate-900">{modal.user.name}</span>? This will permanently remove all their associated records.</p>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)]">Confirm Deletion</h3>
+                    <p className="text-sm text-[var(--text-secondary)] mt-2">Are you sure you want to delete <span className="font-bold text-[var(--text-primary)]">{modal.user.name}</span>? This will permanently remove all their associated records.</p>
                   </div>
                   <div className="flex gap-4">
                     <button 
                       onClick={() => setModal({ type: null, user: null })}
-                      className="flex-1 px-6 py-4 rounded-2xl bg-slate-50 text-slate-500 font-bold hover:bg-slate-100 transition-all"
+                      className="flex-1 px-6 py-4 rounded-2xl bg-[var(--bg-primary)] text-[var(--text-secondary)] font-bold hover:bg-[var(--bg-muted)] transition-all"
                     >
                       Cancel
                     </button>
@@ -168,22 +168,22 @@ export function UsersPage() {
 
               {modal.type === 'edit' && (
                 <div className="space-y-6">
-                  <div className="flex items-center gap-4 text-[#FF7F50]">
+                  <div className="flex items-center gap-4 text-[var(--accent)]">
                     <PencilSimple size={28} weight="duotone" />
-                    <h3 className="text-xl font-bold text-slate-900">Edit Profile</h3>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)]">Edit Profile</h3>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Full Name</label>
+                    <label className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Full Name</label>
                     <input 
                       type="text" 
                       defaultValue={modal.user.name}
                       onBlur={(e) => saveEdit(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && saveEdit((e.target as HTMLInputElement).value)}
                       autoFocus
-                      className="w-full px-6 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-[#FF7F50] outline-none transition-all font-bold text-slate-900"
+                      className="w-full px-6 py-4 bg-[var(--bg-primary)] rounded-2xl border-2 border-transparent focus:border-[var(--accent)] outline-none transition-all font-bold text-[var(--text-primary)]"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-400 font-medium italic">* Changes will update the local directory view.</p>
+                  <p className="text-[10px] text-[var(--text-muted)] font-medium italic">* Changes will update the local directory view.</p>
                   <button 
                     onClick={() => setModal({ type: null, user: null })}
                     className="w-full px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all"
@@ -198,15 +198,15 @@ export function UsersPage() {
       </AnimatePresence>
 
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[var(--bg-secondary)] p-4 rounded-[2rem] border border-[var(--border)] shadow-[var(--card-shadow)]">
            <div className="relative flex-1 w-full">
-              <MagnifyingGlass size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <MagnifyingGlass size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
               <input 
                 type="text" 
                 placeholder="Search by name or ID..." 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#FF7F50]/20 transition-all"
+                className="w-full bg-[var(--bg-primary)] border-none rounded-2xl pl-12 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]/20 transition-all text-[var(--text-primary)]"
               />
            </div>
            <div className="flex gap-2 w-full md:w-auto">
@@ -215,7 +215,7 @@ export function UsersPage() {
                   key={f}
                   onClick={() => setFilter(f)}
                   className={`flex-1 md:flex-none px-6 py-3 rounded-xl text-xs font-bold transition-all ${
-                    filter === f ? "bg-[#FF7F50] text-white" : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+                    filter === f ? "bg-[var(--accent)] text-white" : "bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
                   }`}
                 >
                   {f}
@@ -223,17 +223,17 @@ export function UsersPage() {
               ))}
               <button 
                 onClick={handleDownload}
-                className="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all"
+                className="p-3 bg-[var(--text-primary)] text-[var(--bg-primary)] rounded-xl hover:opacity-90 transition-all"
               >
                  <DownloadSimple size={20} />
               </button>
            </div>
         </div>
 
-        <div className="rounded-[2.5rem] border border-[var(--border)] bg-white overflow-hidden shadow-[0_24px_70px_rgba(15,23,42,0.05)]">
+        <div className="rounded-[2.5rem] border border-[var(--border)] bg-[var(--bg-secondary)] overflow-hidden shadow-[var(--card-shadow)]">
            <div className="overflow-x-auto">
               <table className="w-full text-left">
-                 <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                 <thead className="bg-[var(--bg-primary)] border-b border-[var(--border)] text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest">
                     <tr>
                        <th className="px-8 py-5">User Info</th>
                        <th className="px-8 py-5">Role</th>
@@ -242,26 +242,26 @@ export function UsersPage() {
                        <th className="px-8 py-5 text-right">Actions</th>
                     </tr>
                  </thead>
-                  <tbody className="divide-y divide-slate-50">
+                  <tbody className="divide-y divide-[var(--border)]">
                     {isLoading ? (
                       <tr>
                         <td colSpan={5} className="px-8 py-20 text-center">
                           <div className="flex flex-col items-center gap-3">
-                            <div className="h-8 w-8 border-4 border-[#FF7F50] border-t-transparent rounded-full animate-spin" />
-                            <p className="text-sm font-bold text-slate-400">Loading directory...</p>
+                            <div className="h-8 w-8 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                            <p className="text-sm font-bold text-[var(--text-muted)]">Loading directory...</p>
                           </div>
                         </td>
                       </tr>
                     ) : filteredUsers.map((user) => (
-                      <tr key={user.dbId} className="hover:bg-slate-50/30 transition-colors group">
+                      <tr key={user.dbId} className="hover:bg-[var(--bg-primary)] transition-colors group">
                          <td className="px-8 py-6">
                             <div className="flex items-center gap-4">
-                               <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                               <div className="h-10 w-10 rounded-full bg-[var(--bg-primary)] flex items-center justify-center text-[var(--text-muted)]">
                                   <UserCircle size={24} weight="duotone" />
                                </div>
                                <div>
-                                  <div className="text-sm font-bold text-slate-900">{user.name}</div>
-                                  <div className="text-[10px] text-slate-400 font-bold uppercase">{user.id}</div>
+                                  <div className="text-sm font-bold text-[var(--text-primary)]">{user.name}</div>
+                                  <div className="text-[10px] text-[var(--text-muted)] font-bold uppercase">{user.id}</div>
                                </div>
                             </div>
                          </td>
@@ -285,8 +285,8 @@ export function UsersPage() {
                                      onClick={() => toggleFeature(user.id, feature)}
                                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold transition-all ${
                                        isActive 
-                                         ? "border-[#FF7F50] bg-[#FF7F50]/5 text-[#FF7F50]" 
-                                         : "border-slate-100 bg-slate-50 text-slate-400"
+                                         ? "border-[var(--accent)] bg-[var(--accent)]/5 text-[var(--accent)]" 
+                                         : "border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-muted)]"
                                      }`}
                                    >
                                      {feature}
@@ -308,13 +308,13 @@ export function UsersPage() {
                             <div className="flex items-center justify-end gap-2">
                                <button 
                                  onClick={() => handleEdit(user)}
-                                 className="p-2 text-slate-300 hover:text-[#FF7F50] transition-colors"
+                                 className="p-2 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
                                >
                                  <PencilSimple size={18} />
                                </button>
                                <button 
                                  onClick={() => handleDelete(user)}
-                                 className="p-2 text-slate-300 hover:text-rose-500 transition-colors"
+                                 className="p-2 text-[var(--text-muted)] hover:text-rose-500 transition-colors"
                                >
                                  <Trash size={18} />
                                </button>

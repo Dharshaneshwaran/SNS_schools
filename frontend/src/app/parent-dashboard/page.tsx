@@ -8,7 +8,7 @@ import DiarySection from "../../components/parent/sections/DiarySection";
 import AcademicSection from "../../components/parent/sections/AcademicSection";
 import TransportSection from "../../components/parent/sections/TransportSection";
 import SettingsSection from "../../components/parent/sections/SettingsSection";
-import MessagesSection from "../../components/parent/sections/MessagesSection";
+
 import NotificationsSection from "../../components/parent/sections/NotificationsSection";
 import DashboardHome from "../../components/parent/sections/DashboardHome";
 import { List, Bell, MagnifyingGlass, Sun, Moon } from "@phosphor-icons/react";
@@ -16,6 +16,8 @@ import { List, Bell, MagnifyingGlass, Sun, Moon } from "@phosphor-icons/react";
 import { DashboardTheme } from "../../types/theme";
 import { MenuKey, Student, AcademicTab } from "../../types/dashboard";
 
+// TODO: This hardcoded data should be replaced with an API fetch or context data
+// once connected to the real database to ensure dynamic rendering.
 const students: Student[] = [
   { 
     id: 1, 
@@ -81,7 +83,6 @@ export default function ParentDashboard() {
       case "academic":      return <AcademicSection student={activeStudent} theme={theme} initialTab={academicTab} />;
       case "transport":     return <TransportSection theme={theme} />;
       case "settings":      return <SettingsSection theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
-      case "messages":      return <MessagesSection theme={theme} />;
       default:              return <EventsGallery theme={theme} />;
     }
   };
@@ -157,8 +158,8 @@ export default function ParentDashboard() {
         </div>
 
         {/* Content Area */}
-        <div className={`flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col ${activeMenu === 'messages' ? '' : 'p-4 md:p-8 lg:p-10'}`}>
-          {activeMenu !== 'dashboard' && activeMenu !== 'messages' && (
+        <div className={`flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col p-4 md:p-8 lg:p-10`}>
+          {activeMenu !== 'dashboard' && (
             <div className="mb-8 md:mb-10 shrink-0">
               <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
                 {activeStudent.name}

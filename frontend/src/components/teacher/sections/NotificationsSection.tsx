@@ -46,18 +46,6 @@ const notifications = [
 export default function NotificationsSection() {
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="text-2xl font-black italic uppercase tracking-tight text-[var(--text-primary)]">
-            Inbox <span className="text-[var(--accent)]">Notifications</span>
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)] font-medium">Stay updated with school alerts and messages</p>
-        </div>
-        <button className="px-6 py-2 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-xs font-black uppercase tracking-widest text-[var(--text-primary)] hover:border-[var(--accent)] transition-all">
-          Mark all as read
-        </button>
-      </div>
-
       <div className="space-y-4">
         {notifications.map((notif, i) => (
           <motion.div

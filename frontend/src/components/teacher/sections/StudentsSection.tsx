@@ -35,14 +35,8 @@ export default function StudentsSection() {
   return (
     <div className="space-y-8">
       {/* Header & Search */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h2 className="text-3xl font-black italic uppercase tracking-tight text-[var(--text-primary)]">
-            Student <span className="text-[var(--accent)]">Database</span>
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)] font-medium">Access student records and profiles</p>
-        </div>
 
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-6">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 bg-[var(--bg-secondary)] p-1.5 rounded-2xl border border-[var(--border)]">
             <select 
@@ -185,7 +179,7 @@ export default function StudentsSection() {
                   <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-zinc-800 border border-zinc-700 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-zinc-700 transition-all">
                     <FileText size={18} /> Detailed Reports
                   </button>
-                  <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-orange-500 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-orange-600 shadow-xl shadow-orange-500/20 transition-all">
+                  <button className="flex-1 min-w-[200px] flex items-center justify-center gap-3 py-5 rounded-2xl bg-orange-500 text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-orange-600 shadow-2xl shadow-orange-500/20 transition-all">
                     <Award size={18} /> View Certificates
                   </button>
                 </div>

@@ -20,7 +20,6 @@ type Tab = "homework" | "classtimetable" | "examtimetable" | "events";
 
 const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: "homework",       label: "Homework",        icon: <BookOpen size={16} /> },
-  { key: "classtimetable", label: "Class Timetable", icon: <Clock size={16} /> },
   { key: "examtimetable",  label: "Exam Timetable",  icon: <CalendarCheck size={16} /> },
   { key: "events",         label: "Upcoming Events", icon: <CalendarBlank size={16} /> },
 ];
@@ -179,44 +178,7 @@ export default function DiarySection({ student, theme }: { student: Student; the
           </motion.div>
         )}
 
-        {activeTab === "classtimetable" && (
-          <motion.div 
-            key="classtimetable" 
-            initial={{ opacity: 0, y: 12 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: -12 }} 
-            transition={{ duration: 0.2 }}
-            style={{ width: "100%", display: "flex", flexDirection: "column", gap: 24 }}
-          >
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
-              {classTT.map((day, di) => (
-                <div key={`day-${day.day}`} className="premium-card" style={{ padding: 0, overflow: "hidden" }}>
-                  <div style={{ padding: "16px 24px", background: theme.primary + "10", borderBottom: `1px solid ${theme.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <h5 style={{ fontWeight: 800, color: theme.primary, fontSize: 16 }}>{day.day}</h5>
-                    <Clock size={18} weight="bold" color={theme.primary} />
-                  </div>
-                  <div style={{ padding: "12px" }}>
-                    {day.periods.map((p, pi) => (
-                      <div key={`period-${di}-${pi}`} style={{ 
-                        padding: "12px 16px", 
-                        display: "flex", 
-                        alignItems: "center", 
-                        justifyContent: "space-between",
-                        borderBottom: pi < day.periods.length - 1 ? `1px solid ${theme.border}` : "none"
-                      }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                          <span style={{ fontSize: 11, fontWeight: 800, color: theme.textMuted, width: 24 }}>P{pi+1}</span>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: theme.text }}>{p}</span>
-                        </div>
-                        <CaretRight size={14} color={theme.textMuted} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+
 
         {activeTab === "examtimetable" && (
           <motion.div 

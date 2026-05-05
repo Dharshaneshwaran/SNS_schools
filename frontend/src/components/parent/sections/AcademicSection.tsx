@@ -23,7 +23,6 @@ import { DashboardTheme } from "../../../types/theme";
 const tabs: { key: AcademicTab | "timetable"; label: string; icon: React.ReactNode }[] = [
   { key: "calendar",   label: "Academic Calendar", icon: <CalendarBlank size={15} /> },
   { key: "attendance", label: "Attendance",         icon: <CalendarCheck size={15} /> },
-  { key: "timetable",  label: "Time Table",         icon: <ClipboardText size={15} /> },
   { key: "exam",       label: "Exam Report Card",   icon: <ChartBar size={15} /> },
   { key: "schedule",   label: "Exam Schedule",      icon: <ClipboardText size={15} /> },
   { key: "leave",      label: "Leave Application",  icon: <PaperPlaneTilt size={15} /> },
@@ -216,49 +215,7 @@ export default function AcademicSection({ student, theme, initialTab }: { studen
             </div>
           )}
 
-          {activeTab === "timetable" && (
-            <div className="premium-card" style={{ padding: 0, overflow: "hidden", border: `1px solid ${theme.border}` }}>
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ background: theme.isDark ? "rgba(255,255,255,0.02)" : "#F8FAFC" }}>
-                      <th style={{ padding: "20px", textAlign: "left", fontSize: 11, fontWeight: 900, color: "#475569", textTransform: "uppercase", borderBottom: `1px solid ${theme.border}` }}>DAY/PERIOD</th>
-                      {periodHeaders.map(h => (
-                        <th key={h} style={{ padding: "20px", textAlign: "center", fontSize: 13, fontWeight: 900, color: "#1e293b", borderBottom: `1px solid ${theme.border}` }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {timeTableData.map((row, ri) => (
-                      <tr key={ri} style={{ borderBottom: ri < timeTableData.length - 1 ? `1px solid ${theme.border}` : "none" }}>
-                        <td style={{ padding: "20px", fontSize: 14, fontWeight: 900, color: "#1e293b", background: theme.isDark ? "rgba(255,255,255,0.01)" : "transparent" }}>{row.day}</td>
-                        {row.periods.map((p, pi) => {
-                          const isLunch = p === "LUNCH";
-                          const isSpecial = p === "L A B" || p === "L I B R A R Y" || p === "S E M I N A R" || p === "SPORTS";
-                          return (
-                            <td key={pi} style={{ 
-                              padding: "20px", 
-                              textAlign: "center", 
-                              fontSize: 13, 
-                              fontWeight: isLunch || isSpecial ? 900 : 700,
-                              color: isLunch ? "#94a3b8" : (isSpecial ? "#475569" : "#334155"),
-                              background: isLunch ? "transparent" : (p === "" ? "transparent" : (theme.isDark ? "rgba(255,255,255,0.02)" : "white")),
-                              letterSpacing: isSpecial ? "0.2em" : "normal",
-                              opacity: isLunch ? 0.6 : 1
-                            }}>
-                              {p === "SPORTS" ? (
-                                <span style={{ background: "#f1f5f9", padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 800, color: "#475569", textTransform: "uppercase" }}>SPORTS</span>
-                              ) : p}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+
 
           {activeTab === "exam" && (
             <div className="premium-card" style={{ padding: 0, overflow: "hidden", border: `1px solid ${theme.border}` }}>

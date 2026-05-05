@@ -28,13 +28,7 @@ export default function ResultsSection() {
   return (
     <div className="space-y-8">
       {/* Header & Mode Toggle */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h2 className="text-3xl font-black italic uppercase tracking-tight text-[var(--text-primary)]">
-            Academic <span className="text-[var(--accent)]">Results</span>
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)] font-medium">Manage student performance and grade entry</p>
-        </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-6">
 
         <div className="flex items-center gap-2 bg-[var(--bg-secondary)] p-1.5 rounded-2xl border border-[var(--border)]">
           <button 

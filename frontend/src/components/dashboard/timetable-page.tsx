@@ -44,14 +44,14 @@ export function TimetablePage() {
       <div className="flex flex-col gap-8">
         
         {/* Header Actions */}
-        <div className="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center bg-[var(--bg-secondary)] p-6 rounded-[2rem] border border-[var(--border)] shadow-[var(--card-shadow)] gap-4">
            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[#FF7F50]">
+              <div className="h-12 w-12 rounded-2xl bg-[var(--bg-primary)] flex items-center justify-center text-[var(--accent)]">
                  <Calendar size={24} weight="duotone" />
               </div>
               <div>
-                 <h4 className="text-lg font-bold text-slate-900">Weekly View</h4>
-                 <p className="text-xs text-slate-500 font-medium">May 2024 • Term 1 Schedule</p>
+                 <h4 className="text-lg font-bold text-[var(--text-primary)]">Weekly View</h4>
+                 <p className="text-xs text-[var(--text-secondary)] font-medium">May 2024 • Term 1 Schedule</p>
               </div>
            </div>
            <div className="flex gap-2">
@@ -64,7 +64,7 @@ export function TimetablePage() {
                  {isEditing ? <CheckCircle size={18} /> : <PencilSimple size={18} />}
                  {isEditing ? "Save Schedule" : "Edit Timetable"}
               </button>
-              <button className="p-3 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all">
+              <button className="p-3 bg-[var(--bg-primary)] text-[var(--text-muted)] rounded-xl hover:bg-[var(--bg-muted)] transition-all">
                  <Plus size={20} />
               </button>
            </div>
@@ -79,16 +79,16 @@ export function TimetablePage() {
              const daySchedule = schedule.find(s => s.day === day);
              return (
                <div key={day} className="flex flex-col gap-4">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] text-center mb-2">{day}</div>
-                  <div className="flex flex-col gap-4 min-h-[400px] p-4 rounded-[2.5rem] bg-slate-50/50 border border-slate-100/50 relative">
+                  <div className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-[0.2em] text-center mb-2">{day}</div>
+                  <div className="flex flex-col gap-4 min-h-[400px] p-4 rounded-[2.5rem] bg-[var(--bg-primary)]/50 border border-[var(--border)]/50 relative">
                      {daySchedule?.slots.map((slot, i) => (
                        <motion.div 
                          key={i}
                          whileHover={{ y: -5 }}
-                         className="p-5 rounded-3xl bg-white border border-slate-100 shadow-sm group relative"
+                         className="p-5 rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--card-shadow)] group relative"
                        >
                           <div className="flex items-center justify-between mb-3">
-                             <div className="flex items-center gap-2 text-[8px] font-bold text-[#FF7F50] uppercase tracking-tighter">
+                             <div className="flex items-center gap-2 text-[8px] font-bold text-[var(--accent)] uppercase tracking-tighter">
                                 <Clock size={12} /> {slot.time}
                              </div>
                              {isEditing && (
@@ -97,16 +97,16 @@ export function TimetablePage() {
                                </button>
                              )}
                           </div>
-                          <div className="font-bold text-slate-900 mb-1">{slot.subject}</div>
-                          <div className="text-[10px] text-slate-400 font-bold uppercase mb-4">{slot.grade} • {slot.room}</div>
-                          <div className="flex items-center gap-2 pt-4 border-t border-slate-50">
-                             <div className="h-6 w-6 rounded-full bg-slate-100" />
-                             <span className="text-[10px] text-slate-500 font-medium truncate">With Class {slot.grade}</span>
+                          <div className="font-bold text-[var(--text-primary)] mb-1">{slot.subject}</div>
+                          <div className="text-[10px] text-[var(--text-muted)] font-bold uppercase mb-4">{slot.grade} • {slot.room}</div>
+                          <div className="flex items-center gap-2 pt-4 border-t border-[var(--border)]">
+                             <div className="h-6 w-6 rounded-full bg-[var(--bg-muted)]" />
+                             <span className="text-[10px] text-[var(--text-secondary)] font-medium truncate">With Class {slot.grade}</span>
                           </div>
                        </motion.div>
                      ))}
                      {isEditing && (
-                       <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-3xl text-slate-300 hover:border-[#FF7F50] hover:text-[#FF7F50] transition-all flex items-center justify-center">
+                       <button className="w-full py-4 border-2 border-dashed border-[var(--border)] rounded-3xl text-[var(--text-muted)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all flex items-center justify-center">
                           <Plus size={20} />
                        </button>
                      )}
