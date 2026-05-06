@@ -9,6 +9,7 @@
     "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "prestart": "node -e \"const fs = require('fs'); if (!fs.existsSync('.env')) fs.writeFileSync('.env', '')\"",
+    "postinstall": "npm run build",
     "start": "node --max-old-space-size=450 dist/main",
     "prestart:dev": "node -e \"const fs = require('fs'); if (!fs.existsSync('.env')) fs.writeFileSync('.env', '')\"",
     "start:dev": "node --env-file=.env ./node_modules/@nestjs/cli/bin/nest.js start --watch",
