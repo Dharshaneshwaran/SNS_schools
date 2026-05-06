@@ -14,7 +14,10 @@ import {
   BookOpen,
   UsersThree,
   MapPin,
-  Bus
+  Bus,
+  Key,
+  Eye,
+  Plus
 } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageSection } from "./page-section";
@@ -25,8 +28,13 @@ export function UsersPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
-  const [modal, setModal] = useState<{ type: 'delete' | 'edit' | 'view' | 'assign-bus' | null, user: any | null }>({ type: null, user: null });
+   const [modal, setModal] = useState<{ type: 'delete' | 'edit' | 'view' | 'assign-bus' | null, user: any | null }>({ type: null, user: null });
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
+
+  const togglePassword = (id: string) => {
+    setShowPasswords(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -39,6 +47,7 @@ export function UsersPage() {
           role: u.role === 'parent' ? 'Student' : u.role.charAt(0).toUpperCase() + u.role.slice(1),
           status: u.status === 'active' ? 'Active' : 'Inactive',
           email: u.email,
+          phone: u.studentProfile?.fatherContact || u.studentProfile?.motherContact || "No Contact",
           rawUser: u,
           features: ["Transport", "Attendance", "Results", "Reports"].filter(() => Math.random() > 0.3)
         }));
@@ -436,17 +445,20 @@ export function UsersPage() {
               />
            </div>
            <div className="flex gap-2 w-full md:w-auto">
-              {["All", "Student", "Teacher"].map(f => (
-                <button 
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`flex-1 md:flex-none px-6 py-3 rounded-xl text-xs font-bold transition-all ${
-                    filter === f ? "bg-[#FF7F50] text-white" : "bg-slate-50 text-slate-500 hover:bg-slate-100"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
+              <button 
+                onClick={() => window.location.href = '/dashboard/admission'}
+                className="flex items-center gap-2 px-6 py-3 bg-[#FF7F50] text-white rounded-xl text-xs font-bold hover:bg-[#e66a3e] transition-all shadow-lg shadow-[#FF7F50]/20"
+              >
+                <Plus size={16} weight="bold" />
+                Enroll Student
+              </button>
+              <button 
+                onClick={() => window.location.href = '/dashboard/staff'}
+                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-lg"
+              >
+                <Plus size={16} weight="bold" />
+                Add Staff
+              </button>
               <button 
                 onClick={handleDownload}
                 className="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all"
@@ -495,7 +507,19 @@ export function UsersPage() {
                                </div>
                                <div>
                                   <div className="text-sm font-bold text-slate-900">{user.name}</div>
-                                  <div className="text-[10px] text-slate-400 font-bold uppercase">{user.id}</div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="text-[10px] text-slate-400 font-bold uppercase">{user.id}</div>
+                                    <span className="text-[10px] text-slate-300">•</span>
+                                    <div className="text-[10px] text-[#FF7F50] font-black">{user.phone}</div>
+                                    <span className="text-[10px] text-slate-300">•</span>
+                                    <button 
+                                      onClick={(e) => { e.stopPropagation(); togglePassword(user.dbId); }}
+                                      className="flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-slate-900 transition-colors"
+                                    >
+                                      <Key size={12} weight="fill" className="text-amber-500" />
+                                      {showPasswords[user.dbId] ? user.rawUser.password : "••••••••"}
+                                    </button>
+                                  </div>
                                </div>
                             </div>
                          </td>

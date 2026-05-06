@@ -69,7 +69,7 @@ class TeacherDashboardHome extends StatelessWidget {
           padding: EdgeInsets.only(right: 20.0),
           child: CircleAvatar(
             radius: 18,
-            backgroundColor: AppColors.primaryOrange,
+            backgroundColor: AppColors.primary,
             child: Icon(Icons.person, color: Colors.white, size: 20),
           ),
         ),
@@ -112,12 +112,12 @@ class TeacherDashboardHome extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryOrange.withOpacity(0.1),
+                  color: AppColors.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
                   'ONGOING',
-                  style: TextStyle(color: AppColors.primaryOrange, fontSize: 10, fontWeight: FontWeight.w900),
+                  style: TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.w900),
                 ),
               ),
               const Spacer(),
@@ -140,7 +140,7 @@ class TeacherDashboardHome extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOrange,
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 16),

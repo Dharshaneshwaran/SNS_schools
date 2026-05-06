@@ -1,10 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class DashboardService {
-  getOverview() {
+  constructor(private readonly usersService: UsersService) {}
+
+  async getOverview() {
+    const stats = await this.usersService.getSystemStats();
+    
     return {
       stats: [
+        {
+          label: 'Total Students',
+          value: stats.totalStudents.toString(),
+          hint: 'Live count of enrolled students in the database.',
+          trend: 'Live',
+        },
+        {
+          label: 'Total Staff',
+          value: stats.totalTeachers.toString(),
+          hint: 'Active faculty and administrators.',
+          trend: 'Live',
+        },
         {
           label: 'Attendance Coverage',
           value: '94.6%',
@@ -12,24 +29,13 @@ export class DashboardService {
           trend: '+2.3%',
         },
         {
-          label: 'Pending Substitutions',
+          label: 'Pending Approvals',
           value: '08',
           hint: 'Requests waiting for approval or final teacher confirmation.',
           trend: 'Stable',
         },
-        {
-          label: 'Staff Available',
-          value: '126',
-          hint: 'Teachers currently marked active and available for scheduling.',
-          trend: '+6',
-        },
-        {
-          label: 'Conflict Alerts',
-          value: '03',
-          hint: 'Timetable or leave overlaps requiring admin review.',
-          trend: 'Watch',
-        },
       ],
+      // ... rest of hardcoded panels for now
       panels: [
         {
           title: 'Attendance Summary',

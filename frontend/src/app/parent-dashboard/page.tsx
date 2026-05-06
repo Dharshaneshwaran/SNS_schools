@@ -15,47 +15,50 @@ import { List, Bell, MagnifyingGlass, Sun, Moon } from "@phosphor-icons/react";
 
 import { DashboardTheme } from "../../types/theme";
 import { MenuKey, Student, AcademicTab } from "../../types/dashboard";
+import { useAuth } from "../../hooks/use-auth";
 
-const students: Student[] = [
-  { 
-    id: 1, 
-    name: "Arjun Sharma", 
-    class: "8", 
-    section: "A", 
-    avatar: "AS",
-    fatherNumber: "+91 00000 00000",
-    fatherEmail: "father@email.com",
-    motherNumber: "+91 00000 00000",
-    motherEmail: "mother@email.com",
-    guardianNumber: "+91 00000 00000",
-    address: "Dummy Address, Street Name, City, State - Pincode",
-    parentMobile: "+91 00000 00000",
-    classTeacher: "Mrs. Sarah Jenkins",
-    teacherEmail: "sarah.j@snsacademy.org"
-  },
-  { 
-    id: 2, 
-    name: "Priya Sharma", 
-    class: "5", 
-    section: "B", 
-    avatar: "PS",
-    fatherNumber: "+91 00000 00000",
-    fatherEmail: "father@email.com",
-    motherNumber: "+91 00000 00000",
-    motherEmail: "mother@email.com",
-    address: "Dummy Address, Street Name, City, State - Pincode",
-    parentMobile: "+91 00000 00000",
-    classTeacher: "Mr. Robert Wilson",
-    teacherEmail: "robert.w@snsacademy.org"
-  },
-];
 
 export default function ParentDashboard() {
-  const [activeMenu, setActiveMenu] = useState<MenuKey>("events");
+  const { session, isBootstrapping } = useAuth();
+  const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
   const [academicTab, setAcademicTab] = useState<AcademicTab>("calendar");
-  const [activeStudent, setActiveStudent] = useState(students[0]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Derive student data from session
+  const studentProfile = session?.user?.studentProfile;
+  const activeStudent: Student = {
+    id: studentProfile?.id || "N/A",
+    studentId: studentProfile?.studentId || "N/A",
+    name: session?.user?.name || "Student Name",
+    class: studentProfile?.class || "N/A",
+    section: studentProfile?.section || "N/A",
+    avatar: (session?.user?.name || "S").split(" ").map(n => n[0]).join("").toUpperCase(),
+    schoolName: studentProfile?.presentSchool || "SNS Academy, Coimbatore",
+    fatherName: studentProfile?.fatherName || "Not Provided",
+    fatherNumber: studentProfile?.fatherContact || "N/A",
+    fatherEmail: studentProfile?.fatherEmail || "N/A",
+    motherName: studentProfile?.motherName || "Not Provided",
+    motherNumber: studentProfile?.motherContact || "N/A",
+    motherEmail: studentProfile?.motherEmail || "N/A",
+    guardianName: "Not Provided", // Add to schema later if needed
+    guardianNumber: "N/A",
+    relation: "Contact",
+    address: studentProfile?.fatherOfficeAddress || "N/A",
+    parentMobile: studentProfile?.fatherContact || "N/A",
+    classTeacher: "Assigning...",
+    teacherEmail: "contact@school.com"
+  };
+
+  const students = [activeStudent];
+
+  if (isBootstrapping) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF7F50]"></div>
+      </div>
+    );
+  }
 
   const theme: DashboardTheme = {
     isDark: isDarkMode,
@@ -108,7 +111,7 @@ export default function ParentDashboard() {
         <ParentSidebar
           students={students}
           activeStudent={activeStudent}
-          setActiveStudent={(s) => { setActiveStudent(s); setIsSidebarOpen(false); }}
+          setActiveStudent={() => setIsSidebarOpen(false)}
           activeMenu={activeMenu}
           setActiveMenu={(m) => { setActiveMenu(m); setIsSidebarOpen(false); }}
           theme={theme}

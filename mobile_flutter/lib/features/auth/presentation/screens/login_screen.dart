@@ -5,7 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/models/user_model.dart';
 import '../../../home/presentation/screens/home_screen.dart';
-import '../../../home/presentation/screens/teacher_home_screen.dart';
+import '../../../teacher/presentation/screens/teacher_main_screen.dart';
 import '../../../home/presentation/screens/admin_home_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -82,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
           destination = const AdminHomeScreen();
           break;
         case UserRole.staff:
-          destination = const TeacherHomeScreen();
+          destination = const TeacherMainScreen();
           break;
         case UserRole.parent:
           destination = const HomeScreen();

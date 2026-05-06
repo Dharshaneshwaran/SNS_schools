@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "997693308564",
+    "project_id": "snserp",
+    "storage_bucket": "snserp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997693308564:android:d0419ff0bc679ce356fe81",
+        "android_client_info": {
+          "package_name": "sns.erpp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCckPHPKw2KJG0sjUztx2WodnaTG61w8kk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

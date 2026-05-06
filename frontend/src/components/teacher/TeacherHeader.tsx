@@ -15,9 +15,10 @@ import {
 interface HeaderProps {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  setActiveTab: (tab: string) => void;
 }
 
-export default function TeacherHeader({ theme, toggleTheme }: HeaderProps) {
+export default function TeacherHeader({ theme, toggleTheme, setActiveTab }: HeaderProps) {
   return (
     <header className="h-20 bg-[var(--bg-primary)]/80 backdrop-blur-xl border-b border-[var(--border)] sticky top-0 z-40 px-6 lg:px-10 flex items-center justify-between">
       {/* Mobile Menu Toggle (Hidden on desktop) */}
@@ -48,7 +49,10 @@ export default function TeacherHeader({ theme, toggleTheme }: HeaderProps) {
         </button>
 
         {/* Notifications */}
-        <button className="p-3 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-all relative group">
+        <button 
+          onClick={() => setActiveTab("notifications")}
+          className="p-3 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-all relative group"
+        >
           <Bell size={20} />
           <span className="absolute top-3 right-3 w-2 h-2 bg-[var(--accent)] rounded-full border-2 border-[var(--bg-secondary)] shadow-[0_0_8px_var(--accent)] group-hover:scale-125 transition-transform" />
         </button>

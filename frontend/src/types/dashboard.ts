@@ -2,16 +2,22 @@ export type MenuKey = "dashboard" | "events" | "profile" | "diary" | "notificati
 export type AcademicTab = "calendar" | "attendance" | "exam" | "schedule" | "leave";
 
 export interface Student {
-  id: number;
+  id: string;
+  studentId: string;
   name: string;
   class: string;
   section: string;
   avatar: string;
+  schoolName?: string;
+  fatherName?: string;
   fatherNumber?: string;
   fatherEmail?: string;
+  motherName?: string;
   motherNumber?: string;
   motherEmail?: string;
+  guardianName?: string;
   guardianNumber?: string;
+  relation?: string;
   address?: string;
   parentMobile?: string;
   classTeacher?: string;

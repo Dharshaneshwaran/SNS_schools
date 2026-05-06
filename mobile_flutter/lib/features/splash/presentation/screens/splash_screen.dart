@@ -5,7 +5,7 @@ import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/models/user_model.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
 import '../../../home/presentation/screens/home_screen.dart';
-import '../../../home/presentation/screens/teacher_home_screen.dart';
+import '../../../teacher/presentation/screens/teacher_main_screen.dart';
 import '../../../home/presentation/screens/admin_home_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -96,7 +96,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with TickerProvider
           destination = const AdminHomeScreen();
           break;
         case UserRole.staff:
-          destination = const TeacherHomeScreen();
+          destination = const TeacherMainScreen();
           break;
         case UserRole.parent:
           destination = const HomeScreen();

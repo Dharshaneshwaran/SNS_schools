@@ -12,7 +12,8 @@ import {
   UploadSimple,
   Info,
   UsersThree,
-  GraduationCap
+  GraduationCap,
+  MagicWand
 } from "@phosphor-icons/react";
 import { PageSection } from "./page-section";
 import { createStudent } from "../../services/users-service";
@@ -56,16 +57,31 @@ export function AdmissionPage() {
     motherOccupation: "",
     motherOrganization: "",
     motherDesignation: "",
+    motherDesignation: "",
     motherOfficeAddress: "",
+    password: "",
   });
   const [isSaving, setIsSaving] = useState(false);
 
   const nextStep = () => setStep((prev) => (prev + 1) as Step);
   const prevStep = () => setStep((prev) => (prev - 1) as Step);
 
+  // Auto-fetch phone to ID
+  useEffect(() => {
+    const phone = formData.fatherContact || formData.motherContact;
+    if (phone && (!formData.admissionNo || formData.admissionNo.startsWith('ADM-'))) {
+      setFormData(prev => ({ ...prev, admissionNo: phone }));
+    }
+  }, [formData.fatherContact, formData.motherContact]);
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      console.log("Submitting Student Data:", {
+        ...formData,
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        email: formData.fatherEmail || formData.motherEmail || `${formData.firstName.toLowerCase()}${Math.floor(Math.random()*1000)}@sns.edu`,
+      });
       await createStudent({
         name: `${formData.firstName} ${formData.lastName}`.trim(),
         email: formData.fatherEmail || formData.motherEmail || `${formData.firstName.toLowerCase()}${Math.floor(Math.random()*1000)}@sns.edu`,
@@ -103,6 +119,7 @@ export function AdmissionPage() {
         motherOrganization: formData.motherOrganization,
         motherDesignation: formData.motherDesignation,
         motherOfficeAddress: formData.motherOfficeAddress,
+        password: formData.password,
       });
       setStep(4);
     } catch (error) {
@@ -154,8 +171,26 @@ export function AdmissionPage() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <InputField label="Admission No" placeholder="e.g. ADM-2026-001" value={formData.admissionNo} onChange={(val) => setFormData({...formData, admissionNo: val})} />
-                    <InputField label="Application No" placeholder="e.g. APP-89234" value={formData.applicationNo} onChange={(val) => setFormData({...formData, applicationNo: val})} />
+                    <div className="relative group">
+                      <InputField label="Admission No" placeholder="e.g. ADM-2026-001" value={formData.admissionNo} onChange={(val) => setFormData({...formData, admissionNo: val})} />
+                      <button 
+                        onClick={() => setFormData({...formData, admissionNo: `ADM-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`})}
+                        className="absolute right-3 top-[34px] p-2 text-slate-300 hover:text-[#FF7F50] transition-colors"
+                        title="Auto-generate ID"
+                      >
+                        <MagicWand size={18} weight="duotone" />
+                      </button>
+                    </div>
+                    <div className="relative group">
+                      <InputField label="Application No" placeholder="e.g. APP-89234" value={formData.applicationNo} onChange={(val) => setFormData({...formData, applicationNo: val})} />
+                      <button 
+                        onClick={() => setFormData({...formData, applicationNo: `APP-${Math.floor(100000 + Math.random() * 900000)}`})}
+                        className="absolute right-3 top-[34px] p-2 text-slate-300 hover:text-[#FF7F50] transition-colors"
+                        title="Auto-generate ID"
+                      >
+                        <MagicWand size={18} weight="duotone" />
+                      </button>
+                    </div>
                     
                     <InputField label="First Name" placeholder="e.g. Arjun" value={formData.firstName} onChange={(val) => setFormData({...formData, firstName: val})} />
                     <InputField label="Last Name" placeholder="e.g. Sharma" value={formData.lastName} onChange={(val) => setFormData({...formData, lastName: val})} />
@@ -200,6 +235,28 @@ export function AdmissionPage() {
                     
                     <InputField label="Blood Group" placeholder="e.g. O+" value={formData.bloodGroup} onChange={(val) => setFormData({...formData, bloodGroup: val})} />
                     <InputField label="Mother Tongue" placeholder="e.g. Tamil" value={formData.motherTongue} onChange={(val) => setFormData({...formData, motherTongue: val})} />
+                    
+                    <div className="relative group">
+                      <InputField 
+                        label="Login Password" 
+                        placeholder="••••••••" 
+                        type="text"
+                        value={formData.password}
+                        onChange={(val) => setFormData({...formData, password: val})}
+                      />
+                      <button 
+                        onClick={() => {
+                          const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+                          let pass = "";
+                          for(let i=0; i<8; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+                          setFormData({...formData, password: pass});
+                        }}
+                        className="absolute right-3 top-[34px] p-2 text-slate-300 hover:text-[#FF7F50] transition-colors"
+                        title="Generate Password"
+                      >
+                        <MagicWand size={18} weight="duotone" />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex justify-end pt-4 border-t border-slate-100">

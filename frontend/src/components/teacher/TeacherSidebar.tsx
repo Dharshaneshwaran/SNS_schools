@@ -19,6 +19,7 @@ import {
   CalendarDays
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "../../hooks/use-auth";
 
 interface SidebarProps {
   activeTab: string;
@@ -44,6 +45,11 @@ const menuItems = [
 ];
 
 export default function TeacherSidebar({ activeTab, setActiveTab }: SidebarProps) {
+  const { session, logout } = useAuth();
+  const teacherName = session?.user.name || "Teacher";
+  const teacherRole = session?.user.role || "Faculty";
+  const teacherInitial = teacherName.charAt(0).toUpperCase();
+
   return (
     <div className="hidden lg:flex flex-col h-screen w-72 bg-[var(--bg-secondary)] border-r border-[var(--border)] p-6 fixed left-0 top-0 z-50">
       {/* Brand */}
@@ -61,11 +67,11 @@ export default function TeacherSidebar({ activeTab, setActiveTab }: SidebarProps
           onClick={() => setActiveTab("profile")}
           className="w-full px-4 py-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)] hover:shadow-lg hover:shadow-[var(--accent-glow)] transition-all text-left group"
         >
-          <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-1 group-hover:text-[var(--accent)] transition-colors">Active Teacher</p>
+          <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-1 group-hover:text-[var(--accent)] transition-colors">Active {teacherRole}</p>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <p className="text-lg font-black text-[var(--text-primary)] tracking-tight">Yukesh</p>
+              <p className="text-lg font-black text-[var(--text-primary)] tracking-tight">{teacherName}</p>
             </div>
             <User size={16} className="text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors" />
           </div>
@@ -103,7 +109,7 @@ export default function TeacherSidebar({ activeTab, setActiveTab }: SidebarProps
       {/* Bottom Profile & Logout */}
       <div className="pt-6 border-t border-[var(--border)]">
         <button 
-          onClick={() => setActiveTab("logout")}
+          onClick={logout}
           className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-red-500 text-white font-black uppercase tracking-widest text-xs hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all active:scale-95"
         >
           <LogOut size={16} strokeWidth={3} />

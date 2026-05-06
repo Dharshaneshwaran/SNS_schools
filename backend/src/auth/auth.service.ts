@@ -13,7 +13,7 @@ export class AuthService {
   constructor(private readonly usersService: UsersService) {}
 
   async login(payload: LoginDto): Promise<AuthSession> {
-    const email = payload.email?.trim().toLowerCase() ?? '';
+    const email = payload.email?.trim() ?? '';
     const password = payload.password ?? '';
 
     if (!email || !password) {
@@ -22,7 +22,7 @@ export class AuthService {
       );
     }
 
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByIdentifier(email);
 
     if (!user || !this.safeCompare(password, user.password)) {
       throw new UnauthorizedException('Invalid email or password.');
@@ -64,6 +64,8 @@ export class AuthService {
       role: user.role,
       department: user.department,
       status: user.status,
+      studentProfile: user.studentProfile,
+      teacherProfile: user.teacherProfile,
     };
   }
 
@@ -168,6 +170,8 @@ export class AuthService {
         role: user.role,
         department: user.department,
         status: user.status,
+        studentProfile: user.studentProfile,
+        teacherProfile: user.teacherProfile,
       },
     };
   }

@@ -18,8 +18,11 @@ model User {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   status         UserStatus      @default(active)
+  phone          String?
   groups         GroupMember[]
   sentMessages   Message[]       @relation("SentMessages")
+  notifications  Notification[]
+  fcmTokens      FCMToken[]
   studentProfile StudentProfile?
   teacherProfile TeacherProfile?
 }
@@ -30,6 +33,7 @@ model TeacherProfile {
   employeeId     String @unique
   designation    String
   specialization String
+  phone          String?
   user           User   @relation(fields: [userId], references: [id])
 }
 
@@ -39,6 +43,7 @@ model StudentProfile {
   studentId            String @unique
   class                String
   section              String
+  phone                String?
   admissionNo          String?
   applicationNo        String?
   gender               String?
@@ -101,6 +106,27 @@ model Message {
   createdAt DateTime @default(now())
   group     Group    @relation(fields: [groupId], references: [id])
   sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("info") // message, alert, info
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model FCMToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  device    String?  // web, mobile
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 enum Role {

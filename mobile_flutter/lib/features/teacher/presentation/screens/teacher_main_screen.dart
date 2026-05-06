@@ -28,7 +28,7 @@ class _TeacherMainScreenState extends State<TeacherMainScreen> {
         onTap: (index) => setState(() => _selectedIndex = index),
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: AppColors.primaryOrange,
+        selectedItemColor: AppColors.primary,
         unselectedItemColor: Colors.black26,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: 'Home'),

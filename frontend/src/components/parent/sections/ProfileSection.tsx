@@ -11,29 +11,29 @@ export default function ProfileSection({ student, theme }: { student: Student; t
   const studentInfo = [
     { label: "Full Name", value: student.name, icon: <User size={18} /> },
     { label: "Class", value: `Class ${student.class} – Section ${student.section}`, icon: <GraduationCap size={18} /> },
-    { label: "School", value: "SNS Academy, Coimbatore", icon: <MapPin size={18} /> },
-    { label: "Student ID", value: "SNS-2026-0042", icon: <PencilSimple size={18} /> },
+    { label: "School", value: student.schoolName || "SNS Academy, Coimbatore", icon: <MapPin size={18} /> },
+    { label: "Student ID", value: student.studentId, icon: <PencilSimple size={18} /> },
   ];
 
   const parentDetails = [
     { 
       type: "Father", 
-      name: "Mr. Rajesh Sharma", 
+      name: student.fatherName || "Not Provided", 
       mobile: student.fatherNumber, 
-      email: student.fatherEmail || "father@snsacademy.org" 
+      email: student.fatherEmail || "N/A" 
     },
     { 
       type: "Mother", 
-      name: "Mrs. Meena Sharma", 
+      name: student.motherName || "Not Provided", 
       mobile: student.motherNumber, 
-      email: student.motherEmail || "mother@snsacademy.org" 
+      email: student.motherEmail || "N/A" 
     },
   ];
 
   const guardianDetail = {
-    name: "Mr. Vijay Sharma",
+    name: student.guardianName || "Not Provided",
     mobile: student.guardianNumber || "Not Provided",
-    relation: "Uncle / Emergency Contact"
+    relation: student.relation || "Emergency Contact"
   };
 
   const teacherDetails = [

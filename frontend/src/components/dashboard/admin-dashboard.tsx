@@ -27,6 +27,7 @@ import { useState, useEffect } from "react";
 import { AdminStatCard } from "./admin-stat-card";
 import { EventsGallery } from "./events-gallery";
 import { getAllUsers } from "../../services/users-service";
+import { getDashboardOverview, DashboardOverview } from "../../services/dashboard-service";
 import Link from "next/link";
 
 interface DashboardUser {
@@ -39,22 +40,28 @@ interface DashboardUser {
 
 export function AdminDashboard() {
   const [users, setUsers] = useState<DashboardUser[]>([]);
+  const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchUsers() {
+    async function fetchData() {
       try {
-        const data = await getAllUsers() as DashboardUser[];
+        const [usersData, overviewData] = await Promise.all([
+          getAllUsers(),
+          getDashboardOverview()
+        ]);
+        
         // Filter for students (parents in current role mapping)
-        const students = data.filter((u: DashboardUser) => u.role === "parent");
+        const students = (usersData as DashboardUser[]).filter((u: DashboardUser) => u.role === "parent");
         setUsers(students);
+        setOverview(overviewData);
       } catch (err) {
-        console.error("Failed to fetch users", err);
+        console.error("Failed to fetch dashboard data", err);
       } finally {
         setIsLoading(false);
       }
     }
-    fetchUsers();
+    fetchData();
   }, []);
 
   return (
@@ -75,29 +82,29 @@ export function AdminDashboard() {
       {/* Stats Grid */}
       <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <AdminStatCard 
-          label="Total Students" 
-          value={isLoading ? "..." : users.length.toLocaleString()} 
+          label={overview?.stats[0]?.label || "Total Students"} 
+          value={isLoading ? "..." : (overview?.stats[0]?.value || users.length.toString())} 
           change="+12" 
           trend="up" 
           icon={<Users size={24} />} 
         />
         <AdminStatCard 
-          label="Active Staff" 
-          value="142" 
+          label={overview?.stats[1]?.label || "Active Staff"} 
+          value={isLoading ? "..." : (overview?.stats[1]?.value || "0")} 
           change="+3" 
           trend="up" 
           icon={<UserSquare size={24} />} 
         />
         <AdminStatCard 
-          label="Attendance" 
-          value="94.2%" 
+          label={overview?.stats[2]?.label || "Attendance"} 
+          value={isLoading ? "..." : (overview?.stats[2]?.value || "0%")} 
           change="-0.5%" 
           trend="down" 
           icon={<CalendarCheck size={24} />} 
         />
         <AdminStatCard 
-          label="Pending Approvals" 
-          value="28" 
+          label={overview?.stats[3]?.label || "Pending Approvals"} 
+          value={isLoading ? "..." : (overview?.stats[3]?.value || "0")} 
           change="+5" 
           trend="up" 
           icon={<Clock size={24} />} 

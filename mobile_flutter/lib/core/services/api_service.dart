@@ -8,8 +8,8 @@ class ApiService {
 
   ApiService() {
     _dio.options.baseUrl = Env.apiBaseUrl;
-    _dio.options.connectTimeout = const Duration(seconds: 10);
-    _dio.options.receiveTimeout = const Duration(seconds: 10);
+    _dio.options.connectTimeout = const Duration(seconds: 30);
+    _dio.options.receiveTimeout = const Duration(seconds: 30);
 
     _dio.interceptors.add(
       InterceptorsWrapper(

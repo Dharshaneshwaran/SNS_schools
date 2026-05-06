@@ -30,6 +30,21 @@ export class UsersService implements OnModuleInit {
     }
   }
 
+  async getSystemStats() {
+    const [totalStudents, totalTeachers, totalAdmins] = await Promise.all([
+      this.prisma.user.count({ where: { role: 'parent' } }),
+      this.prisma.user.count({ where: { role: 'teacher' } }),
+      this.prisma.user.count({ where: { role: 'admin' } }),
+    ]);
+
+    return {
+      totalStudents,
+      totalTeachers,
+      totalAdmins,
+      totalUsers: totalStudents + totalTeachers + totalAdmins,
+    };
+  }
+
   async findAll() {
     const users = await this.prisma.user.findMany({
       include: {
@@ -39,6 +54,29 @@ export class UsersService implements OnModuleInit {
       orderBy: { createdAt: 'desc' },
     });
     return users.map(this.mapUser);
+  }
+
+  async findByIdentifier(identifier: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: { equals: identifier.toLowerCase(), mode: 'insensitive' } },
+          { phone: { equals: identifier } },
+          { studentProfile: { studentId: { equals: identifier, mode: 'insensitive' } } },
+          { studentProfile: { admissionNo: { equals: identifier, mode: 'insensitive' } } },
+          { studentProfile: { phone: { equals: identifier } } },
+          { studentProfile: { fatherContact: { equals: identifier } } },
+          { studentProfile: { motherContact: { equals: identifier } } },
+          { teacherProfile: { employeeId: { equals: identifier, mode: 'insensitive' } } },
+          { teacherProfile: { phone: { equals: identifier } } },
+        ],
+      },
+      include: {
+        studentProfile: true,
+        teacherProfile: true,
+      },
+    });
+    return user ? this.mapUser(user) : null;
   }
 
   async findByEmail(email: string) {
@@ -102,28 +140,50 @@ export class UsersService implements OnModuleInit {
     }
   }
 
+  private generatePassword(): string {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  }
+
+  private async generateId(prefix: string): Promise<string> {
+    const year = new Date().getFullYear();
+    const count = await this.prisma.user.count({
+      where: { role: prefix === 'TCH' ? 'teacher' : 'parent' }
+    });
+    const sequence = (count + 1).toString().padStart(4, '0');
+    return `${prefix}-${year}-${sequence}`;
+  }
+
   async createTeacher(data: {
     name: string;
     email: string;
     department: string;
-    employeeId: string;
     designation: string;
     specialization: string;
+    employeeId?: string;
     password?: string;
   }) {
+    const autoId = data.employeeId || await this.generateId('TCH');
+    const autoPassword = data.password || this.generatePassword();
+
     return this.prisma.user.create({
       data: {
         name: data.name,
         email: data.email.toLowerCase(),
-        password: data.password || process.env.DEMO_USER_PASSWORD || 'ChangeMe123!',
+        password: autoPassword,
         role: 'teacher',
         department: data.department,
         status: 'active',
         teacherProfile: {
           create: {
-            employeeId: data.employeeId,
+            employeeId: autoId,
             designation: data.designation,
             specialization: data.specialization,
+            phone: data.phone,
           },
         },
       },
@@ -131,21 +191,27 @@ export class UsersService implements OnModuleInit {
   }
 
   async createStudent(data: any) {
+    console.log('Creating Student with data:', { ...data, password: data.password ? '***' : 'empty' });
+    const autoId = data.studentId || await this.generateId('STD');
+    const autoPassword = data.password || this.generatePassword();
+    console.log('Final Student Credentials:', { id: autoId, password: autoPassword });
+
     return this.prisma.user.create({
       data: {
         name: data.name,
         email: data.email.toLowerCase(),
-        password: data.password || process.env.DEMO_USER_PASSWORD || 'ChangeMe123!',
+        password: autoPassword,
         role: 'parent',
         department: data.department,
         status: 'active',
         studentProfile: {
           create: {
-            studentId: data.studentId,
+            studentId: autoId,
             class: data.class,
             section: data.section,
-            admissionNo: data.admissionNo,
-            applicationNo: data.applicationNo,
+            phone: data.phone || data.fatherContact || data.motherContact,
+            admissionNo: data.admissionNo || data.studentId || `ADM-${Date.now()}`,
+            applicationNo: data.applicationNo || `APP-${Date.now()}`,
             gender: data.gender,
             dob: data.dob,
             birthCertNo: data.birthCertNo,

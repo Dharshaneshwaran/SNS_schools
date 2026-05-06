@@ -3,6 +3,7 @@ import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../services/biometric_service.dart';
 import '../models/user_model.dart';
+import '../services/notification_service.dart';
 
 final apiServiceProvider = Provider((ref) => ApiService());
 final biometricServiceProvider = Provider((ref) => BiometricService());
@@ -12,10 +13,16 @@ final authServiceProvider = Provider((ref) {
   return AuthService(apiService);
 });
 
+final notificationServiceProvider = Provider((ref) {
+  final apiService = ref.watch(apiServiceProvider);
+  return NotificationService(apiService);
+});
+
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final authService = ref.watch(authServiceProvider);
   final biometricService = ref.watch(biometricServiceProvider);
-  return AuthNotifier(authService, biometricService);
+  final notificationService = ref.watch(notificationServiceProvider);
+  return AuthNotifier(authService, biometricService, notificationService);
 });
 
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
@@ -33,8 +40,9 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService;
   final BiometricService _biometricService;
+  final NotificationService _notificationService;
 
-  AuthNotifier(this._authService, this._biometricService) : super(AuthState.initial());
+  AuthNotifier(this._authService, this._biometricService, this._notificationService) : super(AuthState.initial());
 
   Future<void> login(String email, String password) async {
     state = AuthState(status: AuthStatus.loading);
@@ -48,6 +56,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
       state = AuthState(status: AuthStatus.authenticated, user: user);
+      await _notificationService.initialize();
+      await _notificationService.registerToken();
     } catch (e) {
       state = AuthState(status: AuthStatus.error, errorMessage: e.toString());
     }
@@ -62,6 +72,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final user = await _authService.getCurrentUser();
     if (user != null) {
       state = AuthState(status: AuthStatus.authenticated, user: user);
+      await _notificationService.initialize();
+      await _notificationService.registerToken();
     } else {
       state = AuthState(status: AuthStatus.unauthenticated);
     }

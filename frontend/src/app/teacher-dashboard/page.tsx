@@ -12,6 +12,14 @@ import { ChatPage } from "../../components/dashboard/chat-page";
 import LearningResources from "../../components/teacher/LearningResources";
 import { motion, AnimatePresence } from "framer-motion";
 import { Settings, BarChart3, HelpCircle } from "lucide-react";
+import { AttendancePage } from "../../components/dashboard/attendance-page";
+import { CalendarPage } from "../../components/dashboard/calendar-page";
+import { ResultsPage } from "../../components/dashboard/results-page";
+import { TransportPage } from "../../components/dashboard/transport-page";
+import { ReportsPage } from "../../components/dashboard/reports-page";
+import { SettingsPage } from "../../components/dashboard/settings-page";
+import { NotificationsPage } from "../../components/dashboard/notifications-page";
+import { ProfilePage } from "../../components/dashboard/profile-page";
 
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -26,73 +34,17 @@ export default function TeacherDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case "overview": return <DashboardOverview />;
-      case "notifications": return <DashboardOverview />; // Replace with Notifications component if available
-      case "attendance": return <DashboardOverview />; // Replace with Attendance component
+      case "notifications": return <NotificationsPage />;
+      case "attendance": return <AttendancePage />;
       case "schedule": return <ScheduleManager />;
-      case "calendar": return <DashboardOverview />;
+      case "calendar": return <CalendarPage />;
       case "classes": return <ClassesSubjects />;
-      case "results": return <DashboardOverview />;
-      case "transport": return <DashboardOverview />;
-      case "tasks": return <AssignmentsExams />;
+      case "results": return <ResultsPage />;
+      case "transport": return <TransportPage />;
+      case "tasks": return <ReportsPage />;
       case "communication": return <div className="h-[calc(100vh-160px)] -mx-6 lg:-mx-10 -mt-8"><ChatPage /></div>;
-      case "settings": return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            { label: "Performance Reports", icon: BarChart3, desc: "Detailed student analytics" },
-            { label: "System Settings", icon: Settings, desc: "Notification & Privacy preferences" },
-            { label: "Help & Support", icon: HelpCircle, desc: "Contact IT or administration" },
-          ].map((tool, i) => (
-            <motion.div 
-              key={i}
-              whileHover={{ y: -5 }}
-              className="p-6 rounded-[32px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--card-shadow)] hover:border-[var(--accent)] transition-all cursor-pointer group"
-            >
-              <div className="p-4 rounded-2xl bg-[var(--bg-primary)] text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-all mb-4 w-fit">
-                <tool.icon size={24} />
-              </div>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">{tool.label}</h3>
-              <p className="text-sm text-[var(--text-secondary)]">{tool.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      );
-      case "profile": return (
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-2xl p-10 rounded-[48px] bg-[var(--bg-secondary)] border border-[var(--border)] shadow-2xl relative overflow-hidden"
-        >
-          <div className="relative z-10">
-            <div className="flex items-center gap-6 mb-10">
-              <div className="w-24 h-24 rounded-[32px] bg-zinc-800 text-white flex items-center justify-center text-4xl font-black italic shadow-xl">
-                Y
-              </div>
-              <div>
-                <h2 className="text-4xl font-black italic text-[var(--text-primary)] tracking-tight">Yukesh</h2>
-                <p className="text-[var(--accent)] font-black uppercase tracking-[0.2em] text-xs mt-1">Senior Teacher · Computer Science</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {[
-                { label: "Mobile Number", value: "+91 98765 43210" },
-                { label: "Email Address", value: "yukesh.v@snsacademy.org" },
-                { label: "Employee ID", value: "SNS-T-2026-001" },
-                { label: "Department", value: "Science & Engineering" },
-                { label: "Address", value: "SNS Academy Campus, Coimbatore" },
-                { label: "Joining Date", value: "15th August 2026" },
-              ].map((info, i) => (
-                <div key={i} className="space-y-1">
-                  <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">{info.label}</p>
-                  <p className="text-lg font-bold text-[var(--text-primary)]">{info.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="absolute -right-20 -top-20 w-80 h-80 bg-[var(--accent-glow)] rounded-full blur-3xl opacity-30" />
-        </motion.div>
-      );
+      case "settings": return <SettingsPage />;
+      case "profile": return <ProfilePage />;
       default: return <DashboardOverview />;
     }
   };
@@ -107,7 +59,11 @@ export default function TeacherDashboard() {
 
       {/* Main Content Area */}
       <div className="flex-1 lg:ml-72 flex flex-col pb-24 lg:pb-0">
-        <TeacherHeader theme={theme} toggleTheme={toggleTheme} />
+        <TeacherHeader 
+          theme={theme} 
+          toggleTheme={toggleTheme} 
+          setActiveTab={setActiveTab}
+        />
         
         <div className="p-6 lg:p-10 flex-1 max-w-[1600px] mx-auto w-full">
           <div className="flex items-center justify-between mb-8">

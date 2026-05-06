@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/auth_provider.dart';
@@ -7,12 +8,15 @@ import 'core/providers/theme_provider.dart';
 import 'core/models/user_model.dart';
 import 'features/auth/presentation/screens/role_selection_screen.dart';
 import 'features/home/presentation/screens/home_screen.dart';
-import 'features/home/presentation/screens/teacher_home_screen.dart';
+import 'features/teacher/presentation/screens/teacher_main_screen.dart';
 import 'features/home/presentation/screens/admin_home_screen.dart';
 import 'features/splash/presentation/screens/splash_screen.dart';
 
-void main() {
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   GoogleFonts.config.allowRuntimeFetching = false;
   runApp(const ProviderScope(child: SNSErpApp()));
 }
@@ -27,6 +31,7 @@ class SNSErpApp extends ConsumerWidget {
     return MaterialApp(
       title: 'SNS ERP',
       debugShowCheckedModeBanner: false,
+      scaffoldMessengerKey: scaffoldMessengerKey,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
@@ -63,7 +68,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         case UserRole.admin:
           return const AdminHomeScreen();
         case UserRole.staff:
-          return const TeacherHomeScreen();
+          return const TeacherMainScreen();
         case UserRole.parent:
           return const HomeScreen();
       }

@@ -31,8 +31,8 @@ async function main() {
     console.log('Creating mock students...');
     await prisma.user.createMany({
       data: [
-        { name: 'Arjun Sharma', email: 'arjun@sns.edu', password: 'ChangeMe123!', role: 'parent', department: 'Academic', status: 'active' },
-        { name: 'Priya Patel', email: 'priya@sns.edu', password: 'ChangeMe123!', role: 'parent', department: 'Academic', status: 'active' },
+        { name: 'Arjun Sharma', email: 'arjun@sns.edu', password: 'ChangeMe123!', role: 'parent', department: 'Academic', status: 'active', phone: '9952134884' },
+        { name: 'Priya Patel', email: 'priya@sns.edu', password: 'ChangeMe123!', role: 'parent', department: 'Academic', status: 'active', phone: '9876543210' },
       ]
     });
     users = await prisma.user.findMany();

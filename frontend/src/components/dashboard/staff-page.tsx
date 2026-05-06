@@ -10,7 +10,8 @@ import {
   CaretRight,
   CaretLeft,
   UserGear,
-  Plus
+  Plus,
+  MagicWand
 } from "@phosphor-icons/react";
 import { PageSection } from "./page-section";
 import { createTeacher } from "../../services/users-service";
@@ -111,19 +112,42 @@ export function StaffPage() {
                       value={formData.email}
                       onChange={(val) => setFormData({...formData, email: val})}
                     />
-                    <InputField 
-                      label="Employee ID" 
-                      placeholder="e.g. SNS-T-2024" 
-                      value={formData.employeeId}
-                      onChange={(val) => setFormData({...formData, employeeId: val})}
-                    />
-                    <InputField 
-                      label="Account Password" 
-                      placeholder="••••••••" 
-                      type="password"
-                      value={formData.password}
-                      onChange={(val) => setFormData({...formData, password: val})}
-                    />
+                    <div className="relative group">
+                      <InputField 
+                        label="Employee ID" 
+                        placeholder="e.g. SNS-T-2024" 
+                        value={formData.employeeId}
+                        onChange={(val) => setFormData({...formData, employeeId: val})}
+                      />
+                      <button 
+                        onClick={() => setFormData({...formData, employeeId: `TCH-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`})}
+                        className="absolute right-3 top-[34px] p-2 text-slate-300 hover:text-[#FF7F50] transition-colors"
+                        title="Auto-generate ID"
+                      >
+                        <MagicWand size={18} weight="duotone" />
+                      </button>
+                    </div>
+                    <div className="relative group">
+                      <InputField 
+                        label="Account Password" 
+                        placeholder="••••••••" 
+                        type="text"
+                        value={formData.password}
+                        onChange={(val) => setFormData({...formData, password: val})}
+                      />
+                      <button 
+                        onClick={() => {
+                          const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+                          let pass = "";
+                          for(let i=0; i<10; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+                          setFormData({...formData, password: pass});
+                        }}
+                        className="absolute right-3 top-[34px] p-2 text-slate-300 hover:text-[#FF7F50] transition-colors"
+                        title="Generate Secure Password"
+                      >
+                        <MagicWand size={18} weight="duotone" />
+                      </button>
+                    </div>
                     <InputField 
                       label="Phone Number" 
                       placeholder="+91 XXXXX XXXXX" 
