@@ -7,11 +7,23 @@ export class FcmService implements OnModuleInit {
   private firebaseApp: admin.app.App;
 
   onModuleInit() {
-    const serviceAccountPath = path.join(process.cwd(), 'firebase-service-account.json');
-    
-    this.firebaseApp = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccountPath),
-    });
+    try {
+      let serviceAccount: any;
+      const envServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+      if (envServiceAccount) {
+        serviceAccount = JSON.parse(envServiceAccount);
+      } else {
+        const serviceAccountPath = path.join(process.cwd(), 'firebase-service-account.json');
+        serviceAccount = require(serviceAccountPath);
+      }
+
+      this.firebaseApp = admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    } catch (error) {
+      console.warn('Firebase Admin initialization failed. Push notifications may not work.', error.message);
+    }
   }
 
   async sendPushNotification(tokens: string[], title: string, body: string, data?: any) {
