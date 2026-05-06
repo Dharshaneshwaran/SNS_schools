@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: sns-backend
+    runtime: node
+    buildCommand: cd backend && npm ci && npm run build
+    startCommand: cd backend && npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=2048"
+    plan: standard
+    maxInstances: 1
+    
+  - type: web
+    name: sns-frontend
+    runtime: node
+    buildCommand: cd frontend && npm ci && npm run build
+    startCommand: cd frontend && npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=1024"
+    plan: standard
+    maxInstances: 1
