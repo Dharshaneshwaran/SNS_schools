@@ -12,6 +12,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       },
       log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
     });
+    console.log('Prisma initialized with host:', process.env.DATABASE_URL?.split('@')[1]?.split('/')[0]);
   }
 
   async onModuleInit() {

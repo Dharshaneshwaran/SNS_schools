@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AnnouncementsService } from './announcements.service';
 import type { CreateAnnouncementDto } from './announcements.service';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -36,6 +36,13 @@ export class AnnouncementsController {
   @Get(':id')
   async findById(@Param('id') id: string) {
     return this.announcementsService.findById(id);
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin', 'leader')
+  async update(@Param('id') id: string, @Body() data: Partial<CreateAnnouncementDto>) {
+    return this.announcementsService.update(id, data);
   }
 
   @Delete(':id')

@@ -130,7 +130,10 @@ export function SidebarNav() {
 
       {/* Search */}
       <div className="px-4 mb-3">
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 cursor-text group hover:border-slate-200 transition-all">
+        <div 
+          onClick={() => window.dispatchEvent(new CustomEvent("open-command-palette"))}
+          className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 cursor-pointer group hover:border-slate-200 transition-all shadow-sm active:scale-[0.98]"
+        >
           <MagnifyingGlass size={14} className="text-slate-400 shrink-0" />
           <span className="flex-1 text-xs text-slate-400 font-medium">Search...</span>
           <div className="flex items-center gap-0.5 shrink-0">

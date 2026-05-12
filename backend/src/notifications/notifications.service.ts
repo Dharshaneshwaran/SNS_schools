@@ -9,6 +9,15 @@ export class NotificationsService {
     private fcm: FcmService,
   ) {}
 
+  private async cleanupTokens(invalidTokens: string[]) {
+    if (invalidTokens && invalidTokens.length > 0) {
+      console.log(`Cleaning up ${invalidTokens.length} invalid tokens`);
+      await this.prisma.fCMToken.deleteMany({
+        where: { token: { in: invalidTokens } },
+      });
+    }
+  }
+
   async createNotification(userId: string, title: string, message: string, type: string = 'info') {
     const notification = await this.prisma.notification.create({
       data: {
@@ -26,12 +35,15 @@ export class NotificationsService {
     });
 
     if (tokens.length > 0) {
-      await this.fcm.sendPushNotification(
+      const response = await this.fcm.sendPushNotification(
         tokens.map((t) => t.token),
         title,
         message,
         { notificationId: notification.id },
       );
+      if (response?.invalidTokens) {
+        await this.cleanupTokens(response.invalidTokens);
+      }
     }
 
     return notification;
@@ -74,11 +86,14 @@ export class NotificationsService {
     });
 
     if (tokens.length > 0) {
-      await this.fcm.sendPushNotification(
+      const response = await this.fcm.sendPushNotification(
         tokens.map((t) => t.token),
         title,
         message,
       );
+      if (response?.invalidTokens) {
+        await this.cleanupTokens(response.invalidTokens);
+      }
     }
 
     return { recipients: userIds.length };
@@ -116,6 +131,12 @@ export class NotificationsService {
   async deleteNotification(userId: string, id: string) {
     return this.prisma.notification.delete({
       where: { id, userId },
+    });
+  }
+
+  async deleteAllNotifications(userId: string) {
+    return this.prisma.notification.deleteMany({
+      where: { userId },
     });
   }
 

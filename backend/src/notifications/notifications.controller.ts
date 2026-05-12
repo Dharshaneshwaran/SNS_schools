@@ -46,6 +46,11 @@ export class NotificationsController {
     return this.notificationsService.deleteNotification(req.user.sub, id);
   }
 
+  @Post('delete-all')
+  deleteAll(@Request() req) {
+    return this.notificationsService.deleteAllNotifications(req.user.sub);
+  }
+
   @Post('update')
   updateNotification(@Request() req, @Body('id') id: string, @Body() data: { title?: string, message?: string }) {
     return this.notificationsService.updateNotification(req.user.sub, id, data);

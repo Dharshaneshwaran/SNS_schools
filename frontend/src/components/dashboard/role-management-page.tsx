@@ -56,7 +56,7 @@ const emptyPermissions = (): Record<string, boolean> =>
 
 export function RoleManagementPage() {
   const { session } = useAuth();
-  const [tab, setTab] = useState<"users" | "groups">("users");
+  const [tab, setTab] = useState<"users" | "groups">("groups");
 
   /* ── Users state ── */
   const [users, setUsers] = useState<User[]>([]);
@@ -236,7 +236,6 @@ export function RoleManagementPage() {
       {/* Tab switcher */}
       <div className="flex gap-2 mb-8">
         {([
-          { key: "users",  label: "Users",        icon: <Users  size={16} weight="duotone" /> },
           { key: "groups", label: "Role Groups",   icon: <Folders size={16} weight="duotone" /> },
         ] as const).map((t) => (
           <button

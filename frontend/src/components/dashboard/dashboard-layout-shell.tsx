@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Bell, MagnifyingGlass, Sun, Moon, ChatCircleDots, List, X, SidebarSimple, DownloadSimple, Plus } from "@phosphor-icons/react";
 import { SidebarNav } from "./sidebar-nav";
 import { NotificationCenter } from "./notification-center";
+import { CommandPalette } from "./command-palette";
 import { useAuth } from "../../hooks/use-auth";
 import { canAccessWebDashboard } from "../../lib/role-access";
 import { getProfilePhotoLocally } from "../../lib/supabase";
@@ -299,6 +300,7 @@ export function DashboardLayoutShell({
           {children}
         </section>
       </div>
+      <CommandPalette />
     </main>
   );
 }

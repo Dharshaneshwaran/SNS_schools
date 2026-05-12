@@ -42,6 +42,13 @@ export async function deleteAnnouncement(id: string): Promise<void> {
   await apiRequest(`/announcements/${id}`, { method: "DELETE" });
 }
 
+export async function updateAnnouncement(id: string, data: Partial<CreateAnnouncementDto>): Promise<Announcement> {
+  return apiRequest<Announcement>(`/announcements/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
 export async function getAnnouncementCount(): Promise<{ count: number }> {
   return apiRequest<{ count: number }>("/announcements/count");
 }

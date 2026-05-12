@@ -13,8 +13,10 @@ import {
 } from "@phosphor-icons/react";
 import { PageSection } from "./page-section";
 import { toast } from "sonner";
-import { createAnnouncement } from "../../services/announcements-service";
+import { createAnnouncement, getAnnouncementById, updateAnnouncement } from "../../services/announcements-service";
 import { uploadFile } from "../../lib/supabase";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export function NoticePostPage() {
   const router = useRouter();
@@ -28,6 +30,28 @@ export function NoticePostPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
+
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
+
+  useEffect(() => {
+    if (editId) {
+      const fetchPost = async () => {
+        try {
+          const post = await getAnnouncementById(editId);
+          setTitle(post.title);
+          setContent(post.content);
+          setTarget(post.target);
+          if (post.imageUrl) {
+            setImagePreview(post.imageUrl);
+          }
+        } catch (err) {
+          toast.error("Failed to fetch post for editing");
+        }
+      };
+      fetchPost();
+    }
+  }, [editId]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -72,16 +96,26 @@ export function NoticePostPage() {
 
     setIsPosting(true);
     try {
-      await createAnnouncement({
-        title: title.trim(),
-        content: content.trim(),
-        target,
-        ...(imageUrl ? { imageUrl } : {}),
-      });
-      toast.success("Notice posted successfully!");
+      if (editId) {
+        await updateAnnouncement(editId, {
+          title: title.trim(),
+          content: content.trim(),
+          target,
+          ...(imageUrl ? { imageUrl } : {}),
+        });
+        toast.success("Notice updated successfully!");
+      } else {
+        await createAnnouncement({
+          title: title.trim(),
+          content: content.trim(),
+          target,
+          ...(imageUrl ? { imageUrl } : {}),
+        });
+        toast.success("Notice posted successfully!");
+      }
       router.push("/dashboard/events-gallery");
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Failed to post announcement";
+      const errorMsg = error instanceof Error ? error.message : "Failed to save announcement";
       toast.error(errorMsg);
     } finally {
       setIsPosting(false);
@@ -228,12 +262,12 @@ export function NoticePostPage() {
                   {busy ? (
                     <>
                       <SpinnerGap size={20} className="animate-spin" />
-                      {isUploading ? "Uploading…" : "Publishing…"}
+                      {isUploading ? "Uploading…" : (editId ? "Updating…" : "Publishing…")}
                     </>
                   ) : (
                     <>
                       <PaperPlaneTilt size={20} weight="fill" />
-                      Publish Post
+                      {editId ? "Update Post" : "Publish Post"}
                     </>
                   )}
                 </button>

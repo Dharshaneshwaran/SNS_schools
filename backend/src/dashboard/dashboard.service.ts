@@ -23,7 +23,7 @@ export class DashboardService {
     return { notifications, profileRequests, substitutions, leaves, admission };
   }
 
-  async getOverview() {
+  async getOverview(userId: string) {
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const currentYear = now.getFullYear();
@@ -58,7 +58,7 @@ export class DashboardService {
 
     try {
       [unreadNotifications, groups, messages] = await Promise.all([
-        this.prisma.notification.count({ where: { isRead: false } }),
+        this.prisma.notification.count({ where: { userId, isRead: false } }),
         this.prisma.group.count(),
         this.prisma.message.count(),
       ]);

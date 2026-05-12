@@ -11,8 +11,8 @@ export class DashboardController {
 
   @Get('overview')
   @Roles('admin')
-  getOverview() {
-    return this.dashboardService.getOverview();
+  getOverview(@Req() req: any) {
+    return this.dashboardService.getOverview(req.user.sub);
   }
 
   @Get('counts')

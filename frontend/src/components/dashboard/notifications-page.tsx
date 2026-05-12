@@ -113,6 +113,19 @@ export function NotificationsPage() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!confirm("Are you sure you want to delete all notifications?")) return;
+    try {
+      await apiRequest("/notifications/delete-all", {
+        method: "POST",
+      });
+      toast.success("All notifications cleared");
+      fetchHistory();
+    } catch (err) {
+      toast.error("Failed to clear notifications");
+    }
+  };
+
   return (
     <PageSection
       eyebrow="SNS COMMUNICATION"
@@ -129,11 +142,18 @@ export function NotificationsPage() {
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Online</p>
               </div>
               <div className="h-4 w-px bg-slate-100" />
-              <div className="flex items-center gap-2 text-slate-900">
-                 <Bell size={18} weight="duotone" className="text-[#FF7F50]" />
-                 <p className="text-xs font-black uppercase tracking-tight">{history.length} Broadcasts</p>
-              </div>
-           </div>
+               <div className="flex items-center gap-2 text-slate-900">
+                  <Bell size={18} weight="duotone" className="text-[#FF7F50]" />
+                  <p className="text-xs font-black uppercase tracking-tight">{history.length} Broadcasts</p>
+               </div>
+            </div>
+            <button 
+              onClick={handleDeleteAll}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-red-100 text-red-500 hover:bg-red-50 transition-all text-xs font-black uppercase tracking-widest"
+            >
+              <Trash size={16} weight="bold" />
+              Delete All
+            </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

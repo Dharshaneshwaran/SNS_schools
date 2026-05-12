@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ShareNetwork, Globe, Bell, Megaphone, Plus, ArrowClockwise } from "@phosphor-icons/react";
-import { getAnnouncements, type Announcement } from "../../services/announcements-service";
+import { ShareNetwork, Globe, Bell, Megaphone, Plus, ArrowClockwise, PencilSimple, TrashSimple } from "@phosphor-icons/react";
+import { getAnnouncements, deleteAnnouncement, type Announcement } from "../../services/announcements-service";
 import { useAuth } from "../../hooks/use-auth";
+import { toast } from "sonner";
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -47,6 +48,17 @@ export function EventsGallery() {
       setError("Failed to load announcements.");
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this post?")) return;
+    try {
+      await deleteAnnouncement(id);
+      toast.success("Post deleted successfully");
+      fetchPosts();
+    } catch (err) {
+      toast.error("Failed to delete post");
     }
   };
 
@@ -186,9 +198,29 @@ export function EventsGallery() {
                       </div>
                     </div>
                   </div>
-                  <button className="text-slate-300 hover:text-slate-600 transition-colors shrink-0 mt-0.5">
-                    <ShareNetwork size={18} />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {isAdmin && (
+                      <>
+                        <button 
+                          onClick={() => router.push(`/dashboard/notice-post?edit=${post.id}`)}
+                          className="p-2 rounded-lg text-slate-300 hover:text-blue-500 hover:bg-blue-50 transition-all"
+                          title="Edit Post"
+                        >
+                          <PencilSimple size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(post.id)}
+                          className="p-2 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all"
+                          title="Delete Post"
+                        >
+                          <TrashSimple size={18} />
+                        </button>
+                      </>
+                    )}
+                    <button className="p-2 rounded-lg text-slate-300 hover:text-slate-600 hover:bg-slate-50 transition-all">
+                      <ShareNetwork size={18} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Image */}
