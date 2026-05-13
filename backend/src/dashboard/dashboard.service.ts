@@ -250,4 +250,112 @@ export class DashboardService {
       },
     };
   }
+
+  async getTeacherOverview(teacherId: string) {
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0];
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][today.getDay()];
+    const currentTime = today.toTimeString().slice(0, 5); // HH:MM
+
+    // 1. School Presence (Attendance for today across all students)
+    const todayAttendance = await this.prisma.attendance.findMany({
+      where: { date: dateString }
+    });
+    const totalPresent = todayAttendance.filter(a => a.status === 'P').length;
+    const totalAbsent = todayAttendance.filter(a => a.status !== 'P').length;
+
+    // 2. Celebrations (Birthdays)
+    const [studentProfiles, teacherProfiles] = await Promise.all([
+      this.prisma.studentProfile.findMany({
+        where: { dob: { contains: `-${month}-` } },
+        include: { user: { select: { name: true } } }
+      }),
+      this.prisma.teacherProfile.findMany({
+        where: { dateOfBirth: { contains: `-${month}-` } },
+        include: { user: { select: { name: true } } }
+      })
+    ]);
+
+    const studentBirthdays = studentProfiles.map(s => ({
+      name: s.user.name,
+      grade: `Grade ${s.class}${s.section}`,
+      date: s.dob?.endsWith(`-${month}-${day}`) ? 'Today' : (s.dob || 'Unknown')
+    })).slice(0, 5);
+
+    const staffBirthdays = teacherProfiles.map(t => ({
+      name: t.user.name,
+      role: t.designation || 'Staff',
+      date: t.dateOfBirth?.endsWith(`-${month}-${day}`) ? 'Today' : (t.dateOfBirth || 'Unknown')
+    })).slice(0, 5);
+
+    // 3. Upcoming Class
+    const upcomingClass = await this.prisma.timetableEntry.findFirst({
+      where: {
+        teacherId,
+        day: dayName,
+        startTime: { gte: currentTime }
+      },
+      orderBy: { startTime: 'asc' }
+    });
+
+    let upcomingClassStudentsCount = 0;
+    if (upcomingClass) {
+      upcomingClassStudentsCount = await this.prisma.studentProfile.count({
+        where: { class: upcomingClass.class, section: upcomingClass.section }
+      });
+    }
+
+    // 4. Class Attendance Summary (for the teacher's next or main class, but let's just get today's stats for their upcoming class if exists)
+    let classAttendance = { present: 0, absent: 0, percentage: 0, grade: 'N/A' };
+    if (upcomingClass) {
+      const classAtt = await this.prisma.attendance.findMany({
+        where: { 
+          date: dateString,
+          class: upcomingClass.class,
+          section: upcomingClass.section
+        }
+      });
+      const pres = classAtt.filter(a => a.status === 'P').length;
+      const abs = classAtt.filter(a => a.status !== 'P').length;
+      classAttendance = {
+        grade: `Grade ${upcomingClass.class}${upcomingClass.section}`,
+        present: pres,
+        absent: abs,
+        percentage: upcomingClassStudentsCount > 0 ? Math.round((pres / upcomingClassStudentsCount) * 100) : 0
+      };
+    }
+
+    // 5. Important Note from Admin
+    const latestAnnouncement = await this.prisma.announcement.findFirst({
+      where: { target: { in: ['all', 'staff'] } },
+      orderBy: { createdAt: 'desc' },
+      include: { author: { select: { name: true } } }
+    });
+
+    return {
+      schoolPresence: {
+        present: totalPresent,
+        absent: totalAbsent,
+      },
+      celebrations: {
+        studentBirthdays,
+        staffBirthdays,
+      },
+      upcomingClass: upcomingClass ? {
+        subject: upcomingClass.subject,
+        grade: `Grade ${upcomingClass.class}${upcomingClass.section}`,
+        time: `Today, ${upcomingClass.startTime}`,
+        students: upcomingClassStudentsCount
+      } : null,
+      classAttendance,
+      announcement: latestAnnouncement ? {
+        title: latestAnnouncement.title,
+        message: latestAnnouncement.content,
+        author: latestAnnouncement.author.name,
+        date: latestAnnouncement.createdAt
+      } : null
+    };
+  }
 }

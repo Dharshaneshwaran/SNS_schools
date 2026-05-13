@@ -43,7 +43,7 @@ export default function TeacherDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "overview": return <DashboardOverview />;
+      case "overview": return <DashboardOverview onNavigate={setActiveTab} />;
       case "notifications": return <NotificationsPage />;
       case "attendance": return <AttendancePage />;
       case "schedule": return <ScheduleManager />;
@@ -55,7 +55,7 @@ export default function TeacherDashboard() {
       case "communication": return <div className="flex-1 -mx-6 lg:-mx-10 -mt-8 overflow-hidden"><ChatPage /></div>;
       case "settings": return <SettingsPage />;
       case "profile": return <ProfilePage />;
-      default: return <DashboardOverview />;
+      default: return <DashboardOverview onNavigate={setActiveTab} />;
     }
   };
 

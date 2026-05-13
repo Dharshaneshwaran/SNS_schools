@@ -35,7 +35,7 @@ export class FcmService implements OnModuleInit {
   }
 
   async sendPushNotification(tokens: string[], title: string, body: string, data?: any) {
-    if (tokens.length === 0) return;
+    if (tokens.length === 0) return { successCount: 0, failureCount: 0, invalidTokens: [] };
 
     const message: admin.messaging.MulticastMessage = {
       tokens,
@@ -63,20 +63,29 @@ export class FcmService implements OnModuleInit {
 
     try {
       const response = await admin.messaging().sendEachForMulticast(message);
-      console.log(`${response.successCount} messages were sent successfully`);
+      const invalidTokens: string[] = [];
       
       if (response.failureCount > 0) {
-        const failedTokens: string[] = [];
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
-            failedTokens.push(tokens[idx]);
-            console.error(`Failed to send to token ${tokens[idx]}:`, resp.error);
+            const error = resp.error as any;
+            // Check for specific error codes that indicate the token is no longer valid
+            if (
+              error?.code === 'messaging/registration-token-not-registered' ||
+              error?.code === 'messaging/invalid-registration-token'
+            ) {
+              invalidTokens.push(tokens[idx]);
+            }
+            console.error(`Failed to send to token ${tokens[idx]}:`, error?.message || error);
           }
         });
-        // You could potentially remove failed tokens from DB here
       }
       
-      return response;
+      return {
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+        invalidTokens,
+      };
     } catch (error) {
       console.error('Error sending push notification:', error);
       throw error;

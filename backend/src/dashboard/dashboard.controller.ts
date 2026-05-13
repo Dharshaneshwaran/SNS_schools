@@ -26,4 +26,10 @@ export class DashboardController {
   getParentOverview(@Param('studentId') studentId: string) {
     return this.dashboardService.getParentOverview(studentId);
   }
+
+  @Get('teacher')
+  @Roles('teacher', 'admin', 'leader')
+  getTeacherOverview(@Req() req: any) {
+    return this.dashboardService.getTeacherOverview(req.user.sub);
+  }
 }

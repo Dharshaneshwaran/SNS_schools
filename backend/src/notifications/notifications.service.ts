@@ -26,12 +26,16 @@ export class NotificationsService {
     });
 
     if (tokens.length > 0) {
-      await this.fcm.sendPushNotification(
+      const result = await this.fcm.sendPushNotification(
         tokens.map((t) => t.token),
         title,
         message,
         { notificationId: notification.id },
       );
+
+      if (result.invalidTokens.length > 0) {
+        await this.cleanupInvalidTokens(result.invalidTokens);
+      }
     }
 
     return notification;
@@ -74,11 +78,15 @@ export class NotificationsService {
     });
 
     if (tokens.length > 0) {
-      await this.fcm.sendPushNotification(
+      const result = await this.fcm.sendPushNotification(
         tokens.map((t) => t.token),
         title,
         message,
       );
+
+      if (result.invalidTokens.length > 0) {
+        await this.cleanupInvalidTokens(result.invalidTokens);
+      }
     }
 
     return { recipients: userIds.length };
@@ -124,5 +132,16 @@ export class NotificationsService {
       where: { id, userId },
       data,
     });
+  }
+
+  private async cleanupInvalidTokens(tokens: string[]) {
+    try {
+      await this.prisma.fCMToken.deleteMany({
+        where: { token: { in: tokens } },
+      });
+      console.log(`Cleaned up ${tokens.length} invalid FCM tokens`);
+    } catch (error) {
+      console.error('Failed to cleanup invalid tokens:', error);
+    }
   }
 }

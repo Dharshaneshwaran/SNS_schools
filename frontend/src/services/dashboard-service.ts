@@ -58,3 +58,42 @@ export interface ParentDashboardOverview {
 export async function getParentDashboardOverview(studentId: string): Promise<ParentDashboardOverview> {
   return apiRequest<ParentDashboardOverview>(`/dashboard/parent/${studentId}`);
 }
+
+export interface TeacherDashboardOverview {
+  schoolPresence: {
+    present: number;
+    absent: number;
+  };
+  celebrations: {
+    studentBirthdays: { name: string; grade: string; date: string }[];
+    staffBirthdays: { name: string; role: string; date: string }[];
+  };
+  upcomingClass: {
+    subject: string;
+    grade: string;
+    time: string;
+    students: number;
+  } | null;
+  classAttendance: {
+    present: number;
+    absent: number;
+    percentage: number;
+    grade: string;
+  };
+  announcement: {
+    title: string;
+    message: string;
+    author: string;
+    date: string;
+  } | null;
+}
+
+export async function getTeacherDashboardOverview(): Promise<TeacherDashboardOverview> {
+  return apiRequest<TeacherDashboardOverview>('/dashboard/teacher', {
+    headers: {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+    },
+  });
+}
