@@ -1,0 +1,127 @@
+# =====================================================================
+# SNS Academy ERP - root .gitignore (applies to backend, frontend, mobile)
+# Sub-folder .gitignore files still apply on top of this.
+# =====================================================================
+
+# ---------- Secrets & environment ----------
+.env
+.env.*
+*.env
+!.env.example
+!**/.env.example
+
+# Private keys / certificates / service accounts
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*-service-account*.json
+*serviceAccount*.json
+firebase-adminsdk*.json
+credentials.json
+secrets.json
+
+# ---------- Node / package managers ----------
+node_modules/
+.npm/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ---------- Build output ----------
+dist/
+build/
+out/
+.next/
+.turbo/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---------- Prisma ----------
+prisma/*.db
+prisma/*.db-journal
+
+# ---------- Tests / coverage ----------
+coverage/
+.nyc_output/
+
+# ---------- Logs & temp ----------
+logs/
+*.log
+.temp/
+.tmp/
+tmp/
+*.pid
+*.pid.lock
+*.seed
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ---------- Flutter / Dart ----------
+mobile_flutter/.dart_tool/
+mobile_flutter/.flutter-plugins
+mobile_flutter/.flutter-plugins-dependencies
+mobile_flutter/.pub-cache/
+mobile_flutter/.pub/
+mobile_flutter/build/
+**/doc/api/
+app.*.symbols
+app.*.map.json
+
+# Android signing & local config
+*.jks
+*.keystore
+**/android/key.properties
+**/android/local.properties
+**/android/.gradle/
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+**/android/captures/
+
+# iOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Runner/GeneratedPluginRegistrant.*
+*.mobileprovision
+xcuserdata/
+
+# ---------- IDEs / editors ----------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# ---------- OS ----------
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---------- Misc ----------
+changed_files.txt

@@ -1,6 +1,13 @@
-
+require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
-const url = 'postgresql://postgres.pyeufzhlnaoflxokekgh:mokkaRaAsU23@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require';
+
+// Never hardcode credentials here — read from backend/.env
+const url = process.env.DATABASE_URL;
+if (!url) {
+  console.error('DATABASE_URL is not set in backend/.env');
+  process.exit(1);
+}
+
 const prisma = new PrismaClient({
   datasources: { db: { url } }
 });
@@ -8,7 +15,7 @@ const prisma = new PrismaClient({
 async function main() {
   try {
     await prisma.$connect();
-    console.log('CONNECTED successfully to pyeufzhlnaoflxokekgh');
+    console.log('CONNECTED successfully');
     const usersCount = await prisma.user.count();
     console.log('Users count:', usersCount);
   } catch (e) {

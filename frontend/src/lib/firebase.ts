@@ -1,5 +1,5 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getMessaging, getToken, onMessage, Messaging } from "firebase/messaging";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getMessaging, getToken, onMessage, isSupported, Messaging } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,18 +10,49 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// Firebase Messaging needs these values; without them getMessaging() throws at import time
+// and crashes the whole app. Skip Firebase entirely when config is incomplete.
+const isFirebaseConfigured = Boolean(
+  firebaseConfig.apiKey &&
+    firebaseConfig.projectId &&
+    firebaseConfig.messagingSenderId &&
+    firebaseConfig.appId
+);
 
-let messaging: Messaging | null = null;
-if (typeof window !== "undefined") {
-  messaging = getMessaging(app);
+if (!isFirebaseConfigured && typeof window !== "undefined") {
+  console.warn(
+    "[firebase] NEXT_PUBLIC_FIREBASE_* env vars are missing; push notifications are disabled."
+  );
 }
 
-export { app, messaging };
+const app: FirebaseApp | null = isFirebaseConfigured
+  ? getApps().length > 0
+    ? getApp()
+    : initializeApp(firebaseConfig)
+  : null;
+
+let messaging: Messaging | null = null;
+
+// Lazily initialise messaging only in supported browsers (needs service workers, HTTPS/localhost, etc.)
+const getMessagingInstance = async (): Promise<Messaging | null> => {
+  if (messaging) return messaging;
+  if (!app || typeof window === "undefined") return null;
+  try {
+    if (!(await isSupported())) return null;
+    messaging = getMessaging(app);
+    return messaging;
+  } catch (err) {
+    console.warn("[firebase] Messaging unavailable:", err);
+    return null;
+  }
+};
+
+export { app, messaging, getMessagingInstance };
 
 export const requestForToken = async () => {
+  const messaging = await getMessagingInstance();
   if (!messaging) return null;
-  
+
   try {
     const currentToken = await getToken(messaging, {
       vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
@@ -41,9 +72,11 @@ export const requestForToken = async () => {
 
 export const onMessageListener = () =>
   new Promise((resolve) => {
-    if (!messaging) return;
-    onMessage(messaging, (payload) => {
-      console.log("Payload received: ", payload);
-      resolve(payload);
+    getMessagingInstance().then((messaging) => {
+      if (!messaging) return;
+      onMessage(messaging, (payload) => {
+        console.log("Payload received: ", payload);
+        resolve(payload);
+      });
     });
   });
