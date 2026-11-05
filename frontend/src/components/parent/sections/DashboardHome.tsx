@@ -44,6 +44,17 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
     localStorage.setItem("sns_dashboard_cols", cols.toString());
   };
 
+  // Phone layout: quick-action cards are designed for >=180px, so columns are
+  // capped at 2 and every card/padding step shrinks below 640px.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   useEffect(() => {
     if (!session?.accessToken) return;
     notificationService
@@ -114,10 +125,10 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 14 : 20 }}>
 
       {/* ── Quick Action Cards Header ── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
         <h3 style={{ fontSize: 11, fontWeight: 800, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>Quick Actions</h3>
         <div style={{ display: "flex", background: theme.isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9", borderRadius: 8, padding: 3, gap: 2 }}>
           {[1, 2, 3, 4].map(num => (
@@ -150,10 +161,11 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: gridCols === 4 
-            ? "repeat(auto-fill, minmax(200px, 1fr))" 
-            : `repeat(${gridCols}, 1fr)`,
-          gap: 20,
+          gridTemplateColumns:
+            gridCols === 4
+              ? `repeat(auto-fill, minmax(${isMobile ? 150 : 200}px, 1fr))`
+              : `repeat(${isMobile ? Math.min(gridCols, 2) : gridCols}, minmax(0, 1fr))`,
+          gap: isMobile ? 12 : 20,
         }}
       >
         {quickCards.map((card, i) => {
@@ -166,75 +178,51 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
               transition={{ delay: i * 0.08 }}
               whileHover={{ y: -5, boxShadow: "0 24px 48px rgba(0,0,0,0.10)" }}
               onClick={card.onClick}
-              className="premium-card"
-              style={{
-                padding: "20px",
-                cursor: "pointer",
-                position: "relative",
-                overflow: "hidden",
-              }}
+              className="premium-card cursor-pointer relative overflow-hidden p-3.5 sm:p-5"
+              style={{ borderRadius: isMobile ? 20 : 32 }}
             >
               {/* Background circle */}
               <div
+                className="absolute rounded-full"
                 style={{
-                  position: "absolute",
-                  top: -24,
-                  right: -24,
-                  width: 100,
-                  height: 100,
+                  top: isMobile ? -18 : -24,
+                  right: isMobile ? -18 : -24,
+                  width: isMobile ? 76 : 100,
+                  height: isMobile ? 76 : 100,
                   background: `${card.color}10`,
-                  borderRadius: "50%",
                 }}
               />
               {/* Top accent bar */}
               <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 3,
-                  background: card.color,
-                  borderRadius: "14px 14px 0 0",
-                }}
+                className="absolute top-0 left-0 right-0 h-[3px]"
+                style={{ background: card.color }}
               />
 
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: 20,
-                }}
-              >
+              <div className="flex items-start justify-between mb-3 sm:mb-5">
                 <div
+                  className="flex items-center justify-center shrink-0"
                   style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: 16,
+                    width: isMobile ? 40 : 52,
+                    height: isMobile ? 40 : 52,
+                    borderRadius: isMobile ? 13 : 16,
                     background: `${card.color}18`,
                     color: card.color,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                     boxShadow: `0 6px 16px ${card.color}18`,
                   }}
                 >
-                  <Icon size={28} weight="bold" />
+                  <Icon size={isMobile ? 22 : 28} weight="bold" />
                 </div>
                 <div
+                  className="flex items-center justify-center shrink-0"
                   style={{
-                    width: 32,
-                    height: 32,
+                    width: isMobile ? 26 : 32,
+                    height: isMobile ? 26 : 32,
                     borderRadius: "50%",
                     background: theme.isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                     color: theme.textMuted,
                   }}
                 >
-                  <ArrowRight size={16} weight="bold" />
+                  <ArrowRight size={isMobile ? 13 : 16} weight="bold" />
                 </div>
               </div>
 
@@ -243,7 +231,7 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
                   style={{
                     color: theme.textMuted,
                     fontWeight: 700,
-                    fontSize: 11,
+                    fontSize: isMobile ? 9.5 : 11,
                     marginBottom: 4,
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
@@ -253,16 +241,17 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
                 </p>
                 <h3
                   style={{
-                    fontSize: 26,
+                    fontSize: isMobile ? 21 : 26,
                     fontWeight: 900,
                     color: theme.text,
                     letterSpacing: "-0.02em",
+                    lineHeight: 1.15,
                     marginBottom: 2,
                   }}
                 >
                   {card.value}
                 </h3>
-                <p style={{ fontSize: 11, color: card.color, fontWeight: 700 }}>{card.sub}</p>
+                <p style={{ fontSize: isMobile ? 10 : 11, color: card.color, fontWeight: 700 }}>{card.sub}</p>
               </div>
             </motion.div>
           );
@@ -270,32 +259,38 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
       </div>
 
       {/* ── Schedule + Info ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 20 }}>
+      <div
+        className="grid grid-cols-1 sm:grid-cols-[1.2fr_0.8fr]"
+        style={{ gap: isMobile ? 12 : 20 }}
+      >
 
         {/* Today's Schedule */}
-        <div className="premium-card" style={{ padding: "20px" }}>
+        <div className="premium-card" style={{ padding: isMobile ? 14 : 20 }}>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: 24,
+              marginBottom: isMobile ? 16 : 24,
+              gap: 8,
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <CalendarCheck size={20} weight="bold" color={theme.primary} />
-              <h4 style={{ fontSize: 18, fontWeight: 800, color: theme.primary }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+              <CalendarCheck size={isMobile ? 17 : 20} weight="bold" color={theme.primary} className="shrink-0" />
+              <h4 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 800, color: theme.primary }}>
                 Today&apos;s Schedule
               </h4>
             </div>
             <span
               style={{
-                fontSize: 11,
+                fontSize: isMobile ? 10 : 11,
                 fontWeight: 800,
                 color: theme.textMuted,
                 background: theme.isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9",
-                padding: "4px 10px",
+                padding: isMobile ? "3px 8px" : "4px 10px",
                 borderRadius: 8,
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
               April 20, 2026
@@ -307,8 +302,8 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
               <div
                 key={i}
                 style={{
-                  padding: "16px 20px",
-                  borderRadius: 18,
+                  padding: isMobile ? "12px 14px" : "16px 20px",
+                  borderRadius: isMobile ? 14 : 18,
                   background:
                     i === 0 ? `${theme.primary}0a` : "transparent",
                   border: `1px solid ${
@@ -319,15 +314,17 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
+                  gap: 8,
                   transition: "0.2s",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 16, minWidth: 0 }}>
                   <div
                     style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 12,
+                      width: isMobile ? 36 : 42,
+                      height: isMobile ? 36 : 42,
+                      borderRadius: isMobile ? 10 : 12,
+                      flexShrink: 0,
                       background:
                         i === 0
                           ? theme.primary
@@ -340,17 +337,20 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
                       color: i === 0 ? "#fff" : theme.textMuted,
                     }}
                   >
-                    <Clock size={18} weight="bold" />
+                    <Clock size={isMobile ? 16 : 18} weight="bold" />
                   </div>
-                  <div>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: theme.text }}>{item.subject}</p>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: theme.textMuted }}>{item.startTime} - {item.endTime}</p>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: isMobile ? 13 : 14, fontWeight: 700, color: theme.text }}>{item.subject}</p>
+                    <p style={{ fontSize: isMobile ? 11 : 12, fontWeight: 600, color: theme.textMuted }}>
+                      {item.startTime} - {item.endTime}
+                    </p>
                   </div>
                 </div>
                 <span
                   style={{
                     fontSize: 10,
                     fontWeight: 800,
+                    flexShrink: 0,
                     color:
                       i === 0 ? theme.primary : theme.textMuted,
                     textTransform: "uppercase",
@@ -360,8 +360,9 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
                         ? `${theme.primary}12`
                         : "transparent",
                     padding:
-                      i === 0 ? "4px 10px" : "0",
+                      i === 0 ? (isMobile ? "3px 8px" : "4px 10px") : "0",
                     borderRadius: 6,
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {i === 0 ? "Current" : "Upcoming"}
@@ -376,13 +377,14 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
         </div>
 
         {/* Announcement + Holiday */}
-        <div className="premium-card" style={{ padding: "20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+        <div className="premium-card" style={{ padding: isMobile ? 14 : 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 10, marginBottom: isMobile ? 16 : 24 }}>
             <span
+              className="shrink-0"
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
+                width: isMobile ? 30 : 36,
+                height: isMobile ? 30 : 36,
+                borderRadius: isMobile ? 9 : 10,
                 background: `${theme.primary}15`,
                 color: theme.primary,
                 display: "flex",
@@ -390,21 +392,21 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
                 justifyContent: "center",
               }}
             >
-              <Info size={20} weight="bold" />
+              <Info size={isMobile ? 17 : 20} weight="bold" />
             </span>
-            <h4 style={{ fontSize: 18, fontWeight: 800, color: theme.primary }}>Important Note</h4>
+            <h4 style={{ fontSize: isMobile ? 15 : 18, fontWeight: 800, color: theme.primary }}>Important Note</h4>
           </div>
 
           <div
             style={{
-              padding: "20px",
-              borderRadius: 18,
+              padding: isMobile ? 14 : 20,
+              borderRadius: isMobile ? 14 : 18,
               background: theme.isDark ? "rgba(255,255,255,0.02)" : "#F8FAFC",
               border: `1px solid ${theme.border}`,
-              marginBottom: 20,
+              marginBottom: isMobile ? 16 : 20,
             }}
           >
-            <p style={{ fontSize: 14, lineHeight: "1.65", color: theme.text, fontWeight: 600, marginBottom: 14 }}>
+            <p style={{ fontSize: isMobile ? 13 : 14, lineHeight: "1.65", color: theme.text, fontWeight: 600, marginBottom: isMobile ? 12 : 14 }}>
               {latestAnnouncement ? latestAnnouncement.content : "No new announcements at this time. Stay tuned for school updates."}
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 6, color: theme.primary, cursor: "pointer" }}>
@@ -430,13 +432,18 @@ export default function DashboardHome({ theme, onNavigate, onNavigateMenu }: Pro
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                padding: "12px 16px",
-                borderRadius: 14,
+                gap: 8,
+                padding: isMobile ? "10px 12px" : "12px 16px",
+                borderRadius: isMobile ? 12 : 14,
                 background: theme.isDark ? "rgba(255,255,255,0.03)" : "#f1f5f9",
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 700, color: theme.text }}>{nextHoliday ? nextHoliday.title : "No upcoming holidays"}</span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: theme.primary }}>{nextHoliday ? new Date(nextHoliday.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : "-"}</span>
+              <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 700, color: theme.text, minWidth: 0 }}>
+                {nextHoliday ? nextHoliday.title : "No upcoming holidays"}
+              </span>
+              <span style={{ fontSize: isMobile ? 12 : 13, fontWeight: 800, color: theme.primary, flexShrink: 0 }}>
+                {nextHoliday ? new Date(nextHoliday.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : "-"}
+              </span>
             </div>
           </div>
         </div>

@@ -35,14 +35,24 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
-    if (response.status === 401) {
+    // A 401 from a credential-check endpoint means "those details are wrong",
+    // which is an ordinary form error the caller renders inline. Hard-redirecting
+    // here reloads the page and wipes the message before the user can read it
+    // (a typo'd password on /login used to just flash and show nothing).
+    const isCredentialCheck =
+      cleanPath === "/auth/login" ||
+      cleanPath === "/auth/change-password" ||
+      cleanPath === "/auth/verify-student";
+
+    if (response.status === 401 && !isCredentialCheck) {
       clearSession();
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
     }
     
-    const errorMessage = (data as any).message || (data as any).error || text || `HTTP ${response.status}`;
+    const errorPayload = data as unknown as { message?: string; error?: string };
+    const errorMessage = errorPayload.message || errorPayload.error || text || `HTTP ${response.status}`;
     console.error(`API Error [${response.status}] ${cleanPath}:`, errorMessage);
     throw new Error(errorMessage);
   }

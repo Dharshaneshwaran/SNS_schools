@@ -401,11 +401,12 @@ export function AttendancePage() {
                       <span key={`roll-${student.rollNo}`} className="font-bold text-slate-400">#{student.rollNo}</span>,
                       <div key={`name-${student.rollNo}`} className="font-bold text-slate-900">{student.name}</div>,
                       <span key={`status-${student.rollNo}`} className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                        currentStatus === 'Present' ? 'bg-emerald-50 text-emerald-600' :
-                        currentStatus === 'Absent' ? 'bg-rose-50 text-rose-600' :
+                        currentStatus === 'Present' || currentStatus === 'P' ? 'bg-emerald-50 text-emerald-600' :
+                        currentStatus === 'Absent' || currentStatus === 'A' ? 'bg-rose-50 text-rose-600' :
+                        currentStatus === 'L' || currentStatus === 'Leave' ? 'bg-blue-50 text-blue-600' :
                         'bg-amber-50 text-amber-600'
                       }`}>
-                        {currentStatus}
+                        {currentStatus === 'L' ? 'Leave' : currentStatus}
                       </span>,
                       <button
                         key={`btn-${student.rollNo}`}

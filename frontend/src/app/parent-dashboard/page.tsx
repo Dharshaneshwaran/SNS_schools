@@ -10,8 +10,13 @@ import TransportSection from "../../components/parent/sections/TransportSection"
 import SettingsSection from "../../components/parent/sections/SettingsSection";
 import NotificationsSection from "../../components/parent/sections/NotificationsSection";
 import DashboardHome from "../../components/parent/sections/DashboardHome";
+import MobileBottomNav from "../../components/parent/MobileBottomNav";
 import { ChatPage } from "../../components/dashboard/chat-page";
-import { List, Bell, Sun, Moon } from "@phosphor-icons/react";
+import {
+  Bell, Sun, Moon, List, GraduationCap,
+  CalendarBlank, CalendarCheck, Clock, ChartBar, ClipboardText, PaperPlaneTilt,
+  BookOpen, IdentificationCard, Bus, Gear,
+} from "@phosphor-icons/react";
 
 import { DashboardTheme } from "../../types/theme";
 import { MenuKey, Student, AcademicTab } from "../../types/dashboard";
@@ -42,7 +47,7 @@ function readLinkedStudents(): Student[] {
 export default function ParentDashboard() {
   const { session, isBootstrapping } = useAuth();
   const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
-  const [academicTab, setAcademicTab] = useState<AcademicTab>("calendar");
+  const [academicTab, setAcademicTab] = useState<AcademicTab | "timetable">("calendar");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [bellCount, setBellCount] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -164,7 +169,7 @@ export default function ParentDashboard() {
       case "profile":       return <ProfileSection student={activeStudent} theme={theme} />;
       case "diary":         return <DiarySection student={activeStudent} theme={theme} />;
       case "notifications": return <NotificationsSection theme={theme} />;
-      case "academic":      return <AcademicSection student={activeStudent} theme={theme} initialTab={academicTab} />;
+      case "academic":      return <AcademicSection student={activeStudent} theme={theme} initialTab={academicTab} onTabChange={setAcademicTab} />;
       case "transport":     return <TransportSection theme={theme} />;
       case "settings":      return <SettingsSection theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
       case "communication": return <div className="flex-1 min-h-0 min-w-0 overflow-hidden"><ChatPage /></div>;
@@ -172,12 +177,37 @@ export default function ParentDashboard() {
     }
   };
 
+  /* ── Contextual page header: icon tile + what you're looking at + who it's for.
+        Replaces the old "student name / class" block, which duplicated the top bar. ── */
+  const academicMeta: Record<string, { title: string; icon: React.ReactNode }> = {
+    calendar:   { title: "Academic Calendar", icon: <CalendarBlank size={24} weight="bold" /> },
+    attendance: { title: "Attendance",        icon: <CalendarCheck size={24} weight="bold" /> },
+    timetable:  { title: "Time Table",        icon: <Clock size={24} weight="bold" /> },
+    exam:       { title: "Exam Report Card",  icon: <ChartBar size={24} weight="bold" /> },
+    schedule:   { title: "Exam Schedule",     icon: <ClipboardText size={24} weight="bold" /> },
+    leave:      { title: "Leave Application", icon: <PaperPlaneTilt size={24} weight="bold" /> },
+  };
+  const sectionMeta: { title: string; icon: React.ReactNode } | undefined =
+    activeMenu === "academic"
+      ? academicMeta[academicTab]
+      : ({
+          diary:         { title: "Diary & Homework",   icon: <BookOpen size={24} weight="bold" /> },
+          profile:       { title: "Student Profile",    icon: <IdentificationCard size={24} weight="bold" /> },
+          transport:     { title: "Transport Tracking", icon: <Bus size={24} weight="bold" /> },
+          settings:      { title: "Settings",           icon: <Gear size={24} weight="bold" /> },
+          notifications: { title: "Announcements",      icon: <Bell size={24} weight="bold" /> },
+        } as Record<string, { title: string; icon: React.ReactNode }>)[activeMenu];
+
   return (
-    <div className={`mesh-bg${isDarkMode ? " dark-mode" : ""} flex h-screen w-full max-w-full font-sans relative overflow-hidden`} style={{ background: theme.bg, transition: "background 0.3s ease" }}>
-      {/* Background Decorative Elements */}
-      <div className="bg-glow" style={{ top: "-10%", left: "-10%", width: 700, height: 700, background: "radial-gradient(circle, rgba(255, 127, 80, 0.12), transparent 70%)", position: "absolute", zIndex: 0 }} />
-      <div className="bg-glow" style={{ bottom: "-10%", right: "-10%", width: 600, height: 600, background: "radial-gradient(circle, rgba(79, 70, 229, 0.1), transparent 70%)", animationDelay: "-5s", position: "absolute", zIndex: 0 }} />
-      
+    <div className={`mesh-bg${isDarkMode ? " dark-mode" : ""} flex h-screen w-full max-w-full font-sans relative overflow-hidden`} style={{ background: theme.bg, transition: "background 0.3s ease", overflow: "clip" }}>
+      {/* Background Decorative Elements — clipped in their own layer so they never
+          widen the root box (an overflow:hidden root can still be scrolled
+          programmatically by scrollIntoView, which shifted the whole page sideways). */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div className="bg-glow" style={{ top: "-10%", left: "-10%", width: 700, height: 700, background: "radial-gradient(circle, rgba(255, 127, 80, 0.12), transparent 70%)", position: "absolute", zIndex: 0 }} />
+        <div className="bg-glow" style={{ bottom: "-10%", right: "-10%", width: 600, height: 600, background: "radial-gradient(circle, rgba(79, 70, 229, 0.1), transparent 70%)", animationDelay: "-5s", position: "absolute", zIndex: 0 }} />
+      </div>
+
       {/* Sidebar Overlay for mobile */}
       {isSidebarOpen && (
         <div 
@@ -201,35 +231,48 @@ export default function ParentDashboard() {
         />
       </div>
 
-      <main className="flex-1 h-screen min-w-0 max-w-full relative z-10 flex flex-col overflow-hidden">
+      <main className="flex-1 h-screen min-w-0 max-w-full relative z-10 flex flex-col overflow-hidden pb-[calc(78px_+_env(safe-area-inset-bottom,0px))] lg:pb-0">
         {/* Global Dashboard Header */}
         <div
-          className="flex items-center px-4 md:px-6 py-4 shrink-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
+          className="flex items-center px-4 md:px-6 py-3 sm:py-4 shrink-0 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
           style={{
             background: theme.isDark ? "rgba(18,18,18,0.85)" : "rgba(255,255,255,0.85)",
             backdropFilter: "blur(16px)",
             borderBottom: `1px solid ${theme.border}`,
           }}
         >
-          {/* Mobile hamburger */}
-          <button
-            className="lg:hidden p-2 rounded-xl mr-3 transition-all hover:bg-orange-50 active:scale-95"
-            style={{ color: "#FF7F50" }}
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <List size={22} weight="bold" />
-          </button>
-
-          {/* Student name + class — centred */}
-          <div className="flex-1 flex flex-col items-center justify-center">
+          {/* Left slot — hamburger below lg, context label on desktop. Flex-1 on
+              both sides keeps the student name dead-centre in the bar. */}
+          <div className="flex-1 min-w-0 flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Open menu"
+              title="Open menu"
+              onClick={() => setIsSidebarOpen(true)}
+              className="icon-btn lg:hidden w-9 h-9 shrink-0 rounded-full flex items-center justify-center active:scale-95"
+              style={{ background: "rgba(255,127,80,0.10)", color: "#FF7F50" }}
+            >
+              <List size={19} weight="bold" />
+            </button>
             <span
-              className="font-extrabold text-[15px] tracking-tight leading-none"
+              className="hidden lg:flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.14em] whitespace-nowrap"
+              style={{ color: theme.textMuted }}
+            >
+              <CalendarBlank size={15} weight="bold" style={{ color: "#FF7F50" }} />
+              {new Date().toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
+            </span>
+          </div>
+
+          {/* Centre — student identity */}
+          <div className="min-w-0 max-w-[46%] flex flex-col items-center">
+            <span
+              className="w-full text-center truncate font-extrabold text-[15px] tracking-tight leading-none"
               style={{ color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)" }}
             >
               {activeStudent.name}
             </span>
             <span
-              className="text-[11px] font-semibold tracking-wide mt-0.5"
+              className="w-full text-center truncate text-[11px] font-semibold tracking-wide mt-1"
               style={{ color: theme.textMuted }}
             >
               Class {activeStudent.class}-{activeStudent.section}
@@ -237,51 +280,96 @@ export default function ParentDashboard() {
           </div>
 
           {/* Right controls */}
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex-1 min-w-0 flex items-center justify-end gap-2">
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded-xl transition-all hover:bg-orange-50 active:scale-95"
-              style={{ color: "#FF7F50" }}
+              className="icon-btn w-9 h-9 shrink-0 rounded-full flex items-center justify-center active:scale-95"
+              style={{ background: "rgba(255,127,80,0.10)", color: "#FF7F50" }}
               title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {isDarkMode ? <Sun size={22} weight="duotone" /> : <Moon size={22} weight="duotone" />}
+              {isDarkMode ? <Sun size={19} weight="bold" /> : <Moon size={19} weight="bold" />}
             </button>
 
             {/* Bell with live count badge */}
             <button
               onClick={() => setActiveMenu("notifications")}
-              className="relative p-2 rounded-xl transition-all hover:bg-orange-50 active:scale-95"
-              style={{ color: "#FF7F50" }}
+              className="icon-btn relative w-9 h-9 shrink-0 rounded-full flex items-center justify-center active:scale-95"
+              style={{ background: "rgba(255,127,80,0.10)", color: "#FF7F50" }}
               title="Notifications"
+              aria-label="Notifications"
             >
-              <Bell size={22} weight="duotone" />
+              <Bell size={19} weight="bold" />
               {bellCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-[#EF4444] rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-white px-0.5">
+                <span
+                  className="absolute -top-1 -right-1 min-w-[17px] h-[17px] bg-[#EF4444] rounded-full flex items-center justify-center text-[9px] font-black text-white px-1"
+                  style={{ boxShadow: `0 0 0 2px ${theme.isDark ? "#121212" : "#FFFFFF"}` }}
+                >
                   {bellCount > 99 ? "99+" : bellCount}
                 </span>
               )}
             </button>
 
-            {/* Avatar */}
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF7F50] to-[#e66a3e] text-white flex items-center justify-center font-bold text-xs shadow-[0_2px_8px_rgba(255,127,80,0.3)] ring-2 ring-white">
+            {/* Avatar — profile shortcut (menu opens from the hamburger below lg) */}
+            <button
+              type="button"
+              aria-label="Open profile"
+              title="Profile"
+              onClick={() => setActiveMenu("profile")}
+              className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-[#FF7F50] to-[#e66a3e] text-white flex items-center justify-center font-bold text-xs active:scale-95 transition-transform cursor-pointer"
+              style={{ boxShadow: `0 2px 8px rgba(255,127,80,0.30), 0 0 0 2px ${theme.isDark ? "rgba(255,255,255,0.18)" : "#FFFFFF"}` }}
+            >
               {activeStudent.avatar}
-            </div>
+            </button>
           </div>
         </div>
 
         {/* Content Area */}
         <div className={`flex-1 min-h-0 min-w-0 custom-scrollbar flex flex-col ${activeMenu === 'communication' ? 'overflow-hidden' : 'overflow-y-auto pt-2 pb-8 px-4 md:px-6 lg:px-8'}`}>
-          {activeMenu !== 'dashboard' && activeMenu !== 'communication' && activeMenu !== 'events' && (
-            <div className="mb-8 md:mb-10 shrink-0">
-              <h2 style={{ fontSize: 32, fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em" }}>
-                {activeStudent.name}
-              </h2>
-              <p style={{ color: theme.textMuted, fontWeight: 600, fontSize: 16 }}>Class {activeStudent.class}-{activeStudent.section} Student</p>
+          {sectionMeta && (
+            <div className="mb-4 sm:mb-6 md:mb-8 shrink-0 flex items-center gap-3 sm:gap-4">
+              {/* Gradient icon tile — swaps with the active section/tab */}
+              <div
+                className="shrink-0 w-12 h-12 sm:w-[52px] sm:h-[52px] rounded-2xl flex items-center justify-center text-white"
+                style={{ background: "linear-gradient(135deg, #FF7F50, #e66a3e)", boxShadow: "0 10px 24px rgba(255,127,80,0.30)" }}
+              >
+                {sectionMeta.icon}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2
+                  className="truncate text-[21px] sm:text-[26px] md:text-[30px]"
+                  style={{ fontWeight: 900, color: theme.text, fontFamily: "var(--font-poppins,'Poppins',sans-serif)", letterSpacing: "-0.03em", lineHeight: 1.15 }}
+                >
+                  {sectionMeta.title}
+                </h2>
+                <p className="truncate text-[13px] sm:text-[15px]" style={{ color: theme.textMuted, fontWeight: 600 }}>
+                  {activeStudent.name}
+                </p>
+              </div>
+              <span
+                className="hidden sm:inline-flex shrink-0 items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-extrabold whitespace-nowrap"
+                style={{ background: theme.isDark ? "rgba(255,127,80,0.14)" : "rgba(255,127,80,0.10)", color: "#FF7F50", border: "1px solid rgba(255,127,80,0.20)" }}
+              >
+                <GraduationCap size={15} weight="bold" />
+                Class {activeStudent.class}-{activeStudent.section}
+              </span>
             </div>
           )}
           {renderContent()}
         </div>
       </main>
+
+      {/* Fixed mobile bottom navigation — Figma button placement */}
+      <MobileBottomNav
+        activeMenu={activeMenu}
+        academicTab={academicTab}
+        theme={theme}
+        onNavigate={(menu, tab) => {
+          if (tab) setAcademicTab(tab);
+          setActiveMenu(menu);
+          setIsSidebarOpen(false);
+        }}
+      />
     </div>
   );
 }

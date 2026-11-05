@@ -53,7 +53,7 @@ export default function LoginPage() {
         display: "flex",
         minHeight: "100vh",
         fontFamily: "var(--font-inter, 'Inter', sans-serif)",
-        overflow: "hidden",
+        overflowX: "hidden",
       }}
     >
       {/* ── Left Panel: Form ── */}
@@ -66,6 +66,9 @@ export default function LoginPage() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          // Reserves room for the absolutely-positioned logo (top) and footer
+          // (bottom) so they can never overlap the card on short screens.
+          padding: "96px 0 72px",
           position: "relative",
           background: "#FFFFFF",
           zIndex: 10,
@@ -255,14 +258,14 @@ export default function LoginPage() {
                         background: "rgba(239,68,68,0.12)",
                         border: "1px solid rgba(239,68,68,0.28)",
                         borderRadius: 10,
-                        color: "#fca5a5",
+                        color: "#b91c1c",
                         fontSize: 13,
                         display: "flex",
                         alignItems: "center",
                         gap: 10,
                       }}
                     >
-                      <Warning size={18} weight="fill" style={{ color: "#f87171", flexShrink: 0 }} />
+                      <Warning size={18} weight="fill" style={{ color: "#dc2626", flexShrink: 0 }} />
                       <span>{error}</span>
                     </motion.div>
                   )}
@@ -279,15 +282,8 @@ export default function LoginPage() {
                         onChange={(e) => setEmailOrMobile(e.target.value)}
                         placeholder={role === "admin" ? "admin@sns-erp.local" : role === "parent" ? "SNS-2026-XXXX" : "teacher@sns-erp.local"}
                         required
-                        style={inputStyle}
-                        onFocus={(e) => {
-                          e.currentTarget.style.borderColor = "#FF7F50";
-                          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                        }}
-                        onBlur={(e) => {
-                          e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-                          e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                        }}
+                        className="auth-input"
+                        autoComplete="username"
                       />
                     </div>
 
@@ -301,19 +297,15 @@ export default function LoginPage() {
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
                           required
-                          style={{ ...inputStyle, paddingRight: 48 }}
-                          onFocus={(e) => {
-                            e.currentTarget.style.borderColor = "#FF7F50";
-                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                          }}
-                          onBlur={(e) => {
-                            e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-                            e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                          }}
+                          className="auth-input"
+                          style={{ paddingRight: 48 }}
+                          autoComplete="current-password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          title={showPassword ? "Hide password" : "Show password"}
                           style={{
                             position: "absolute",
                             right: 14,
@@ -601,18 +593,4 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "var(--font-poppins, 'Poppins', sans-serif)",
   letterSpacing: "0.04em",
   textTransform: "uppercase",
-};
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "16px 20px",
-  borderRadius: 16,
-  background: "rgba(0,0,0,0.02)",
-  border: "1px solid rgba(0,0,0,0.08)",
-  outline: "none",
-  color: "#121212",
-  fontSize: 15,
-  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  fontFamily: "var(--font-inter, 'Inter', sans-serif)",
-  fontWeight: 500,
 };

@@ -230,10 +230,14 @@ export class DashboardService {
       }),
     ]);
 
-    const totalDays = attendance.length;
-    const presentDays = attendance.filter((a) => a.status === 'P').length;
+    const presentDays = attendance.filter((a) => a.status === 'P' || a.status === 'Present').length;
+    // Excused leave (L) and holidays (H) are not counted against the student,
+    // so an approved leave never drags the percentage down.
+    const countedDays = attendance.filter(
+      (a) => !['L', 'Leave', 'H', 'Holiday'].includes(a.status),
+    ).length;
     const attendancePercentage =
-      totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(1) : '0';
+      countedDays > 0 ? ((presentDays / countedDays) * 100).toFixed(1) : '0';
 
     const latestExam = examResults[0];
     const examGrade = latestExam ? latestExam.grade : 'N/A';
