@@ -133,3 +133,4 @@ bash deploy.sh
 
 ### test 
     the file test file
+    the #2 the phase testing
