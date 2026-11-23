@@ -33,6 +33,7 @@ model User {
   timetableEntries      TimetableEntry[]       @relation("TeacherTimetable")
   absentSubstitutions   Substitution[]         @relation("AbsentTeacher")
   substituteSubstitutions Substitution[]       @relation("SubstituteTeacher")
+  wingCoordinator       Wing[]                 @relation("WingCoordinator")
 }
 
 model RoleGroup {
@@ -196,7 +197,46 @@ model SchoolSettings {
   contactEmail String   @default("")
   contactPhone String   @default("")
   address      String   @default("")
+  // Section 6 - medium of instruction
+  mediumOfInstruction String @default("English")
+  secondLanguage      String @default("")
+  board               String @default("")
+  // Attendance rules (Phase B)
+  lateAfterMinutes       Int @default(15)
+  minAttendancePercent   Int @default(75)
+  consecutiveAbsenceAlerts Int @default(3)
+  monthlyReportDay       Int @default(1)
   updatedAt    DateTime @updatedAt
+}
+
+// Section 12 - academic calendar. Persisted instead of the hardcoded
+// INITIAL_EVENTS the calendar page used to ship with.
+model AcademicEvent {
+  id          String   @id @default(uuid())
+  title       String
+  date        String   // YYYY-MM-DD (single-day events)
+  endDate     String?  // optional, for multi-day spans
+  time        String   @default("")
+  type        String   @default("academic") // academic | holiday | event | exam
+  location    String   @default("")
+  description String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+  @@index([type])
+}
+
+// Section 17 - school image gallery. Rows point at files served from
+// /files/gallery/... written by UploadsModule.
+model SchoolImage {
+  id        String   @id @default(uuid())
+  url       String
+  caption   String   @default("")
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([sortOrder])
 }
 
 model TimetableEntry {
@@ -208,10 +248,16 @@ model TimetableEntry {
   class     String
   section   String
   subject   String
+  room      String   @default("")
   teacherId String
   teacher   User     @relation("TeacherTimetable", fields: [teacherId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // One slot per class-section per period - the API rejects duplicates
+  // before this, but the constraint makes it impossible to lose.
+  @@unique([day, period, class, section])
+  @@index([class, section])
 }
 
 model Substitution {
@@ -310,8 +356,117 @@ enum Role {
   superadmin
   admin
   leader
+  // Added in Phase B - school leadership roles. Both are additive enum
+  // values, so existing rows and tokens are unaffected.
+  principal
+  coordinator
   teacher
   parent
+}
+
+// ---------------------------------------------------------------------------
+// Phase A - academic foundation
+// Sections 3, 4, 5, 6, 7, 10 and 11 of "New ERP school.xlsx"
+// ---------------------------------------------------------------------------
+
+/// Section 3 + 4: school wings and their coordinators.
+model Wing {
+  id        String   @id @default(uuid())
+  name      String   @unique // Senior Secondary, Secondary, Midwing, ...
+  sortOrder Int      @default(0)
+  gradeRange String  @default("") // "Grade 11 and Grade 12"
+  coordinatorName String @default("") // display name until linked to an account
+  coordinatorId   String?
+  coordinator     User?   @relation("WingCoordinator", fields: [coordinatorId], references: [id], onDelete: SetNull) // one teacher may coordinate several wings
+  classes   SchoolClass[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Section 5: classes. `name` is the display label from the spreadsheet
+/// ("Grade X"), `code` is the short form already used by existing records
+/// ("10") so current student/homework/timetable rows keep matching.
+model SchoolClass {
+  id        String   @id @default(uuid())
+  name      String   @unique // "Grade X", "PRE KG"
+  code      String   @unique // "10", "PRE KG"
+  sortOrder Int      @default(0)
+  wingId    String?
+  wing      Wing?    @relation(fields: [wingId], references: [id], onDelete: SetNull)
+  sections  ClassSection[]
+  subjects  ClassSubject[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ClassSection {
+  id      String @id @default(uuid())
+  classId String
+  name    String // "A", "B", ...
+  class   SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, name])
+}
+
+/// Section 7: subject catalogue.
+model Subject {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  type      String   @default("scholastic") // scholastic | co-scholastic | assessment
+  sortOrder Int      @default(0)
+  classes   ClassSubject[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Which subjects a class offers. `optional` marks choice sets
+/// (Language II Tamil/Hindi/French - a student picks one).
+model ClassSubject {
+  id        String  @id @default(uuid())
+  classId   String
+  subjectId String
+  sortOrder Int     @default(0)
+  optional  Boolean @default(false)
+  class     SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, subjectId])
+}
+
+/// Section 11: configurable grading scale (replaces the hardcoded
+/// calcGrade() in exams.service.ts).
+model GradingScale {
+  id        String      @id @default(uuid())
+  name      String      @unique
+  isDefault Boolean     @default(false)
+  passMark  Int         @default(33)
+  bands     GradeBand[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model GradeBand {
+  id        String @id @default(uuid())
+  scaleId   String
+  minMark   Int
+  maxMark   Int
+  grade     String // "A1", "A2", ...
+  remark    String @default("")
+  sortOrder Int    @default(0)
+  scale     GradingScale @relation(fields: [scaleId], references: [id], onDelete: Cascade)
+
+  @@unique([scaleId, minMark])
+}
+
+/// Section 10: exam types (Periodic Test 1-3, Term 1-2, Preboard, Annual).
+model ExamType {
+  id        String   @id @default(uuid())
+  name      String // "Periodic Test 1"
+  appliesTo String   @default("All grades (I - XII)")
+  isTerm    Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum UserStatus {

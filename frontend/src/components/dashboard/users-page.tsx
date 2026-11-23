@@ -6,6 +6,8 @@ import {
   PencilSimple, 
   Trash, 
   DownloadSimple,
+  UploadSimple,
+  SpinnerGap,
   MagnifyingGlass,
   CheckCircle,
   XCircle,
@@ -25,6 +27,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PageSection } from "./page-section";
 import { getAllUsers, deleteUser, updateUserStatus } from "../../services/users-service";
 import { apiRequest } from "../../services/api-client";
+import {
+  exportStudentsExcel,
+  downloadStudentTemplate,
+  importStudentsExcel,
+  type ImportResult,
+} from "../../services/excel-service";
 
 export function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -32,9 +40,22 @@ export function UsersPage() {
   const [filter, setFilter] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
   const [roleGroups, setRoleGroups] = useState<any[]>([]);
-  const [modal, setModal] = useState<{ type: 'delete' | 'edit' | 'view' | 'assign-bus' | 'inactivate' | null, user: any | null }>({ type: null, user: null });
+  const [modal, setModal] = useState<{ type: 'delete' | 'edit' | 'view' | 'assign-bus' | 'inactivate' | 'import' | null, user: any | null }>({ type: null, user: null });
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
+
+  // Excel import (section 20)
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+
+  const resetImport = () => {
+    setImportFile(null);
+    setImportResult(null);
+    setImportError(null);
+    setIsImporting(false);
+  };
 
   const togglePassword = (id: string) => {
     setShowPasswords(prev => ({ ...prev, [id]: !prev[id] }));
@@ -54,45 +75,74 @@ export function UsersPage() {
     fetchRoleGroups();
   }, []);
 
+  const fetchUsers = async () => {
+    try {
+      const data = await getAllUsers() as any[];
+      const mapped = data.map(u => ({
+        id: u.studentProfile?.studentId || u.teacherProfile?.employeeId || u.id.slice(0, 8),
+        dbId: u.id,
+        name: u.name,
+        role: u.role === 'parent' ? 'Student' : u.role.charAt(0).toUpperCase() + u.role.slice(1),
+        status: u.status === 'active' ? 'Active' : 'Inactive',
+        email: u.email,
+        phone: u.studentProfile?.fatherContact || u.studentProfile?.motherContact || "No Contact",
+        rawUser: u,
+        roleGroupId: u.roleGroupId,
+        features: ["Transport", "Attendance", "Results", "Reports"].filter(() => Math.random() > 0.3)
+      }));
+      setUsers(mapped);
+    } catch (err) {
+      console.error("Failed to fetch users", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await getAllUsers() as any[];
-        const mapped = data.map(u => ({
-          id: u.studentProfile?.studentId || u.teacherProfile?.employeeId || u.id.slice(0, 8),
-          dbId: u.id,
-          name: u.name,
-          role: u.role === 'parent' ? 'Student' : u.role.charAt(0).toUpperCase() + u.role.slice(1),
-          status: u.status === 'active' ? 'Active' : 'Inactive',
-          email: u.email,
-          phone: u.studentProfile?.fatherContact || u.studentProfile?.motherContact || "No Contact",
-          rawUser: u,
-          roleGroupId: u.roleGroupId,
-          features: ["Transport", "Attendance", "Results", "Reports"].filter(() => Math.random() > 0.3)
-        }));
-        setUsers(mapped);
-      } catch (err) {
-        console.error("Failed to fetch users", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchUsers();
+    void fetchUsers();
+    // Runs once on mount; fetchUsers is stable enough for a refresh trigger.
   }, []);
 
-  const handleDownload = () => {
-    const headers = ["ID", "Name", "Role", "Email", "Status"];
-    const rows = filteredUsers.map(u => [u.id, u.name, u.role, u.email, u.status]);
-    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `sns_users_directory_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const handleDownload = async () => {
+    try {
+      const name = await exportStudentsExcel();
+      setNotice(`Exported ${name}`);
+    } catch (err) {
+      setNotice(`Export failed: ${err instanceof Error ? err.message : "Unknown error"}`);
+    }
+  };
+
+  /** Step 1 of the import: validate the workbook without writing anything. */
+  const previewImport = async () => {
+    if (!importFile) return;
+    setIsImporting(true);
+    setImportError(null);
+    try {
+      const result = await importStudentsExcel(importFile, true);
+      setImportResult(result);
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : "Could not read that file.");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  /** Step 2: commit the rows the preview said were ready. */
+  const commitImport = async () => {
+    if (!importFile) return;
+    setIsImporting(true);
+    setImportError(null);
+    try {
+      const result = await importStudentsExcel(importFile, false);
+      setImportResult(result);
+      await fetchUsers();
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : "Import failed.");
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   const confirmDelete = async () => {
@@ -522,6 +572,138 @@ export function UsersPage() {
                   </div>
                 </div>
               )}
+
+              {modal.type === 'import' && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 text-[#FF7F50]">
+                    <UploadSimple size={28} weight="duotone" />
+                    <h3 className="text-xl font-bold text-slate-900">Import students from Excel</h3>
+                  </div>
+
+                  <p className="text-sm text-slate-500 leading-relaxed">
+                    Upload a spreadsheet with one pupil per row. Headers are matched
+                    case-insensitively, so you can keep your own column names — at minimum
+                    the sheet needs <span className="font-bold text-slate-700">Name</span> and{" "}
+                    <span className="font-bold text-slate-700">Email</span>.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={() => downloadStudentTemplate()
+                        .then((name) => setNotice(`Downloaded ${name}`))
+                        .catch((err) => setImportError(err.message))}
+                      className="px-5 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-100 transition-all"
+                    >
+                      <DownloadSimple size={15} weight="bold" className="inline mr-1.5 -mt-0.5" />
+                      Download template
+                    </button>
+
+                    <label className="px-5 py-3 rounded-2xl bg-white border-2 border-dashed border-slate-300 text-slate-600 text-xs font-bold hover:border-[#FF7F50] hover:text-[#FF7F50] transition-all cursor-pointer">
+                      <UploadSimple size={15} weight="bold" className="inline mr-1.5 -mt-0.5" />
+                      {importFile ? importFile.name : "Choose .xlsx file"}
+                      <input
+                        type="file"
+                        accept=".xlsx"
+                        className="hidden"
+                        onChange={(e) => {
+                          setImportFile(e.target.files?.[0] ?? null);
+                          setImportResult(null);
+                          setImportError(null);
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {importError && (
+                    <p className="text-sm font-bold text-rose-600 bg-rose-50 px-4 py-3 rounded-xl">
+                      {importError}
+                    </p>
+                  )}
+
+                  {importResult && (
+                    <div className="space-y-4 rounded-2xl border border-slate-100 bg-slate-50 p-5">
+                      <div className="flex flex-wrap gap-6 text-xs font-bold">
+                        <span className="text-emerald-600">
+                          {importResult.dryRun
+                            ? `${importResult.ready.length} ready to import`
+                            : `${importResult.created.length} created`}
+                        </span>
+                        <span className="text-slate-500">
+                          {importResult.skipped.length} skipped
+                        </span>
+                        <span className={importResult.errors.length ? "text-rose-600" : "text-slate-400"}>
+                          {importResult.errors.length} errors
+                        </span>
+                      </div>
+
+                      {importResult.unmatchedFields.length > 0 && (
+                        <p className="text-[11px] text-slate-400 font-medium">
+                          Ignored (no matching column): {importResult.unmatchedFields.join(", ")}
+                        </p>
+                      )}
+
+                      {importResult.skipped.length > 0 && (
+                        <ul className="text-[11px] text-slate-500 space-y-1">
+                          {importResult.skipped.slice(0, 5).map((s) => (
+                            <li key={s.row}>• {s.reason}</li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {importResult.errors.length > 0 && (
+                        <ul className="text-[11px] text-rose-600 space-y-1">
+                          {importResult.errors.slice(0, 5).map((e) => (
+                            <li key={e.row}>• Row {e.row}: {e.message}</li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {!importResult.dryRun && importResult.created.length > 0 && (
+                        <div className="rounded-xl bg-white border border-slate-100 p-4">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                            Login credentials — save these now
+                          </p>
+                          <ul className="text-[11px] space-y-1 font-mono">
+                            {importResult.created.map((c) => (
+                              <li key={c.email}>
+                                {c.email} → <span className="font-bold text-[#FF7F50]">{c.password}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setModal({ type: null, user: null })}
+                      className="flex-1 px-6 py-4 rounded-2xl bg-slate-50 text-slate-500 font-bold hover:bg-slate-100 transition-all"
+                    >
+                      {importResult && !importResult.dryRun ? "Done" : "Cancel"}
+                    </button>
+
+                    {/* Only offer the next step while there is one: validate,
+                        then import. Once committed, only "Done" remains. */}
+                    {(!importResult || importResult.dryRun) && (
+                      <button
+                        onClick={() =>
+                          importResult?.dryRun ? commitImport() : previewImport()
+                        }
+                        disabled={isImporting || !importFile}
+                        className="flex-1 px-6 py-4 rounded-2xl bg-[#FF7F50] text-white font-bold hover:bg-[#e66a3e] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {isImporting && <SpinnerGap size={16} className="animate-spin" />}
+                        {isImporting
+                          ? "Working..."
+                          : importResult?.dryRun
+                          ? `Import ${importResult.ready.length} students`
+                          : "Validate file"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </motion.div>
             )}
           </div>
@@ -571,13 +753,34 @@ export function UsersPage() {
                 Add Staff
               </button>
               <button 
+                onClick={() => { resetImport(); setModal({ type: 'import', user: null }); }}
+                className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition-all"
+              >
+                <UploadSimple size={16} weight="bold" />
+                Import Excel
+              </button>
+              <button 
                 onClick={handleDownload}
+                title="Export the student register as .xlsx"
                 className="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all"
               >
                  <DownloadSimple size={20} />
               </button>
            </div>
         </div>
+
+        {notice && (
+          <div className="flex items-center justify-between gap-4 px-5 py-3 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold">
+            <span>{notice}</span>
+            <button
+              onClick={() => setNotice(null)}
+              className="text-emerald-500 hover:text-emerald-700 font-black"
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         <div className="rounded-[2.5rem] border border-[var(--border)] bg-white overflow-hidden shadow-[0_24px_70px_rgba(15,23,42,0.05)]">
            <div className="overflow-x-auto">

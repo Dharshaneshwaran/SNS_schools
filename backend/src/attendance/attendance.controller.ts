@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -20,6 +20,26 @@ export class AttendanceController {
     @Query('month') month?: string,
   ) {
     return this.attendanceService.getStudentAttendance(studentId, month);
+  }
+
+  /** Attendance thresholds (late grace, minimum %, absence streak). */
+  @Get('rules')
+  getRules() {
+    return this.attendanceService.getRules();
+  }
+
+  @Patch('rules')
+  @Roles('admin')
+  updateRules(
+    @Body()
+    body: {
+      lateAfterMinutes?: number;
+      minAttendancePercent?: number;
+      consecutiveAbsenceAlerts?: number;
+      monthlyReportDay?: number;
+    },
+  ) {
+    return this.attendanceService.updateRules(body);
   }
 
   @Post('mark')

@@ -19,6 +19,11 @@ import { LeavesModule } from './leaves/leaves.module';
 import { RoleGroupsModule } from './role-groups/role-groups.module';
 import { HomeworkModule } from './homework/homework.module';
 import { ExamsModule } from './exams/exams.module';
+import { UploadsModule } from './uploads/uploads.module';
+import { AcademicsModule } from './academics/academics.module';
+import { CalendarModule } from './calendar/calendar.module';
+import { GalleryModule } from './gallery/gallery.module';
+import { ExcelModule } from './excel/excel.module';
 
 import { DatabaseModule } from './database/database.module';
 
@@ -42,6 +47,11 @@ import { DatabaseModule } from './database/database.module';
     RoleGroupsModule,
     HomeworkModule,
     ExamsModule,
+    UploadsModule,
+    AcademicsModule,
+    CalendarModule,
+    GalleryModule,
+    ExcelModule,
   ],
   providers: [
     {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   CaretLeft, 
   CaretRight, 
@@ -17,30 +17,33 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../hooks/use-auth";
 import { PageSection } from "./page-section";
+import { apiRequest } from "../../services/api-client";
 
 interface CalendarEvent {
   id: string;
   title: string;
   date: string; // ISO format YYYY-MM-DD
-  time: string;
+  endDate?: string | null; // inclusive; multi-day events
+  time?: string;
   type: "academic" | "holiday" | "event" | "exam";
   location?: string;
   description?: string;
 }
 
-const INITIAL_EVENTS: CalendarEvent[] = [
-  { id: "1", title: "Mid-Term Examination", date: "2026-05-15", time: "09:00 AM", type: "exam", location: "Block A & B" },
-  { id: "2", title: "Annual Sports Meet", date: "2026-05-22", time: "08:30 AM", type: "event", location: "School Ground" },
-  { id: "3", title: "Labor Day Holiday", date: "2026-05-01", time: "Full Day", type: "holiday" },
-  { id: "4", title: "Parent Teacher Meeting", date: "2026-05-28", time: "10:00 AM", type: "academic", location: "Auditorium" },
-];
-
 export function CalendarPage() {
   const { session } = useAuth();
-  const isAdmin = session?.user.role === "admin";
+  const isAdmin =
+    session?.user.role === "admin" ||
+    session?.user.role === "leader" ||
+    session?.user.role === "principal" ||
+    session?.user.role === "coordinator";
   
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 4, 1)); // May 2026
-  const [events, setEvents] = useState<CalendarEvent[]>(INITIAL_EVENTS);
+  const [currentDate, setCurrentDate] = useState(new Date()); 
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   
@@ -48,6 +51,7 @@ export function CalendarPage() {
   const [formData, setFormData] = useState({
     title: "",
     date: "",
+    endDate: "",
     time: "",
     type: "academic" as "academic" | "holiday" | "event" | "exam",
     location: "",
@@ -60,6 +64,27 @@ export function CalendarPage() {
   const monthName = currentDate.toLocaleString('default', { month: 'long' });
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
+  /** `YYYY-MM` for the visible month - the shape the API filters on. */
+  const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+
+  const loadEvents = async (key: string) => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const data = await apiRequest<CalendarEvent[]>(`/calendar?month=${key}`);
+      setEvents(data);
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : "Could not load the calendar.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadEvents(monthKey);
+    // Reloads whenever the user navigates to a different month.
+  }, [monthKey]);
 
   const handlePrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const handleNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
@@ -79,39 +104,91 @@ export function CalendarPage() {
 
   const getEventsForDay = (day: number) => {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return events.filter(e => e.date === dateStr);
+    // An event with an endDate covers every day between the two, inclusive.
+    return events.filter(e =>
+      e.date === dateStr || (!!e.endDate && e.date <= dateStr && e.endDate >= dateStr),
+    );
   };
 
+  /** Events on or after today, for the "Next Events" strip. */
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const upcoming = events
+    .filter(e => e.date >= todayStr)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(0, 4);
+
   const openModal = (event?: CalendarEvent) => {
+    setFormError(null);
     if (event) {
       setEditingEvent(event);
       setFormData({ 
         title: event.title,
         date: event.date,
-        time: event.time,
+        endDate: event.endDate || "",
+        time: event.time || "",
         type: event.type,
         location: event.location || "", 
         description: event.description || "" 
       });
     } else {
       setEditingEvent(null);
-      setFormData({ title: "", date: "", time: "", type: "academic", location: "", description: "" });
+      setFormData({ title: "", date: "", endDate: "", time: "", type: "academic", location: "", description: "" });
     }
     setIsModalOpen(true);
   };
 
-  const handleSave = () => {
-    if (editingEvent) {
-      setEvents(events.map(e => e.id === editingEvent.id ? { ...formData, id: e.id } : e));
-    } else {
-      setEvents([...events, { ...formData, id: Math.random().toString(36).substring(2, 11) }]);
+  const handleSave = async () => {
+    if (!formData.title.trim()) {
+      setFormError("Give the event a title.");
+      return;
     }
-    setIsModalOpen(false);
+    if (!formData.date) {
+      setFormError("Pick a date.");
+      return;
+    }
+
+    setIsSaving(true);
+    setFormError(null);
+    try {
+      const payload = {
+        title: formData.title.trim(),
+        date: formData.date,
+        endDate: formData.endDate || null,
+        time: formData.time.trim() || null,
+        type: formData.type,
+        location: formData.location.trim() || null,
+        description: formData.description.trim() || null,
+      };
+
+      if (editingEvent) {
+        await apiRequest(`/calendar/${editingEvent.id}`, { method: "PATCH", body: JSON.stringify(payload) });
+      } else {
+        await apiRequest("/calendar", { method: "POST", body: JSON.stringify(payload) });
+      }
+
+      setIsModalOpen(false);
+      await loadEvents(monthKey);
+    } catch (err) {
+      // Backend validation messages (bad date, endDate before date, ...) are
+      // readable - show them rather than closing the modal on a silent failure.
+      setFormError(err instanceof Error ? err.message : "Could not save the event.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Delete this event?")) {
-      setEvents(events.filter(e => e.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this event?")) return;
+    setFormError(null);
+    setIsSaving(true);
+    try {
+      await apiRequest(`/calendar/${id}`, { method: "DELETE" });
+      setIsModalOpen(false);
+      await loadEvents(monthKey);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Could not delete the event.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -182,6 +259,30 @@ export function CalendarPage() {
             </div>
 
             {/* Calendar Grid - Auto-filling height */}
+            {isLoading && (
+              <div className="flex-1 grid grid-cols-7 border-l border-slate-100">
+                {Array.from({ length: 35 }).map((_, i) => (
+                  <div key={i} className="min-h-[100px] p-2 border-r border-b border-slate-100 bg-white">
+                    <div className="w-5 h-5 rounded-lg bg-slate-100 animate-pulse" />
+                    <div className="mt-2 h-3 rounded bg-slate-100 animate-pulse" style={{ animationDelay: `${(i % 7) * 60}ms` }} />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!isLoading && loadError && (
+              <div className="flex-1 flex flex-col items-center justify-center gap-3 py-16">
+                <p className="text-sm font-medium text-slate-500">{loadError}</p>
+                <button
+                  onClick={() => void loadEvents(monthKey)}
+                  className="text-[#FF7F50] text-sm font-bold hover:underline"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {!isLoading && !loadError && (
             <div className="grid grid-cols-7 border-l border-slate-100 flex-1 overflow-hidden">
               {days.map((day, idx) => {
                 const dayEvents = day ? getEventsForDay(day) : [];
@@ -225,6 +326,7 @@ export function CalendarPage() {
                 );
               })}
             </div>
+            )}
           </div>
 
           {/* Bottom Section - Condensed */}
@@ -240,7 +342,12 @@ export function CalendarPage() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4 flex-1">
-                  {events.filter(e => new Date(e.date) >= new Date(2026, 4, 1)).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 4).map(event => (
+                  {upcoming.length === 0 && (
+                    <p className="col-span-2 text-xs font-bold text-white/70 self-center">
+                      Nothing scheduled ahead.
+                    </p>
+                  )}
+                  {upcoming.map(event => (
                     <div key={event.id} className="flex gap-3 group/item cursor-pointer">
                       <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex flex-col items-center justify-center shrink-0 border border-white/20 group-hover/item:bg-white group-hover/item:text-[#FF7F50] transition-all">
                         <span className="text-[8px] font-black uppercase opacity-90">{new Date(event.date).toLocaleString('default', { month: 'short' })}</span>
@@ -248,7 +355,7 @@ export function CalendarPage() {
                       </div>
                       <div className="min-w-0 flex flex-col justify-center">
                         <p className="font-black text-xs truncate text-white group-hover/item:text-white/90">{event.title}</p>
-                        <p className="text-[9px] text-white/80 font-bold mt-0.5">{event.time}</p>
+                        <p className="text-[9px] text-white/80 font-bold mt-0.5">{event.time || "All day"}</p>
                       </div>
                     </div>
                   ))}
@@ -343,6 +450,19 @@ export function CalendarPage() {
               </div>
 
               <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                  End date <span className="normal-case font-medium tracking-normal">(optional — for multi-day events)</span>
+                </label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  min={formData.date || undefined}
+                  onChange={e => setFormData({...formData, endDate: e.target.value})}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-[#FF7F50]/10"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Event Category</label>
                 <div className="grid grid-cols-2 gap-3">
                   {['academic', 'holiday', 'exam', 'event'].map(type => (
@@ -372,21 +492,30 @@ export function CalendarPage() {
               </div>
             </div>
 
-            <div className="p-8 bg-slate-50 border-t border-slate-100 flex gap-4">
-              {editingEvent && (
-                <button 
-                  onClick={() => handleDelete(editingEvent.id)}
-                  className="flex-1 bg-white border border-rose-100 text-rose-500 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-rose-50 transition-colors"
-                >
-                  Delete
-                </button>
+            <div className="p-8 bg-slate-50 border-t border-slate-100">
+              {formError && (
+                <p className="mb-4 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-3 rounded-xl">
+                  {formError}
+                </p>
               )}
-              <button 
-                onClick={handleSave}
-                className="flex-[2] bg-[#FF7F50] text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-[#FF7F50]/20 hover:bg-[#e66a3e] transition-all transform active:scale-95"
-              >
-                {editingEvent ? "Update Event" : "Create Event"}
-              </button>
+              <div className="flex gap-4">
+                {editingEvent && (
+                  <button 
+                    onClick={() => handleDelete(editingEvent.id)}
+                    disabled={isSaving}
+                    className="flex-1 bg-white border border-rose-100 text-rose-500 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-rose-50 transition-colors disabled:opacity-50"
+                  >
+                    Delete
+                  </button>
+                )}
+                <button 
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="flex-[2] bg-[#FF7F50] text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-[#FF7F50]/20 hover:bg-[#e66a3e] transition-all transform active:scale-95 disabled:opacity-60"
+                >
+                  {isSaving ? "Saving..." : editingEvent ? "Update Event" : "Create Event"}
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

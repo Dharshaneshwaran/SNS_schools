@@ -1,4 +1,5 @@
 import { apiRequest } from './api-client';
+import type { AttendanceRules } from '../types/modules';
 
 export interface AttendanceRecord {
   id: string;
@@ -31,4 +32,21 @@ export async function markTeacherAttendance(payload: {
   records: { teacherId: string; status: string; department?: string }[];
 }): Promise<{ marked: number }> {
   return apiRequest('/attendance/mark-teacher', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+export async function getAttendanceRules(): Promise<AttendanceRules> {
+  return apiRequest<AttendanceRules>('/attendance/rules');
+}
+
+/**
+ * Admin-only. Out-of-range values come back as a 400 whose message names the
+ * field and its bounds, so callers can show it verbatim.
+ */
+export async function updateAttendanceRules(
+  patch: Partial<AttendanceRules>,
+): Promise<AttendanceRules> {
+  return apiRequest<AttendanceRules>('/attendance/rules', {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
 }

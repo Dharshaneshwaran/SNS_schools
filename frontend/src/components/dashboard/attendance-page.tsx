@@ -1,31 +1,73 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuthResource } from "../../hooks/use-auth-resource";
 import { getAttendance } from "../../services/mock-data-service";
 import { DataTable } from "./data-table";
 import { MetricCard } from "./metric-card";
 import { PageSection } from "./page-section";
 import { ResourceError, ResourceLoading } from "./resource-states";
-import { Users, Student, CheckCircle, XCircle, GraduationCap, CaretLeft, UserCircle, FloppyDisk, SpinnerGap, CheckSquare } from "@phosphor-icons/react";
+import { Users, Student, CheckCircle, XCircle, GraduationCap, CaretLeft, UserCircle, FloppyDisk, SpinnerGap, CheckSquare, WarningCircle, Clock, CalendarBlank, TrendDown, BellRinging } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
-import { markAttendance, markTeacherAttendance } from "../../services/attendance-service";
+import { markAttendance, markTeacherAttendance, updateAttendanceRules } from "../../services/attendance-service";
 import { useAuth } from "../../hooks/use-auth";
 
 export function AttendancePage() {
   const { session } = useAuth();
-  const [view, setView] = useState<"teacher" | "class" | "student">("teacher");
+  const [view, setView] = useState<"teacher" | "class" | "student" | "rules">("teacher");
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
   // localAttendance: keyed by class for students, "__TEACHERS__" for teachers
   const [localAttendance, setLocalAttendance] = useState<Record<string, Record<string, string>>>({});
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
+  // Attendance rules panel (admin-only writes)
+  const [rulesDraft, setRulesDraft] = useState<Record<string, number> | null>(null);
+  const [rulesMsg, setRulesMsg] = useState<string | null>(null);
+  const [rulesError, setRulesError] = useState<string | null>(null);
+  const [savingRules, setSavingRules] = useState(false);
+
   const loadAttendance = useCallback(
     (accessToken: string) => getAttendance(accessToken),
     [],
   );
   const { data, error, isLoading } = useAuthResource(loadAttendance);
+
+  // Seed the editable draft from whatever the server last saved.
+  useEffect(() => {
+    if (data?.rules) setRulesDraft({ ...data.rules });
+  }, [data?.rules]);
+
+  // The backend only lets `admin` write rules; everyone else sees them read-only.
+  const canEditRules = session?.user.role === "admin";
+
+  const RULE_FIELDS = [
+    { key: "lateAfterMinutes", label: "Late arrival after", suffix: "minutes", min: 0, max: 180,
+      hint: "A pupil arriving later than this past roll call is recorded as Late." },
+    { key: "minAttendancePercent", label: "Minimum attendance", suffix: "%", min: 1, max: 100,
+      hint: "Pupils below this are listed under low attendance." },
+    { key: "consecutiveAbsenceAlerts", label: "Absence alert after", suffix: "days", min: 1, max: 30,
+      hint: "Consecutive days absent before a guardian is alerted." },
+    { key: "monthlyReportDay", label: "Monthly report day", suffix: "of month", min: 1, max: 28,
+      hint: "Day the monthly attendance report is generated." },
+  ] as const;
+
+  const handleSaveRules = async () => {
+    if (!rulesDraft) return;
+    setSavingRules(true);
+    setRulesMsg(null);
+    setRulesError(null);
+    try {
+      const updated = await updateAttendanceRules(rulesDraft);
+      setRulesDraft({ ...updated });
+      setRulesMsg("Rules saved.");
+    } catch (err) {
+      setRulesError(err instanceof Error ? err.message : "Could not save the rules.");
+    } finally {
+      setSavingRules(false);
+      setTimeout(() => { setRulesMsg(null); setRulesError(null); }, 6000);
+    }
+  };
 
   const TEACHER_KEY = "__TEACHERS__";
 
@@ -146,6 +188,7 @@ export function AttendancePage() {
       title={
         selectedClass ? `Attendance: Class ${selectedClass}` :
         view === "teacher" ? "Teacher Attendance" :
+        view === "rules" ? "Attendance Rules & Alerts" :
         "Attendance Management"
       }
       description="Manage presence for both faculty and students. Admins can mark and update records in real-time."
@@ -180,6 +223,16 @@ export function AttendancePage() {
         >
           <Student size={20} weight="duotone" />
           Student Attendance
+        </button>
+        <button
+          onClick={() => { setView("rules"); setSelectedClass(null); }}
+          className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all ${view === "rules"
+              ? "bg-slate-900 text-white shadow-lg"
+              : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50"
+            }`}
+        >
+          <WarningCircle size={20} weight="duotone" />
+          Rules &amp; Alerts
         </button>
       </div>
 
@@ -426,8 +479,216 @@ export function AttendancePage() {
               </div>
             )
           )}
+          {/* ═══════════════════════════════════════════════════════
+              RULES & ALERTS TAB
+              ═══════════════════════════════════════════════════════ */}
+          {view === "rules" && (
+            <div className="space-y-8">
+              {/* ── Rules ─────────────────────────────────────────── */}
+              <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-7">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-slate-50">
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">Attendance Rules</h3>
+                    <p className="text-xs text-slate-500 font-medium mt-1">
+                      These drive the late mark, the low-attendance list and the absence alerts.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {rulesMsg && <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-xl">{rulesMsg}</span>}
+                    {rulesError && <span className="text-xs font-bold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl">{rulesError}</span>}
+                    {canEditRules && (
+                      <button
+                        onClick={handleSaveRules}
+                        disabled={savingRules || !rulesDraft}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#FF7F50] text-white rounded-2xl font-bold text-sm shadow-lg shadow-[#FF7F50]/25 hover:bg-[#e66a3e] transition-all disabled:opacity-60"
+                      >
+                        {savingRules ? <SpinnerGap size={16} className="animate-spin" /> : <FloppyDisk size={16} weight="bold" />}
+                        {savingRules ? "Saving..." : "Save Rules"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {!canEditRules && (
+                  <p className="mb-5 text-[11px] font-bold text-slate-400 bg-slate-50 px-4 py-2.5 rounded-xl">
+                    Only an admin can change these.
+                  </p>
+                )}
+
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                  {RULE_FIELDS.map((field) => (
+                    <div key={field.key} className="space-y-2">
+                      <label className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                        {field.label}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min={field.min}
+                          max={field.max}
+                          disabled={!canEditRules}
+                          value={rulesDraft?.[field.key] ?? ""}
+                          onChange={(e) => {
+                            const next = Number(e.target.value);
+                            setRulesDraft((prev) => ({ ...(prev ?? {}), [field.key]: next }));
+                          }}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 pr-24 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-[#FF7F50]/10 disabled:cursor-not-allowed disabled:text-slate-500"
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                          {field.suffix}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 font-medium leading-snug">{field.hint}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Needs attention ───────────────────────────────── */}
+              <div>
+                <h3 className="text-lg font-black text-slate-900 tracking-tight mb-1">Needs attention</h3>
+                <p className="text-xs text-slate-500 font-medium mb-5">
+                  Computed live from today&apos;s marks and the rules above.
+                </p>
+
+                <div className="grid gap-5 lg:grid-cols-2">
+                  {/* Late arrivals */}
+                  <AttentionCard
+                    title="Late arrivals today"
+                    icon={<Clock size={18} weight="bold" />}
+                    tone="amber"
+                    count={data.lateArrivals?.length ?? 0}
+                    empty="Nobody arrived late today."
+                  >
+                    {data.lateArrivals?.map((l) => (
+                      <AttentionRow key={`${l.rollNo}-${l.date}`} primary={l.name} secondary={`#${l.rollNo}`} trailing={l.status} />
+                    ))}
+                  </AttentionCard>
+
+                  {/* Pending leaves */}
+                  <AttentionCard
+                    title="Pending leave requests"
+                    icon={<CalendarBlank size={18} weight="bold" />}
+                    tone="blue"
+                    count={data.leaveRequests?.length ?? 0}
+                    empty="No leave requests waiting."
+                  >
+                    {data.leaveRequests?.map((leave) => (
+                      <AttentionRow
+                        key={leave.id}
+                        primary={leave.studentName}
+                        secondary={`Class ${leave.class}-${leave.section} · ${leave.startDate}${leave.endDate && leave.endDate !== leave.startDate ? ` → ${leave.endDate}` : ""}`}
+                        trailing={leave.status}
+                      />
+                    ))}
+                  </AttentionCard>
+
+                  {/* Low attendance */}
+                  <AttentionCard
+                    title={`Below ${data.rules?.minAttendancePercent ?? 75}% attendance`}
+                    icon={<TrendDown size={18} weight="bold" />}
+                    tone="rose"
+                    count={data.lowAttendance?.length ?? 0}
+                    empty="Every pupil is above the threshold."
+                  >
+                    {data.lowAttendance?.map((s) => (
+                      <AttentionRow
+                        key={s.rollNo}
+                        primary={s.name}
+                        secondary={`#${s.rollNo} · longest absence run ${s.longestAbsenceStreak} day${s.longestAbsenceStreak === 1 ? "" : "s"}`}
+                        trailing={`${s.percent}%`}
+                      />
+                    ))}
+                  </AttentionCard>
+
+                  {/* Absence alerts */}
+                  <AttentionCard
+                    title={`Absence alerts (${data.rules?.consecutiveAbsenceAlerts ?? 3}+ days)`}
+                    icon={<BellRinging size={18} weight="bold" />}
+                    tone="purple"
+                    count={data.absenceAlerts?.length ?? 0}
+                    empty="No pupil has hit the alert streak."
+                  >
+                    {data.absenceAlerts?.map((s) => (
+                      <AttentionRow
+                        key={s.rollNo}
+                        primary={s.name}
+                        secondary={`#${s.rollNo} · ${s.percent}% overall`}
+                        trailing={`${s.longestAbsenceStreak} days`}
+                      />
+                    ))}
+                  </AttentionCard>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </PageSection>
+  );
+}
+
+/** A single line inside an AttentionCard. */
+function AttentionRow({ primary, secondary, trailing }: { primary: string; secondary: string; trailing?: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-2.5 border-b border-slate-50 last:border-0">
+      <div className="min-w-0">
+        <p className="text-sm font-bold text-slate-900 truncate">{primary}</p>
+        <p className="text-[11px] text-slate-400 font-medium truncate">{secondary}</p>
+      </div>
+      {trailing && (
+        <span className="shrink-0 text-[10px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg">
+          {trailing}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** One "needs attention" card with an empty state. */
+function AttentionCard({
+  title,
+  icon,
+  tone,
+  count,
+  empty,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  tone: "amber" | "blue" | "rose" | "purple";
+  count: number;
+  empty: string;
+  children: React.ReactNode;
+}) {
+  const tones = {
+    amber: { chip: "bg-amber-50 text-amber-600", badge: "bg-amber-50 text-amber-600" },
+    blue: { chip: "bg-blue-50 text-blue-600", badge: "bg-blue-50 text-blue-600" },
+    rose: { chip: "bg-rose-50 text-rose-600", badge: "bg-rose-50 text-rose-600" },
+    purple: { chip: "bg-purple-50 text-purple-600", badge: "bg-purple-50 text-purple-600" },
+  } as const;
+
+  return (
+    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 flex flex-col">
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2.5">
+          <span className={`h-8 w-8 rounded-xl flex items-center justify-center ${tones[tone].chip}`}>
+            {icon}
+          </span>
+          <h4 className="text-sm font-black text-slate-900 tracking-tight">{title}</h4>
+        </div>
+        <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg ${tones[tone].badge}`}>
+          {count}
+        </span>
+      </div>
+
+      <div className="flex-1">
+        {count === 0 ? (
+          <p className="text-xs text-slate-400 font-medium py-4">{empty}</p>
+        ) : (
+          children
+        )}
+      </div>
+    </div>
   );
 }

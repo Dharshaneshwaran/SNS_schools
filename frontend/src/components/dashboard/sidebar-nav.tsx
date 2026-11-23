@@ -30,6 +30,7 @@ import {
   Command,
   Images,
   BookOpen,
+  Stack,
 } from "@phosphor-icons/react";
 
 interface SidebarCounts {
@@ -43,16 +44,27 @@ interface SidebarCounts {
 export function SidebarNav() {
   const pathname = usePathname();
   const { session, logout } = useAuth();
-  const isAdmin   = session?.user.role === "admin" || session?.user.role === "leader";
+  // Principal and coordinator inherit the management console (they approve
+  // leaves, exams and events for their wing).
+  const isAdmin =
+    session?.user.role === "admin" ||
+    session?.user.role === "leader" ||
+    session?.user.role === "principal" ||
+    session?.user.role === "coordinator";
   const isTeacher = session?.user.role === "teacher";
 
-  const roleLabel = session?.user.role === "admin"
-    ? "Admin"
-    : session?.user.role === "leader"
-    ? "Leader"
-    : session?.user.role === "teacher"
-    ? "Teacher"
-    : "Portal";
+  const roleLabel =
+    session?.user.role === "admin"
+      ? "Admin"
+      : session?.user.role === "leader"
+      ? "Leader"
+      : session?.user.role === "teacher"
+      ? "Teacher"
+      : session?.user.role === "principal"
+      ? "Principal"
+      : session?.user.role === "coordinator"
+      ? "Coordinator"
+      : "Portal";
 
   const [counts, setCounts] = useState<SidebarCounts>({
     notifications: 0,
@@ -87,6 +99,7 @@ export function SidebarNav() {
       title: "MANAGEMENT",
       items: [
         { label: "Users",              href: "/dashboard/users",            icon: <Users              size={16} weight="duotone" /> },
+        { label: "Academic Structure", href: "/dashboard/academics",        icon: <Stack              size={16} weight="duotone" /> },
         { label: "Staff",              href: "/dashboard/staff",            icon: <ChalkboardTeacher  size={16} weight="duotone" /> },
         { label: "Role Assignment",    href: "/dashboard/roles",            icon: <IdentificationCard size={16} weight="duotone" /> },
         { label: "Admission",          href: "/dashboard/admission",        icon: <UserPlus           size={16} weight="duotone" />, count: counts.admission || undefined },

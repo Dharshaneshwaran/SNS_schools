@@ -54,6 +54,43 @@ export type TimetableData = {
   };
 };
 
+export type AttendanceRules = {
+  /** A pupil arriving after this many minutes past roll call is "Late". */
+  lateAfterMinutes: number;
+  /** Pupils below this attendance percentage are flagged as low. */
+  minAttendancePercent: number;
+  /** Consecutive absences that raise an alert for a guardian. */
+  consecutiveAbsenceAlerts: number;
+  /** Day of month the monthly attendance report is generated. */
+  monthlyReportDay: number;
+};
+
+export type LeaveRequest = {
+  id: string;
+  studentName: string;
+  class: string;
+  section: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  appliedBy: string;
+  status: string;
+};
+
+export type LateArrival = {
+  rollNo: string;
+  name: string;
+  status: string;
+  date: string;
+};
+
+export type AttendanceConcern = {
+  rollNo: string;
+  name: string;
+  percent: number;
+  longestAbsenceStreak: number;
+};
+
 export type AttendanceData = {
   summary: {
     present: number;
@@ -66,17 +103,13 @@ export type AttendanceData = {
     absent: number;
     notMarked: number;
   };
-  leaveRequests: {
-    teacher: string;
-    type: string;
-    duration: string;
-    status: string;
-  }[];
-  lateArrivals: {
-    teacher: string;
-    expected: string;
-    actual: string;
-  }[];
+  rules: AttendanceRules;
+  leaveRequests: LeaveRequest[];
+  lateArrivals: LateArrival[];
+  /** Below `rules.minAttendancePercent`. */
+  lowAttendance: AttendanceConcern[];
+  /** Reached `rules.consecutiveAbsenceAlerts` days in a row. */
+  absenceAlerts: AttendanceConcern[];
   teachers: {
     id: string;
     empId: string;

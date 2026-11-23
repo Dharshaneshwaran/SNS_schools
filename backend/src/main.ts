@@ -1,11 +1,18 @@
 import { NestFactory } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { appConfig } from './config/app.config';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Files written by UploadsController live under <cwd>/uploads and are
+  // handed back as /files/<folder>/<name>. Without this mapping every
+  // uploaded avatar, document and gallery image 404s.
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/files' });
   const allowedOrigins = appConfig.frontendOrigin
     .split(',')
     .map((origin) => origin.trim())

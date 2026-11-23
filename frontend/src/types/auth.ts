@@ -1,4 +1,10 @@
-export type UserRole = "admin" | "leader" | "teacher" | "parent";
+export type UserRole =
+  | "admin"
+  | "leader"
+  | "teacher"
+  | "parent"
+  | "principal"
+  | "coordinator";
 
 export type StudentProfile = {
   id?: string;

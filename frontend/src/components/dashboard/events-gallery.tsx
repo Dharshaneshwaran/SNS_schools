@@ -3,8 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ShareNetwork, Globe, Bell, Megaphone, Plus, ArrowClockwise } from "@phosphor-icons/react";
+import { ShareNetwork, Globe, Bell, Megaphone, Plus, ArrowClockwise, ImageSquare, Trash, UploadSimple, SpinnerGap } from "@phosphor-icons/react";
 import { getAnnouncements, type Announcement } from "../../services/announcements-service";
+import {
+  listGallery,
+  createGalleryImage,
+  deleteGalleryImage,
+  uploadGalleryFile,
+  type SchoolImage,
+} from "../../services/gallery-service";
 import { useAuth } from "../../hooks/use-auth";
 
 function timeAgo(iso: string) {
@@ -30,7 +37,11 @@ const FILTERS = ["All", "Parents"];
 export function EventsGallery() {
   const router = useRouter();
   const { session } = useAuth();
-  const isAdmin = session?.user.role === "admin" || session?.user.role === "leader";
+  const isAdmin =
+    session?.user.role === "admin" ||
+    session?.user.role === "leader" ||
+    session?.user.role === "principal" ||
+    session?.user.role === "coordinator";
 
   const [posts, setPosts] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +63,60 @@ export function EventsGallery() {
 
   useEffect(() => { fetchPosts(); }, []);
 
+  // ─── Photos tab ──────────────────────────────────────────────────
+  const [tab, setTab] = useState<"notices" | "photos">("notices");
+  const [images, setImages] = useState<SchoolImage[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(false);
+  const [imagesError, setImagesError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
+  const fetchImages = async () => {
+    setImagesLoading(true);
+    setImagesError(null);
+    try {
+      setImages(await listGallery());
+    } catch {
+      setImagesError("Failed to load photos.");
+    } finally {
+      setImagesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === "photos" && images.length === 0 && !imagesLoading && !imagesError) {
+      void fetchImages();
+    }
+    // Only on entering the tab, so returning to it does not re-download.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  const handleUpload = async (file: File | undefined) => {
+    if (!file) return;
+    setIsUploading(true);
+    setPhotoError(null);
+    try {
+      const path = await uploadGalleryFile(file);
+      await createGalleryImage(path, file.name.replace(/\.[^.]+$/, ""));
+      await fetchImages();
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteImage = async (image: SchoolImage) => {
+    if (!confirm("Remove this photo from the gallery?")) return;
+    setPhotoError(null);
+    try {
+      await deleteGalleryImage(image.id);
+      setImages((prev) => prev.filter((i) => i.id !== image.id));
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "Could not remove the photo.");
+    }
+  };
+
   const filtered = filter === "All"
     ? posts
     : posts.filter((p) => {
@@ -65,17 +130,21 @@ export function EventsGallery() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-black text-slate-900 tracking-tight">Event Gallery</h2>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">{posts.length} announcements</p>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">
+            {tab === "notices"
+              ? `${posts.length} announcement${posts.length === 1 ? "" : "s"}`
+              : `${images.length} photo${images.length === 1 ? "" : "s"}`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={fetchPosts}
+            onClick={() => (tab === "notices" ? fetchPosts() : fetchImages())}
             className="p-2 rounded-xl border border-slate-100 text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-all"
             title="Refresh"
           >
             <ArrowClockwise size={16} />
           </button>
-          {isAdmin && (
+          {isAdmin && tab === "notices" && (
             <button
               onClick={() => router.push("/dashboard/notice-post")}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FF7F50] text-white text-xs font-bold shadow-sm shadow-[#FF7F50]/30 hover:bg-[#e66a3e] transition-all active:scale-95"
@@ -84,10 +153,51 @@ export function EventsGallery() {
               New Post
             </button>
           )}
+          {isAdmin && tab === "photos" && (
+            <label className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FF7F50] text-white text-xs font-bold shadow-sm shadow-[#FF7F50]/30 hover:bg-[#e66a3e] transition-all active:scale-95 cursor-pointer disabled:opacity-60">
+              {isUploading ? <SpinnerGap size={13} className="animate-spin" /> : <UploadSimple size={13} weight="bold" />}
+              {isUploading ? "Uploading..." : "Upload Photo"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={isUploading}
+                onChange={(e) => {
+                  void handleUpload(e.target.files?.[0]);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          )}
         </div>
       </div>
 
+      {/* Tab switcher */}
+      <div className="flex gap-2 mb-6 p-1 bg-slate-50 rounded-2xl border border-slate-100 w-fit">
+        {([
+          { key: "notices", label: "Notices", icon: <Megaphone size={14} weight="bold" />, count: posts.length },
+          { key: "photos", label: "Photos", icon: <ImageSquare size={14} weight="bold" />, count: images.length },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+              tab === t.key
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-400 hover:text-slate-600"
+            }`}
+          >
+            {t.icon}
+            {t.label}
+            <span className={`text-[10px] ${tab === t.key ? "text-[#FF7F50]" : "text-slate-300"}`}>
+              {t.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
       {/* Filters */}
+      {tab === "notices" && (
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1 hide-scrollbar">
         {FILTERS.map((f) => (
           <button
@@ -103,7 +213,10 @@ export function EventsGallery() {
           </button>
         ))}
       </div>
+      )}
 
+      {tab === "notices" && (
+      <>
       {/* States */}
       {loading && (
         <div className="flex flex-col gap-4">
@@ -231,6 +344,83 @@ export function EventsGallery() {
               </motion.div>
             );
           })}
+        </div>
+      )}
+      </>
+      )}
+
+      {/* ═══════════════ PHOTOS TAB ═══════════════ */}
+      {tab === "photos" && (
+        <div>
+          {photoError && (
+            <p className="mb-4 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 px-4 py-3 rounded-xl">
+              {photoError}
+            </p>
+          )}
+
+          {imagesLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="aspect-[4/3] rounded-3xl bg-slate-100 animate-pulse" />
+              ))}
+            </div>
+          ) : imagesError ? (
+            <div className="text-center py-16">
+              <p className="text-slate-500 text-sm font-medium mb-3">{imagesError}</p>
+              <button onClick={fetchImages} className="text-[#FF7F50] text-sm font-bold hover:underline">
+                Retry
+              </button>
+            </div>
+          ) : images.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-4">
+                <ImageSquare size={28} className="text-slate-300" />
+              </div>
+              <p className="text-slate-500 font-medium text-sm">No photos yet</p>
+              {isAdmin ? (
+                <p className="text-slate-400 text-xs mt-2">
+                  Use <span className="font-bold text-[#FF7F50]">Upload Photo</span> above to start the album.
+                </p>
+              ) : (
+                <p className="text-slate-400 text-xs mt-2">Photos will appear here once leadership adds them.</p>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {images.map((image, idx) => (
+                <motion.figure
+                  key={image.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(idx * 0.04, 0.4) }}
+                  className="group relative overflow-hidden rounded-3xl border border-slate-100 bg-white"
+                >
+                  <div className="aspect-[4/3] bg-slate-50">
+                    <img
+                      src={image.url}
+                      alt={image.caption || "School photo"}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <figcaption className="flex items-center justify-between gap-2 px-4 py-3">
+                    <span className="text-[11px] font-bold text-slate-500 truncate">
+                      {image.caption || "Untitled"}
+                    </span>
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDeleteImage(image)}
+                        title="Remove photo"
+                        className="shrink-0 p-1.5 rounded-lg text-slate-300 opacity-0 group-hover:opacity-100 hover:text-rose-500 hover:bg-rose-50 transition-all"
+                      >
+                        <Trash size={14} weight="bold" />
+                      </button>
+                    )}
+                  </figcaption>
+                </motion.figure>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -43,6 +43,7 @@ export function StaffPage() {
     dateOfBirth: "",
     weddingDate: "",
     role: "teacher",
+    designation: "Faculty",
     permissions: ["view_attendance", "view_reports"]
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -58,7 +59,7 @@ export function StaffPage() {
         email: formData.email,
         department: formData.department,
         employeeId: formData.employeeId || `STAFF-${Math.floor(Math.random() * 10000)}`,
-        designation: "Faculty",
+        designation: formData.designation || "Faculty",
         specialization: formData.department,
         password: formData.password,
         dateOfBirth: formData.dateOfBirth,
@@ -199,6 +200,22 @@ export function StaffPage() {
                         <option value="admin">Administration</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Designation</label>
+                    <select
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 outline-none focus:border-[#FF7F50] transition-colors appearance-none"
+                      value={formData.designation}
+                      onChange={(e) => setFormData({...formData, designation: e.target.value})}
+                    >
+                      <option value="Faculty">Faculty</option>
+                      <option value="Principal">Principal</option>
+                      <option value="Coordinator">Coordinator</option>
+                      <option value="Head of Department">Head of Department</option>
+                      <option value="Office Assistant">Office Assistant</option>
+                      <option value="Support Staff">Support Staff</option>
+                    </select>
                   </div>
 
                   <div className="flex justify-end pt-4">
@@ -375,7 +392,7 @@ export function StaffPage() {
                   
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button 
-                      onClick={() => { setStep(1); setFormData({fullName: "", email: "", phone: "", department: "", employeeId: "", password: "", dateOfBirth: "", weddingDate: "", role: "teacher", permissions: ["view_attendance", "view_reports"]}); }}
+                      onClick={() => { setStep(1); setFormData({fullName: "", email: "", phone: "", department: "", employeeId: "", password: "", dateOfBirth: "", weddingDate: "", role: "teacher", designation: "Faculty", permissions: ["view_attendance", "view_reports"]}); }}
                       className="px-8 py-4 bg-[#FF7F50] text-white rounded-2xl font-bold shadow-lg shadow-[#FF7F50]/30 hover:bg-[#e66a3e] transition-all"
                     >
                       Add Another Member

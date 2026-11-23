@@ -24,7 +24,13 @@ export default function DashboardPage() {
     }
   }, [session, router]);
 
-  if (session?.user.role === "admin" || session?.user.role === "leader") {
+  const isManagementRole =
+    session?.user.role === "admin" ||
+    session?.user.role === "leader" ||
+    session?.user.role === "principal" ||
+    session?.user.role === "coordinator";
+
+  if (isManagementRole) {
     if (theme === "modern") return <ModernDashboard />;
     return <AdminDashboard />;
   }

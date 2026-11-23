@@ -55,3 +55,92 @@ export async function bulkSaveResults(data: {
 }): Promise<{ saved: number }> {
   return apiRequest('/exams/results/bulk', { method: 'POST', body: JSON.stringify(data) });
 }
+
+// ─── Report cards ─────────────────────────────────────────────────────
+
+export interface GradingBand {
+  minMark: number;
+  maxMark: number;
+  grade: string;
+  remark: string;
+}
+
+export interface GradingScale {
+  name: string;
+  passMark: number;
+  bands: GradingBand[];
+}
+
+export interface SchoolInfo {
+  name: string;
+  academicYear: string;
+  mediumOfInstruction: string;
+  board: string;
+  contactPhone: string;
+  address: string;
+}
+
+export interface ReportCardSubject {
+  subject: string;
+  internal: number;
+  exam: number;
+  total: number;
+  maxMark: number;
+  grade: string;
+  remark: string;
+  passed: boolean;
+}
+
+export interface ReportCard {
+  student: {
+    profileId: string;
+    userId: string;
+    rollNo: string;
+    name: string;
+    class: string;
+    section: string;
+    admissionNo: string;
+    gender: string;
+    dob: string;
+  };
+  term: string;
+  subjects: ReportCardSubject[];
+  summary: {
+    totalObtained: number;
+    totalMax: number;
+    percentage: number;
+    overallGrade: string;
+    overallRemark: string;
+    passed: boolean;
+    subjectsAttempted: number;
+    subjectsFailed: string[];
+  };
+  gradingScale: GradingScale;
+  school: SchoolInfo;
+}
+
+export interface ReportCardsResponse {
+  term: string;
+  academicYear: string;
+  class: string;
+  section: string;
+  generatedAt: string;
+  gradingScale: GradingScale | null;
+  school: SchoolInfo;
+  summary: { total: number; withResults: number; passed: number; failed: number };
+  students: ReportCard[];
+}
+
+/** Terms that actually have marks recorded, newest first. */
+export function getTerms(): Promise<{ term: string; academicYear: string }[]> {
+  return apiRequest('/exams/terms');
+}
+
+export function getReportCards(
+  cls: string,
+  section: string,
+  term: string,
+): Promise<ReportCardsResponse> {
+  const query = new URLSearchParams({ class: cls, section, term });
+  return apiRequest<ReportCardsResponse>(`/exams/report-cards?${query}`);
+}

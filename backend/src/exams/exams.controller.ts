@@ -31,6 +31,40 @@ export class ExamsController {
     return this.examsService.getStudentResults(studentId);
   }
 
+  // ─── Report cards ─────────────────────────────────────────────────────
+
+  /** Terms that actually have marks - drives the term dropdowns. */
+  @Get('terms')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin', 'leader', 'teacher')
+  listTerms() {
+    return this.examsService.listTerms();
+  }
+
+  /**
+   * Whole-class report cards. Returns every pupil's marks already graded
+   * against the configured CBSE scale, ready to render or export.
+   */
+  @Get('report-cards')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin', 'leader', 'teacher')
+  getReportCards(
+    @Query('class') cls?: string,
+    @Query('section') section?: string,
+    @Query('term') term?: string,
+    @Query('academicYear') academicYear?: string,
+  ) {
+    return this.examsService.getReportCards({ class: cls, section, term, academicYear });
+  }
+
+  /** One student's report card for a term. */
+  @Get('report-card/:studentId')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin', 'leader', 'teacher')
+  getReportCard(@Param('studentId') studentId: string, @Query('term') term?: string) {
+    return this.examsService.getReportCard(studentId, term ?? '');
+  }
+
   @Get('schedule')
   async getSchedule(
     @Query('class') cls: string,
